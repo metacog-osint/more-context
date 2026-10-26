@@ -1,0 +1,18 @@
+# Data pulled from GDELT and run outputs (large, regenerable)
+data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Web build output
+node_modules/
+dist/
+.vercel/
+
+# Secrets and per-user settings
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
