@@ -40,9 +40,28 @@ Serves warning (did something change?) and awareness (what is the picture, how i
     one RSS poll; writes `cycles/YYYY/MM/DD/HHMMSS.jsonl` + `state/state.json`. `sinks.py`: local folder or GCS.
 - `main.py`, `requirements.txt`, `.gcloudignore` - Cloud Run function wrapper (`mc-ingest`).
   `scripts/deploy_ingest.sh` creates bucket, service accounts, private function, one Scheduler job.
-  Not deployed until Tom approves. Local dry run: `python -I run.py cycle`.
+  Local dry run: `python -I run.py cycle`. Redeploy after code changes with the `gcloud functions deploy`
+  line from that script (needs Tom's yes, like any deploy).
+
+## Cloud (deployed 26 Oct 2026, approved by Tom)
+- Function `mc-ingest` (Cloud Run functions gen2, us-central1, python312, 512 MiB, 300 s, max 1 instance),
+  runs as `mc-ingest@context-484804.iam.gserviceaccount.com`. Private: anonymous calls get 403; only
+  `mc-scheduler@` holds `roles/run.invoker`.
+- Scheduler job `mc-ingest-15min`, `5,20,35,50 * * * *` UTC, OIDC token, 320 s deadline. It is not a v4.3
+  duplicate; v4.3's own job is `trigger-context-update`.
+- Bucket `gs://more-context-484804` (us-central1, uniform access, public access prevented):
+  `cycles/YYYY/MM/DD/HHMMSS.jsonl` (rows kind=gdelt|rss) and `state/state.json` (GDELT progress and
+  retry lists, feed health, last run summary). Read it with `gcloud storage cat gs://more-context-484804/state/state.json`.
+- First cloud run 26 Oct 17:10 UTC: 46 s for a 2-hour catch-up, 4,001 rows. From Google Cloud,
+  france24_en, rfi_afrique and timesofisrael answer HTTP 403 (they block cloud addresses; fine from a home
+  connection) and reliefweb returned an empty body. GDELT still carries all four by domain.
 - `tests/` - `python -m unittest discover -s tests -t .` (CI runs this on every push).
 - `data/` - downloads and reports, git-ignored.
 
 ## Build status
-Phase 0 (foundation) and Phase 1 (ingest + stories) in progress as of 26 Oct 2026.
+- Phase 0 done. Phase 1: GDELT + RSS ingest running in the cloud every 15 minutes since 26 Oct 2026;
+  gate = 7 days of stored data (about 2 Nov) and reprint inflation measured (done: 1.25x overall).
+- First finding: only ~32% of English articles v4.3's rules assign to a zone name that zone in the headline,
+  so Phase 2 starts with a relevance check (embeddings + model) before coding.
+- Waiting on Tom: indicator charters for four zones (suggested Ukraine, Israel-Gaza-Lebanon, Iran & Red Sea,
+  India-Pakistan), decisions on the source list (plan doc, "Source list (draft)" tab), Vertex budget for Phase 2.

@@ -8,6 +8,7 @@ from __future__ import annotations
 import html
 import io
 import re
+import time
 import urllib.error
 import urllib.request
 import zipfile
@@ -76,9 +77,15 @@ def file_url(stamp: str, stream: str) -> str:
 
 
 def download(stamp: str, stream: str) -> bytes | None:
-    """The zipped file's bytes, or None when GDELT has no file for that slot (it happens)."""
+    """The zipped file's bytes, or None when GDELT has no file for that slot (yet).
+
+    GDELT serves files through Google's CDN, which caches "not found" for an hour
+    (cache-control: public, max-age=3600). Its index can list a file before upload, so an early request
+    would pin a stale 404 at the edge. A query string that changes every minute gives each retry a fresh
+    cache key; the storage origin ignores it.
+    """
     try:
-        return fetch(file_url(stamp, stream))
+        return fetch(f"{file_url(stamp, stream)}?mc={int(time.time() // 60)}")
     except urllib.error.HTTPError as e:
         if e.code == 404:
             return None

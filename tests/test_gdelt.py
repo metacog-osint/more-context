@@ -59,6 +59,18 @@ class ParseRowTests(unittest.TestCase):
         self.assertEqual(a.domain, "hna.de")
 
 
+class DownloadTests(unittest.TestCase):
+    def test_download_bypasses_cached_404(self):
+        seen = []
+        original = gdelt.fetch
+        gdelt.fetch = lambda url, timeout=90: seen.append(url) or b"zip"
+        try:
+            self.assertEqual(gdelt.download("20261026171500", "english"), b"zip")
+        finally:
+            gdelt.fetch = original
+        self.assertTrue(seen[0].startswith(gdelt.BASE + "20261026171500.gkg.csv.zip?mc="))
+
+
 class WindowTests(unittest.TestCase):
     def test_window_stamps(self):
         s = gdelt.window_stamps("20261026003000", 1)
