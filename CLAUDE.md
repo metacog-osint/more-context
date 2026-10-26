@@ -60,6 +60,26 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   Local dry run: `python -I run.py cycle`. Redeploy after code changes with the `gcloud functions deploy`
   line from that script (needs Tom's yes, like any deploy).
 
+## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
+Most stories are never read by a person, so model work waits for a reason to spend:
+- **Always on, $0:** ingest, stories, headline-term filter, counts, attention z, casualty share.
+- **Alarm:** the daily build flags an entity-day when attention z >= 2 or casualty-share z >= 2 (and >= 5
+  stories); the 15-minute cycle codes up to 2 flagged entity-days per run (`state.ai.pending`). A spending
+  trigger only; Watch / Warning / Crisis come from the charters.
+- **On view:** `POST /code` on the public API (`pipeline/api.py`, function `mc-api`) codes one entity-day's
+  top 25 uncached stories. Anyone may call it (Tom's choice); `GET /zone` and `GET /status` never spend.
+- **Cache:** `codings/YYYY/MM/DD/<entity>.jsonl`; a story is never coded twice.
+- **Ledger:** `state/ai_spend.json` (`pipeline/budget.py`), compare-and-swap on the GCS generation. Hard cap
+  $5 per UTC month; on-view work at most $0.50 per day and never the last $1 (kept for alarms). Every call
+  reserves estimate x 1.5 first and settles to the cost from Vertex's token counts.
+- **Switch:** Vertex calls from the cloud happen only with env `MC_AI=on`. Deployed with `scripts/deploy_ai.sh`
+  on 26 Oct 2026 22:11-22:14 UTC (approved by Tom): mc-ingest@ holds roles/aiplatform.user; mc-ingest revision
+  mc-ingest-00005-muw and mc-api revision mc-api-00001-zoy both run with MC_AI=on. Kill switch: redeploy with MC_AI=off.
+- **Public API:** https://mc-api-odg3xhcd4a-uc.a.run.app (`/status`, `/zone?entity=&day=`, `POST /code`), open to
+  anyone, max 1 instance, concurrency 1. First call, 26 Oct 22:14 UTC: 13_Sudan / 2026-10-26, 25 stories coded for
+  $0.0049 (22 on-topic); a repeat call was served from the cache for $0.
+- The ledger counts list prices; Google's bill is the final word. A Cloud Billing budget alert is the backstop.
+
 ## Cloud (deployed 26 Oct 2026, approved by Tom)
 - Function `mc-ingest` (Cloud Run functions gen2, us-central1, python312, 512 MiB, 300 s, max 1 instance),
   runs as `mc-ingest@context-484804.iam.gserviceaccount.com`. Private: anonymous calls get 403; only
@@ -80,11 +100,18 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   gate = 7 days of stored data (about 2 Nov) and reprint inflation measured (done: 1.25x overall).
 - First finding: only ~32% of English articles v4.3's rules assign to a zone name that zone in the headline,
   so Phase 2 starts with a relevance check (embeddings + model) before coding.
-- Phase 2 started 26 Oct 2026 (no spend yet). Relevance v1 (Claude-drafted labels): v4.3's rules are on-topic
+- Phase 2 started 26 Oct 2026. Relevance v1 (Claude-drafted labels): v4.3's rules are on-topic
   for ~42% of matched stories (90% range 30-53%); a free headline-term filter reaches ~82% while keeping ~78%
   of on-topic stories (likely flattered: same reviewer wrote terms and labels). Coding all 278 test stories with
   gemini-3.1-flash-lite: est. $0.07; coding every v4.3 match daily: est. ~$219/month, so code only filtered or top stories.
-- Casualty flags (`killed`/`wounded` on GDELT rows, per-story tallies) and the two measures are in the code but
-  NOT deployed: `mc-ingest` still runs the 26 Oct build until Tom approves a redeploy. Old rows simply lack the fields.
+- First Vertex run (approved by Tom, cap $0.25), 26 Oct 21:00 UTC: 278 stories, 19 requests, $0.0595 billed
+  (56,135 in / 30,314 out / 0 thinking tokens). Gemini's relevance call: 94% on-topic (86-100%), ~100% retention,
+  agrees with Claude's labels on 243/253. It rarely says unclear and rates nearly everything high confidence.
+  Prompt fixed in code-v0.2 (topics overlap zones; confidence rule), not yet re-run. Score a codings file with
+  `python -I run.py eval-relevance --codings data/coding/relevance_v1.codings.jsonl`. Estimator recalibrated:
+  ~$188/month for every v4.3 match, ~$12/month ($6 batch) for the top 100 stories per entity per day.
+- Casualty flags (`killed`/`wounded` on GDELT rows, per-story tallies) and the two measures deployed 26 Oct 2026
+  20:57 UTC (revision mc-ingest-00004-yuq, approved by Tom). Rows before that lack the fields; measures count
+  only rows that have them. Attention z needs 14 complete days, so it first appears around 10 Nov.
 - Waiting on Tom: indicator charters for four zones (suggested Ukraine, Israel-Gaza-Lebanon, Iran & Red Sea,
   India-Pakistan), decisions on the source list (plan doc, "Source list (draft)" tab), Vertex budget for Phase 2.

@@ -27,7 +27,7 @@ PROJECT = "context-484804"
 DEFAULT_MODEL = "gemini-3.1-flash-lite"
 ENDPOINT = ("https://aiplatform.googleapis.com/v1/projects/{project}/locations/global/"
             "publishers/google/models/{model}:generateContent")
-OUTPUT_TOKENS_PER_STORY = 140  # planning figure for one coding; calibrate on the first approved sample
+OUTPUT_TOKENS_PER_STORY = 110  # measured: 30,314 output tokens for 278 codings, 26 Oct 2026 (gemini-3.1-flash-lite)
 
 
 class SpendNotApproved(RuntimeError):
@@ -40,7 +40,8 @@ def load_prices(path: Path = PRICES) -> dict:
 
 def estimate_tokens(text: str) -> int:
     """Rough token count with no API call: ~4 ASCII chars per token, ~1 per CJK/Hangul/Kana char,
-    ~2.5 per other non-ASCII char, plus 10%. Expect +-30%; Vertex's countTokens (free) can calibrate it."""
+    ~2.5 per other non-ASCII char, scaled by 1.3. The scale is calibrated on the 26 Oct 2026 sample (Vertex
+    counted 56,135 input tokens where the unscaled rule gave 43,300); expect +-20% on other mixes."""
     n = 0.0
     for ch in text:
         if ord(ch) < 128:
@@ -48,7 +49,7 @@ def estimate_tokens(text: str) -> int:
         else:
             name = unicodedata.name(ch, "")
             n += 1.0 if name.startswith(("CJK", "HANGUL", "HIRAGANA", "KATAKANA")) else 0.4
-    return int(n * 1.1) + 1
+    return int(n * 1.3) + 1
 
 
 def cost(tokens_in: float, tokens_out: float, model: str = DEFAULT_MODEL, batch: bool = False,

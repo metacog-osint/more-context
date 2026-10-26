@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import json
 
-SCHEMA_VERSION = "code-v0.1"
+SCHEMA_VERSION = "code-v0.2"  # v0.2: topic/zone overlap and confidence rules after the 26 Oct sample
 
 QUADS = {
     "verbal_cooperation": ["AGREE", "CONSULT", "SUPPORT", "CONCEDE"],
@@ -99,8 +99,11 @@ Rules:
 - relevance: "on" if the story is about the zone's conflict, security or political-military situation (for a
   topic: about that strategic theme, not a company's routine business); "off" if the place or term is incidental
   or the subject is something else (domestic politics elsewhere, business, sport, entertainment, crime, weather,
-  history); "unclear" if the headline cannot settle it. If the story is about another listed entity, give its id
-  in belongs_to.
+  history); "unclear" if the headline cannot settle it, such as when it omits the place or the link to the
+  conflict.
+- belongs_to: when the story is really about another listed zone or topic instead, give that id and mark
+  relevance "off". Topics overlap zones by design: UK sanctions on Sudanese commanders are "on" for a sanctions
+  topic, with belongs_to null. A story about a neighbouring zone's conflict is "off" here.
 - event_type: the main event the headline reports, one of:
 {events}
   Use NONE when the headline reports no event. Code off-topic stories too, briefly.
@@ -111,7 +114,8 @@ Rules:
   headline credits for the figure, else null.
 - indicator_ids: only ids from the indicator list below that the headline clearly reports; [] if none or no list.
 - frame: how the headline presents the event.
-- confidence: your confidence in this coding, given only a headline: low, moderate or high.
+- confidence: high only when the headline names both the actors and the event; moderate when one of them is
+  implied; low when the coding rests on inference.
 - gist: the headline's claim in plain English, 25 words or fewer, neutral wording.
 - Return every story, in the order given, with its story_id unchanged."""
 

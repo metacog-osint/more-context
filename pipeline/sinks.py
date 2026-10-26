@@ -5,6 +5,7 @@ run keeps Cloud Storage operations near its free allowance.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -43,6 +44,24 @@ class LocalSink:
         p = self.root / key
         return [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
 
+    def exists(self, key: str) -> bool:
+        return (self.root / key).exists()
+
+    def _version(self, key: str) -> str | int:
+        p = self.root / key
+        return hashlib.sha1(p.read_bytes()).hexdigest() if p.exists() else 0
+
+    def read_json_versioned(self, key: str) -> tuple[dict | None, str | int]:
+        """(object or None, version); version 0 means the object does not exist."""
+        return self.read_json(key), self._version(key)
+
+    def write_json_if(self, key: str, obj: dict, version: str | int) -> bool:
+        """Write only if the object is still at `version` (single-process check; GCS does it atomically)."""
+        if self._version(key) != version:
+            return False
+        self.write_json(key, obj)
+        return True
+
 
 class GCSSink:
     def __init__(self, bucket: str):
@@ -67,3 +86,24 @@ class GCSSink:
     def read_lines(self, key: str) -> list[dict]:
         text = self.bucket.blob(key).download_as_text()
         return [json.loads(line) for line in text.splitlines() if line.strip()]
+
+    def exists(self, key: str) -> bool:
+        return self.bucket.blob(key).exists()
+
+    def read_json_versioned(self, key: str) -> tuple[dict | None, int]:
+        """(object or None, generation); generation 0 means the object does not exist."""
+        blob = self.bucket.get_blob(key)
+        if blob is None:
+            return None, 0
+        return json.loads(blob.download_as_text()), blob.generation
+
+    def write_json_if(self, key: str, obj: dict, version: int) -> bool:
+        """Atomic compare-and-swap: Cloud Storage refuses the write if the generation moved on."""
+        from google.api_core.exceptions import PreconditionFailed
+
+        try:
+            self.bucket.blob(key).upload_from_string(json.dumps(obj, ensure_ascii=False),
+                                                     content_type="application/json", if_generation_match=version)
+            return True
+        except PreconditionFailed:
+            return False

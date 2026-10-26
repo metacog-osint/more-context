@@ -156,18 +156,45 @@ def bootstrap(rows: list[dict], w: list[float], keep: list[bool], iters: int = 2
     return dict(out)
 
 
-def methods(matcher: TermMatcher | None = None) -> dict[str, Callable[[dict], bool]]:
-    """The free baselines. Model-based methods are added in Phase 2 once Vertex calls are approved."""
+def load_codings(path: str | Path) -> dict[str, dict]:
+    """Model codings (code-stories output), keyed like set rows: '<entity>:<story_id>'."""
+    out = {}
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            c = json.loads(line)
+            out[f"{c['entity']}:{c['story_id']}"] = c
+    return out
+
+
+def methods(matcher: TermMatcher | None = None, codings: dict[str, dict] | None = None) -> dict[str, Callable[[dict], bool]]:
+    """The free baselines, plus the model's relevance call when a codings file is given."""
     m = matcher or TermMatcher()
-    return {
+    out = {
         "v43_rules": lambda r: True,
         "title_terms": lambda r: m.hit(r["entity"], r["title"]),
         "title_or_url_terms": lambda r: m.hit(r["entity"], r["title"]) or m.hit(r["entity"], title_from_url(r["url"])),
     }
+    if codings:
+        def rel(r):
+            return (codings.get(r["id"]) or {}).get("relevance")
+        out["gemini_on"] = lambda r: rel(r) == "on"
+        out["gemini_on_or_unclear"] = lambda r: rel(r) in ("on", "unclear")
+        out["terms_or_gemini"] = lambda r: rel(r) == "on" or m.hit(r["entity"], r["title"])
+    return out
 
 
-def evaluate(path: str | Path, iters: int = 2000) -> dict:
+def agreement(rows: list[dict], codings: dict[str, dict]) -> dict:
+    """Unweighted label-vs-model counts, e.g. {'on>off': 5}; 'missing' for stories the model did not code."""
+    out: dict[str, int] = defaultdict(int)
+    for r in rows:
+        c = codings.get(r["id"])
+        out[f"{r['label']}>{c['relevance'] if c else 'missing'}"] += 1
+    return dict(sorted(out.items()))
+
+
+def evaluate(path: str | Path, iters: int = 2000, codings_path: str | Path | None = None) -> dict:
     rows, pop = load_set(path)
+    codings = load_codings(codings_path) if codings_path else None
     unlabelled = [r["id"] for r in rows if r.get("label") not in ("on", "off", "unclear")]
     if unlabelled:
         raise ValueError(f"{len(unlabelled)} stories without a label, e.g. {unlabelled[0]}")
@@ -175,7 +202,10 @@ def evaluate(path: str | Path, iters: int = 2000) -> dict:
     report = {"set": Path(path).name, "population": pop["source"], "labels": {}, "methods": {}}
     for lab in ("on", "off", "unclear"):
         report["labels"][lab] = sum(1 for r in rows if r["label"] == lab)
-    for name, fn in methods().items():
+    if codings:
+        report["codings"] = Path(codings_path).name
+        report["agreement"] = agreement(rows, codings)
+    for name, fn in methods(codings=codings).items():
         keep = [fn(r) for r in rows]
         res = score(rows, w, keep)
         res["interval_90"] = bootstrap(rows, w, keep, iters) if iters else {}

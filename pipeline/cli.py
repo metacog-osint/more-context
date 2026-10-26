@@ -80,7 +80,7 @@ def cmd_build_stories(args) -> int:
 def cmd_eval_relevance(args) -> int:
     from . import relevance
 
-    rep = relevance.evaluate(args.set, iters=args.iters)
+    rep = relevance.evaluate(args.set, iters=args.iters, codings_path=args.codings)
     names = list(rep["methods"])
     lab = rep["labels"]
     print(f"{rep['set']}: {sum(lab.values())} stories (on {lab['on']}, off {lab['off']}, unclear {lab['unclear']}); "
@@ -108,6 +108,8 @@ def cmd_eval_relevance(args) -> int:
             cells.append(f"{pct(e['precision']).strip():>9} / {pct(e['retention']).strip():<7}")
         first = rep["methods"][names[0]]["entities"][eid]
         print(f"{eid:<28}{first['n']:>4}{pct(first['unclear_share']):>9}" + "".join(f"{c:>20}" for c in cells))
+    if rep.get("agreement"):
+        print("\nlabel > model (unweighted): " + ", ".join(f"{k} {v}" for k, v in rep["agreement"].items()))
     if args.out:
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)
         Path(args.out).write_text(json.dumps(rep, indent=1), encoding="utf-8")
@@ -371,6 +373,7 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--set", default=str(DATA.parent / "catalog" / "eval" / "relevance_v1.jsonl"))
     e.add_argument("--iters", type=int, default=2000, help="bootstrap resamples (0 to skip intervals)")
     e.add_argument("--out", help="also write the full report as JSON")
+    e.add_argument("--codings", help="model codings from code-stories, scored as extra methods")
     e.set_defaults(func=cmd_eval_relevance)
     default_set = str(DATA.parent / "catalog" / "eval" / "relevance_v1.jsonl")
     v = sub.add_parser("vertex-estimate", help="dry-run token and cost estimate for coding stories (no calls)")
