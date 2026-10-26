@@ -20,6 +20,11 @@ from statistics import mean, pstdev
 BASELINE_DAYS = 28
 MIN_BASELINE_DAYS = 14
 SD_FLOOR = 0.15  # log units; stops a very steady baseline from turning small changes into huge z
+SHARE_SD_FLOOR = 0.02  # for shares (0-1)
+# Alarm = a free signal that buys model coding for that entity-day (pipeline/ondemand.py). It is a spending
+# trigger, not a warning level; Watch / Warning / Crisis come from the charters.
+ALARM_Z = 2.0
+ALARM_MIN_STORIES = 5
 
 
 def attention_anomaly(history: dict[date, float], day: date, count: float,
@@ -81,6 +86,31 @@ def casualty_share(articles: list[dict], stories: list[dict] | None = None) -> d
         out["by_group"][g] = {"articles": len(rows), "killed_share": share(rows, "killed")}
     if stories is not None and len(known) == len(articles) and stories:
         out["stories_with_killed_share"] = round(sum(1 for s in stories if s.get("killed_articles")) / len(stories), 3)
+    return out
+
+
+def share_anomaly(history: dict[date, float], day: date, value: float,
+                  baseline_days: int = BASELINE_DAYS, min_days: int = MIN_BASELINE_DAYS) -> dict | None:
+    """z of a share (e.g. casualty-reporting share) against the previous `baseline_days` days."""
+    start = day - timedelta(days=baseline_days)
+    base = [v for d, v in history.items() if start <= d < day and v is not None]
+    if len(base) < min_days:
+        return None
+    mu, sd = mean(base), max(pstdev(base), SHARE_SD_FLOOR)
+    return {"z": round((value - mu) / sd, 2), "baseline": round(mu, 3), "baseline_days": len(base)}
+
+
+def alarm_reasons(entity: dict) -> list[str]:
+    """Why an entity-day should be coded by the model, from its free measures; [] when it should not."""
+    if entity.get("stories", 0) < ALARM_MIN_STORIES:
+        return []
+    out = []
+    att = entity.get("attention")
+    if att and att["z"] >= ALARM_Z:
+        out.append(f"attention z {att['z']}")
+    cas = (entity.get("casualty") or {}).get("anomaly")
+    if cas and cas["z"] >= ALARM_Z:
+        out.append(f"casualty share z {cas['z']}")
     return out
 
 

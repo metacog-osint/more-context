@@ -9,7 +9,8 @@ from __future__ import annotations
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 
-from . import daily, feeds, gdelt, health
+from . import daily, feeds, gdelt, health, ondemand
+from .budget import BudgetExceeded
 from .match import Matcher
 from .sources import lookup_domain
 
@@ -19,6 +20,8 @@ MAX_FILES_PER_STREAM = 8  # catch up at most two hours in one run
 # 26 Oct 2026). A not-found file younger than this is "not published yet": stop and retry next run.
 NOT_YET_PUBLISHED = timedelta(hours=3)
 STATE_KEY = "state/state.json"
+MAX_ALARMS_PER_RUN = 2  # each is one Vertex request (~10 s); the rest wait for the next run
+MAX_PENDING_ALARMS = 50
 _FMT = "%Y%m%d%H%M%S"
 
 
@@ -64,7 +67,7 @@ def gdelt_rows(stamp: str, stream: str, data: bytes, matcher: Matcher) -> list[d
 
 def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool = True,
               latest=gdelt.latest_stamp, download=gdelt.download, poll=feeds.poll,
-              build_stories: bool = True) -> dict:
+              build_stories: bool = True, ai_on: bool | None = None, code_alarm=ondemand.code_entity_day) -> dict:
     now = now or datetime.now(timezone.utc)
     state = sink.read_json(STATE_KEY) or {}
     gstate = state.setdefault("gdelt", {})
@@ -142,6 +145,35 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
                 summary["stories_error"] = sstate["last_error"]
                 break
 
+    run_alarms(sink, state, summary, ondemand.ai_enabled() if ai_on is None else ai_on, code_alarm)
     state["last_run"] = summary
     sink.write_json(STATE_KEY, state)
     return summary
+
+
+def run_alarms(sink, state: dict, summary: dict, ai_on: bool, code_alarm) -> None:
+    """Queue alarms from days built this run; when AI is on, code up to MAX_ALARMS_PER_RUN of them."""
+    ai = state.setdefault("ai", {"pending": [], "done": []})
+    for built in summary.get("stories_built", []):
+        for eid, reasons in (built.get("alarms") or {}).items():
+            ai["pending"].append({"entity": eid, "day": built["day"], "reasons": reasons, "tries": 0})
+    ai["pending"] = ai["pending"][-MAX_PENDING_ALARMS:]
+    if not ai_on or not ai["pending"]:
+        return
+    results = []
+    for _ in range(min(MAX_ALARMS_PER_RUN, len(ai["pending"]))):
+        job = ai["pending"].pop(0)
+        try:
+            r = code_alarm(sink, job["entity"], date.fromisoformat(job["day"]), "alarm")
+            results.append({k: r[k] for k in ("entity", "day", "coded", "already_coded", "cost_usd")})
+            ai["done"].append({**job, "coded": r["coded"], "cost_usd": r["cost_usd"]})
+        except BudgetExceeded as e:
+            ai["done"].append({**job, "skipped": str(e)[:120]})
+            results.append({"entity": job["entity"], "day": job["day"], "skipped": "budget"})
+        except Exception as e:  # network or Vertex trouble: retry later, up to three times
+            job["tries"] += 1
+            if job["tries"] < 3:
+                ai["pending"].append(job)
+            results.append({"entity": job["entity"], "day": job["day"], "error": str(e)[:120]})
+    ai["done"] = ai["done"][-50:]
+    summary["ai_alarms"] = results

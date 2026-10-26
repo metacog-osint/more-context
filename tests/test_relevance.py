@@ -75,6 +75,15 @@ class ScoreTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 relevance.evaluate(p, iters=0)
 
+    def test_model_codings_become_methods(self):
+        rows = [row("Z", "top", "on", title="a"), row("Z", "top", "off", title="b"), row("Z", "top", "on", title="c")]
+        codings = {"Z:a": {"relevance": "on"}, "Z:b": {"relevance": "on"}, "Z:c": {"relevance": "unclear"}}
+        m = relevance.methods(relevance.TermMatcher({"Z": ["zzz"]}), codings)
+        self.assertEqual([m["gemini_on"](r) for r in rows], [True, True, False])
+        self.assertEqual([m["gemini_on_or_unclear"](r) for r in rows], [True, True, True])
+        self.assertEqual(relevance.agreement(rows + [row("Z", "top", "off", title="d")], codings),
+                         {"off>missing": 1, "off>on": 1, "on>on": 1, "on>unclear": 1})
+
     def test_committed_set_is_fully_labelled(self):
         rows, pop = relevance.load_set(Path(__file__).resolve().parent.parent / "catalog" / "eval" / "relevance_v1.jsonl")
         self.assertEqual(len(rows), 278)
