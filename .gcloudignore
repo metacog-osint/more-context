@@ -1,0 +1,14 @@
+# Upload only what the ingest function needs: main.py, requirements.txt, pipeline/, catalog/.
+.git/
+.github/
+.claude/
+data/
+tests/
+scripts/
+web/
+*.md
+*.log
+run.py
+__pycache__/
+.gitignore
+.gcloudignore

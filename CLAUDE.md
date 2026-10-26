@@ -35,6 +35,12 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   - `health.py` - feed health (fresh / late / stale / failing / never) against each source's expected interval.
   - `sources.py` - domain -> source group lookup, so GDELT articles get the same groups as RSS items.
   - `cli.py` - `python -I run.py measure-reprints --hours 6`, `rss-poll`, `feed-health` (run.py makes `python -I` work)
+  - `feeds.py` - one RSS poll over the active sources (shared by the CLI and the cloud cycle).
+  - `cycle.py` - one 15-minute ingest cycle: new GDELT files (late files retried up to 3 h, never blocking),
+    one RSS poll; writes `cycles/YYYY/MM/DD/HHMMSS.jsonl` + `state/state.json`. `sinks.py`: local folder or GCS.
+- `main.py`, `requirements.txt`, `.gcloudignore` - Cloud Run function wrapper (`mc-ingest`).
+  `scripts/deploy_ingest.sh` creates bucket, service accounts, private function, one Scheduler job.
+  Not deployed until Tom approves. Local dry run: `python -I run.py cycle`.
 - `tests/` - `python -m unittest discover -s tests -t .` (CI runs this on every push).
 - `data/` - downloads and reports, git-ignored.
 
