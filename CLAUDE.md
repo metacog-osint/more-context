@@ -24,12 +24,17 @@ Serves warning (did something change?) and awareness (what is the picture, how i
 ## Layout
 - `catalog/entities.json` - zones and Watch Topics. `match_v43` holds v4.3's exact rules (baseline for
   comparison); MORE CONTEXT's own matching replaces them in Phase 2.
+- `catalog/sources.json` - 83 sources in 16 groups: 51 polled RSS feeds, 2 to retry, 17 dropped (reason
+  recorded), 13 GDELT-only outlets tagged by domain (wires, Russian/Chinese/Iranian outlets with no usable feed).
 - `catalog/indicators/` - per-zone charters (key questions + indicator ladder). Tom writes these.
 - `pipeline/` - Python, standard library only so far.
   - `gdelt.py` - list, download and parse GDELT GKG 2.1 15-minute files (English + translation streams).
   - `match.py` - zone/topic matching from the catalog.
   - `stories.py` - title normalisation, exact + near-duplicate grouping (MinHash LSH) into stories.
-  - `cli.py` - `python -I run.py measure-reprints --hours 6` (run.py makes `python -I` work)
+  - `rss.py` - fetch (ETag/Last-Modified) and parse RSS, Atom and RDF feeds; titles + short leads only.
+  - `health.py` - feed health (fresh / late / stale / failing / never) against each source's expected interval.
+  - `sources.py` - domain -> source group lookup, so GDELT articles get the same groups as RSS items.
+  - `cli.py` - `python -I run.py measure-reprints --hours 6`, `rss-poll`, `feed-health` (run.py makes `python -I` work)
 - `tests/` - `python -m unittest discover -s tests -t .` (CI runs this on every push).
 - `data/` - downloads and reports, git-ignored.
 

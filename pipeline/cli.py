@@ -2,22 +2,141 @@
 
     python -I run.py measure-reprints --hours 6
     python -I run.py measure-reprints --from-jsonl data/raw/matched-<stamp>.jsonl
+    python -I run.py rss-poll [--include-candidates] [--probe-report data/reports/probe.json]
+    python -I run.py feed-health
 """
 from __future__ import annotations
 
 import argparse
 import json
+import statistics
 import sys
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from . import gdelt
+from . import gdelt, health, rss
 from .match import Matcher
 from .stories import build_stories
 
 DATA = Path(__file__).resolve().parent.parent / "data"
+SOURCES = Path(__file__).resolve().parent.parent / "catalog" / "sources.json"
+
+
+def load_sources(include_candidates: bool = False) -> list[dict]:
+    """RSS sources to poll: rss_status active, plus candidates when asked."""
+    cat = json.loads(SOURCES.read_text(encoding="utf-8"))
+    keep = {"active", "candidate"} if include_candidates else {"active"}
+    return [s for s in cat["sources"] if s.get("url") and s.get("rss_status") in keep]
+
+
+def median_gap_minutes(items: list[dict]) -> float | None:
+    times = sorted((i["published"] for i in items if i["published"]), reverse=True)
+    gaps = [(a - b).total_seconds() / 60 for a, b in zip(times, times[1:])]
+    return round(statistics.median(gaps), 1) if gaps else None
+
+
+def cmd_rss_poll(args) -> int:
+    sources = load_sources(args.include_candidates)
+    state = health.load_state()
+    feeds = state.setdefault("rss", {})
+    now = health.utcnow()
+
+    def work(src):
+        entry = feeds.get(src["id"], {})
+        res = rss.fetch(src["url"], entry.get("etag"), entry.get("last_modified"))
+        items, err = None, res.error
+        if res.ok:
+            try:
+                items = rss.parse_feed(res.body)
+            except ValueError as e:
+                err = str(e)[:200]
+        if items:
+            rss.correct_clock(items, src.get("clock_skew_hours", 0))
+        return src, res, items, err
+
+    with ThreadPoolExecutor(8) as ex:
+        results = list(ex.map(work, sources))
+
+    new_rows, probe = [], []
+    for src, res, items, err in results:
+        entry = feeds.setdefault(src["id"], {})
+        if res.not_modified:
+            health.record_success(entry, now, entry.get("last_items", 0), None, None, None)
+            new = []
+        elif items is not None:
+            newest = max((i["published"] for i in items if i["published"]), default=None)
+            health.record_success(entry, now, len(items), newest, res.etag, res.last_modified)
+            new_urls = set(health.remember(entry, [i["url"] for i in items]))
+            new = [i for i in items if i["url"] in new_urls]
+            for i in new:
+                new_rows.append({"source": src["id"], "group": src["group"], "owner": src["owner"],
+                                 "lang": src["lang"], "title": i["title"], "url": i["url"],
+                                 "published": health.iso(i["published"]), "summary": i["summary"],
+                                 "fetched": health.iso(now)})
+        else:
+            health.record_failure(entry, now, err or f"HTTP {res.status}")
+            new = []
+        st = health.status(entry, src["expected_minutes"], now)
+        newest_dt = health.from_iso(entry.get("newest_item"))
+        future_h = rss.future_skew_hours(items or [], now)
+        probe.append({
+            "id": src["id"], "group": src["group"], "status": st,
+            "http": res.status, "items": len(items) if items is not None else None, "new": len(new),
+            "newest_age_h": round((now - newest_dt).total_seconds() / 3600, 1) if newest_dt else None,
+            "median_gap_min": median_gap_minutes(items) if items else None,
+            "error": entry.get("last_error", "") or (f"items dated {future_h}h in the future: check clock_skew_hours" if future_h else ""),
+        })
+    health.save_state(state)
+
+    if new_rows:
+        raw = DATA / "raw"
+        raw.mkdir(parents=True, exist_ok=True)
+        with (raw / f"rss-{now:%Y%m%d}.jsonl").open("a", encoding="utf-8") as f:
+            for r in new_rows:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+    probe.sort(key=lambda p: (p["status"] != "fresh", p["group"], p["id"]))
+    print(f"{'source':<22}{'group':<16}{'status':<9}{'http':>5}{'items':>6}{'new':>5}{'newest':>8}{'gap':>7}  error")
+    for p in probe:
+        age = f"{p['newest_age_h']}h" if p["newest_age_h"] is not None else "-"
+        gap = f"{p['median_gap_min']:g}m" if p["median_gap_min"] is not None else "-"
+        print(f"{p['id']:<22}{p['group']:<16}{p['status']:<9}{p['http']:>5}{p['items'] or 0:>6}{p['new']:>5}"
+              f"{age:>8}{gap:>7}  {p['error'][:60]}")
+    counts = defaultdict(int)
+    for p in probe:
+        counts[p["status"]] += 1
+    print(f"\n{len(probe)} sources: " + ", ".join(f"{k} {v}" for k, v in sorted(counts.items()))
+          + f"; {len(new_rows)} new items")
+    if args.probe_report:
+        Path(args.probe_report).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.probe_report).write_text(json.dumps(probe, indent=1), encoding="utf-8")
+    return 0
+
+
+def cmd_feed_health(args) -> int:
+    now = health.utcnow()
+    print("GDELT streams (expected every 15 min):")
+    for stream in ("english", "translation"):
+        try:
+            stamp = gdelt.latest_stamp(stream)
+            lag = (now - health.from_iso(f"{stamp[:4]}-{stamp[4:6]}-{stamp[6:8]}T{stamp[8:10]}:{stamp[10:12]}:00Z"))
+            mins = lag.total_seconds() / 60
+            st = "fresh" if mins <= 30 else "late" if mins <= 90 else "stale"
+            print(f"  {stream:<12} latest {stamp}  {mins:.0f} min ago  {st}")
+        except Exception as e:
+            print(f"  {stream:<12} failing: {e}")
+    feeds = health.load_state().get("rss", {})
+    srcs = {s["id"]: s for s in load_sources(include_candidates=True)}
+    counts = defaultdict(list)
+    for sid, src in srcs.items():
+        counts[health.status(feeds.get(sid), src["expected_minutes"], now)].append(sid)
+    print("\nRSS sources:")
+    for st in ("fresh", "late", "stale", "failing", "never"):
+        if counts[st]:
+            print(f"  {st:<8} {len(counts[st]):>3}  {', '.join(sorted(counts[st]))}")
+    return 0
 
 
 def collect(hours: float, streams: list[str], workers: int = 4) -> tuple[list[dict], dict]:
@@ -151,6 +270,12 @@ def main(argv: list[str] | None = None) -> int:
     m.add_argument("--workers", type=int, default=4)
     m.add_argument("--from-jsonl", help="re-run grouping on a saved matched-*.jsonl file")
     m.set_defaults(func=cmd_measure_reprints)
+    r = sub.add_parser("rss-poll", help="fetch RSS sources once, store new items, update feed health")
+    r.add_argument("--include-candidates", action="store_true", help="also poll sources not yet approved")
+    r.add_argument("--probe-report", help="write per-source results to this JSON file")
+    r.set_defaults(func=cmd_rss_poll)
+    h = sub.add_parser("feed-health", help="status of GDELT and every RSS source")
+    h.set_defaults(func=cmd_feed_health)
     args = p.parse_args(argv)
     return args.func(args)
 

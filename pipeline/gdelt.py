@@ -8,7 +8,6 @@ from __future__ import annotations
 import html
 import io
 import re
-import sys
 import urllib.error
 import urllib.request
 import zipfile

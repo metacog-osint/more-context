@@ -1,0 +1,1414 @@
+{
+ "catalog_version": "2026-10-26.2",
+ "notes": "Draft list for Tom's approval. group = the perspective a source speaks from (used for framing divergence); owner = state | public | private | intergovernmental | ngo. domains tag GDELT articles with the same groups, so outlets without a usable feed still count. rss_status: active (polled) | candidate (retry) | dropped (reason in rss_note) | none (GDELT only). expected_minutes = normal gap between new items, calibrated from the 26 Oct probe. clock_skew_hours = hours to subtract from a feed that labels local time as UTC.",
+ "groups": {
+  "western_public": "Western public broadcasters",
+  "western_press": "Western private press",
+  "gulf_arab": "Gulf and Arab outlets",
+  "israeli": "Israeli press",
+  "iranian_state": "Iranian state and state-affiliated media",
+  "russian_state": "Russian state and Kremlin-aligned media",
+  "chinese_state": "Chinese state media",
+  "ukrainian": "Ukrainian outlets",
+  "south_asian": "Indian and Pakistani press",
+  "east_asian": "Korean, Taiwanese and Japanese outlets",
+  "southeast_asian": "Philippine, Vietnamese and Myanmar outlets",
+  "african": "African outlets",
+  "latin_american": "Latin American outlets",
+  "official": "Intergovernmental and official sources",
+  "specialist": "Defense, maritime, space and research outlets",
+  "western_wire": "Western news wires"
+ },
+ "sources": [
+  {
+   "id": "bbc_world",
+   "name": "BBC News - World",
+   "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+   "group": "western_public",
+   "owner": "public",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "bbc.co.uk",
+    "bbc.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "dw_world",
+   "name": "DW - World",
+   "url": "https://rss.dw.com/rdf/rss-en-world",
+   "group": "western_public",
+   "owner": "public",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "dw.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "france24_en",
+   "name": "France 24 (English)",
+   "url": "https://www.france24.com/en/rss",
+   "group": "western_public",
+   "owner": "public",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "france24.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "npr_world",
+   "name": "NPR - World",
+   "url": "https://feeds.npr.org/1004/rss.xml",
+   "group": "western_public",
+   "owner": "public",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "npr.org"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "guardian_world",
+   "name": "The Guardian - World",
+   "url": "https://www.theguardian.com/world/rss",
+   "group": "western_press",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "theguardian.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "nyt_world",
+   "name": "New York Times - World",
+   "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+   "group": "western_press",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "nytimes.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "aljazeera_en",
+   "name": "Al Jazeera English",
+   "url": "https://www.aljazeera.com/xml/rss/all.xml",
+   "group": "gulf_arab",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "aljazeera.com",
+    "aljazeera.net"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "arabnews",
+   "name": "Arab News",
+   "url": "https://www.arabnews.com/rss.xml",
+   "group": "gulf_arab",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "10_Israel_Gaza_Lebanon",
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "arabnews.com"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "blocks automated readers (HTTP 403)"
+  },
+  {
+   "id": "alarabiya_en",
+   "name": "Al Arabiya English",
+   "url": "https://english.alarabiya.net/feed/rss2/en.xml",
+   "group": "gulf_arab",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "10_Israel_Gaza_Lebanon",
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "alarabiya.net"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "blocks automated readers (HTTP 403)"
+  },
+  {
+   "id": "middleeasteye",
+   "name": "Middle East Eye",
+   "url": "https://www.middleeasteye.net/rss",
+   "group": "gulf_arab",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "10_Israel_Gaza_Lebanon",
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 120,
+   "domains": [
+    "middleeasteye.net"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "timesofisrael",
+   "name": "The Times of Israel",
+   "url": "https://www.timesofisrael.com/feed/",
+   "group": "israeli",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "10_Israel_Gaza_Lebanon",
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 30,
+   "domains": [
+    "timesofisrael.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "jpost",
+   "name": "The Jerusalem Post",
+   "url": "https://www.jpost.com/rss/rssfeedsfrontpage.aspx",
+   "group": "israeli",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "10_Israel_Gaza_Lebanon",
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 30,
+   "domains": [
+    "jpost.com"
+   ],
+   "rss_status": "active",
+   "clock_skew_hours": 2,
+   "clock_note": "feed labels local time as UTC; subtract before use (Israel shifts by an hour with DST)"
+  },
+  {
+   "id": "presstv",
+   "name": "Press TV",
+   "url": "https://www.presstv.ir/rss.xml",
+   "group": "iranian_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "11_Iran_Red_Sea",
+    "10_Israel_Gaza_Lebanon"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "presstv.ir",
+    "presstv.com"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "TLS certificate fails verification; not bypassed"
+  },
+  {
+   "id": "irna_en",
+   "name": "IRNA (English)",
+   "url": "https://en.irna.ir/rss",
+   "group": "iranian_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "irna.ir"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "tehrantimes",
+   "name": "Tehran Times",
+   "url": "https://www.tehrantimes.com/rss",
+   "group": "iranian_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 120,
+   "domains": [
+    "tehrantimes.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "mehr_en",
+   "name": "Mehr News (English)",
+   "url": "https://en.mehrnews.com/rss",
+   "group": "iranian_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "mehrnews.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "tasnim_en",
+   "name": "Tasnim (English)",
+   "url": "https://www.tasnimnews.com/en/rss/feed/0/7/0/all-stories",
+   "group": "iranian_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "tasnimnews.com"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "address does not resolve from here"
+  },
+  {
+   "id": "tass_en",
+   "name": "TASS (English)",
+   "url": "https://tass.com/rss/v2.xml",
+   "group": "russian_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 30,
+   "domains": [
+    "tass.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "tass_ru",
+   "name": "TASS (Russian)",
+   "url": "https://tass.ru/rss/v2.xml",
+   "group": "russian_state",
+   "owner": "state",
+   "lang": "rus",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 15,
+   "domains": [
+    "tass.ru"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "ria_ru",
+   "name": "RIA Novosti (Russian)",
+   "url": "https://ria.ru/export/rss2/archive/index.xml",
+   "group": "russian_state",
+   "owner": "state",
+   "lang": "rus",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 15,
+   "domains": [
+    "ria.ru"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "TLS certificate fails verification; covered through GDELT by domain"
+  },
+  {
+   "id": "rt_en",
+   "name": "RT (English)",
+   "url": "https://www.rt.com/rss/news/",
+   "group": "russian_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "rt.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "xinhua_en",
+   "name": "Xinhua (English) - World",
+   "url": "http://www.xinhuanet.com/english/rss/worldrss.xml",
+   "group": "chinese_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "xinhuanet.com",
+    "news.cn"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "feed years old over http; https certificate fails verification"
+  },
+  {
+   "id": "chinadaily_world",
+   "name": "China Daily - World",
+   "url": "http://www.chinadaily.com.cn/rss/world_rss.xml",
+   "group": "chinese_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 120,
+   "domains": [
+    "chinadaily.com.cn"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "feed removed (HTTP 404); covered through GDELT by domain"
+  },
+  {
+   "id": "globaltimes",
+   "name": "Global Times",
+   "url": "https://www.globaltimes.cn/rss/outbrain.xml",
+   "group": "chinese_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "02_Taiwan_Strait",
+    "08_South_China_Sea",
+    "T2_Semiconductors",
+    "T1_Critical_Minerals"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "globaltimes.cn"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "feed not updated in 17 days; covered through GDELT by domain"
+  },
+  {
+   "id": "cgtn_world",
+   "name": "CGTN - World",
+   "url": "https://www.cgtn.com/subscribe/rss/section/world.xml",
+   "group": "chinese_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 720,
+   "domains": [
+    "cgtn.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "peoplesdaily_en",
+   "name": "People's Daily (English) - World",
+   "url": "http://en.people.cn/rss/World.xml",
+   "group": "chinese_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 120,
+   "domains": [
+    "people.cn",
+    "people.com.cn"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "feed returns items years old; covered through GDELT by domain"
+  },
+  {
+   "id": "kyivindependent",
+   "name": "The Kyiv Independent",
+   "url": "https://kyivindependent.com/news-archive/rss/",
+   "group": "ukrainian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "kyivindependent.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "ukrinform_en",
+   "name": "Ukrinform (English)",
+   "url": "https://www.ukrinform.net/rss/block-lastnews",
+   "group": "ukrainian",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "01_Ukraine_Conflict"
+   ],
+   "expected_minutes": 30,
+   "domains": [
+    "ukrinform.net",
+    "ukrinform.ua"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "pravda_ua_en",
+   "name": "Ukrainska Pravda (English)",
+   "url": "https://www.pravda.com.ua/eng/rss/",
+   "group": "ukrainian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "01_Ukraine_Conflict"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "pravda.com.ua"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "dawn",
+   "name": "Dawn",
+   "url": "https://www.dawn.com/feeds/home",
+   "group": "south_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "06_India_Pakistan"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "dawn.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "tribune_pk",
+   "name": "The Express Tribune",
+   "url": "https://tribune.com.pk/feed/home",
+   "group": "south_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "06_India_Pakistan"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "tribune.com.pk"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "thehindu_intl",
+   "name": "The Hindu - International",
+   "url": "https://www.thehindu.com/news/international/feeder/default.rss",
+   "group": "south_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global",
+    "06_India_Pakistan"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "thehindu.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "thehindu_national",
+   "name": "The Hindu - National",
+   "url": "https://www.thehindu.com/news/national/feeder/default.rss",
+   "group": "south_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "06_India_Pakistan"
+   ],
+   "expected_minutes": 30,
+   "domains": [
+    "thehindu.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "hindustantimes_world",
+   "name": "Hindustan Times - World",
+   "url": "https://www.hindustantimes.com/feeds/rss/world-news/rssfeed.xml",
+   "group": "south_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "hindustantimes.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "yonhap_en",
+   "name": "Yonhap (English)",
+   "url": "https://en.yna.co.kr/RSS/news.xml",
+   "group": "east_asian",
+   "owner": "public",
+   "lang": "eng",
+   "focus": [
+    "03_Korea_Peninsula"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "yna.co.kr"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "focustaiwan",
+   "name": "Focus Taiwan (CNA)",
+   "url": "https://focustaiwan.tw/rss/aall.xml",
+   "group": "east_asian",
+   "owner": "public",
+   "lang": "eng",
+   "focus": [
+    "02_Taiwan_Strait",
+    "T2_Semiconductors"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "focustaiwan.tw"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "no RSS feed found; covered through GDELT by domain"
+  },
+  {
+   "id": "taipeitimes",
+   "name": "Taipei Times",
+   "url": "https://www.taipeitimes.com/xml/index.rss",
+   "group": "east_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "02_Taiwan_Strait"
+   ],
+   "expected_minutes": 120,
+   "domains": [
+    "taipeitimes.com"
+   ],
+   "rss_status": "active",
+   "clock_skew_hours": 8,
+   "clock_note": "feed labels local time as UTC; subtract before use"
+  },
+  {
+   "id": "japantimes",
+   "name": "The Japan Times",
+   "url": "https://www.japantimes.co.jp/feed/",
+   "group": "east_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "02_Taiwan_Strait",
+    "03_Korea_Peninsula",
+    "08_South_China_Sea"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "japantimes.co.jp"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "scmp_china",
+   "name": "South China Morning Post - China",
+   "url": "https://www.scmp.com/rss/4/feed",
+   "group": "east_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "02_Taiwan_Strait",
+    "08_South_China_Sea"
+   ],
+   "expected_minutes": 120,
+   "domains": [
+    "scmp.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "inquirer_globalnation",
+   "name": "Inquirer Global Nation",
+   "url": "https://globalnation.inquirer.net/feed",
+   "group": "southeast_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "08_South_China_Sea"
+   ],
+   "expected_minutes": 120,
+   "domains": [
+    "inquirer.net"
+   ],
+   "rss_status": "active",
+   "clock_skew_hours": 8,
+   "clock_note": "feed labels local time as UTC; subtract before use"
+  },
+  {
+   "id": "vnexpress_en",
+   "name": "VnExpress International",
+   "url": "https://e.vnexpress.net/rss/news.rss",
+   "group": "southeast_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "08_South_China_Sea"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "vnexpress.net"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "irrawaddy",
+   "name": "The Irrawaddy",
+   "url": "https://www.irrawaddy.com/feed",
+   "group": "southeast_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "16_Myanmar"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "irrawaddy.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "mizzima",
+   "name": "Mizzima",
+   "url": "https://eng.mizzima.com/feed",
+   "group": "southeast_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "16_Myanmar"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "mizzima.com"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "blocks automated readers (HTTP 403)"
+  },
+  {
+   "id": "sudantribune",
+   "name": "Sudan Tribune",
+   "url": "https://sudantribune.com/feed/",
+   "group": "african",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "13_Sudan"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "sudantribune.com"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "blocks automated readers (HTTP 403)"
+  },
+  {
+   "id": "dabanga",
+   "name": "Radio Dabanga",
+   "url": "https://www.dabangasudan.org/en/feed",
+   "group": "african",
+   "owner": "ngo",
+   "lang": "eng",
+   "focus": [
+    "13_Sudan"
+   ],
+   "expected_minutes": 720,
+   "domains": [
+    "dabangasudan.org"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "addisstandard",
+   "name": "Addis Standard",
+   "url": "https://addisstandard.com/feed/",
+   "group": "african",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "17_Horn_of_Africa"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "addisstandard.com"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "blocks automated readers (HTTP 403)"
+  },
+  {
+   "id": "garowe",
+   "name": "Garowe Online",
+   "url": "https://www.garoweonline.com/en/rss",
+   "group": "african",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "17_Horn_of_Africa"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "garoweonline.com"
+   ],
+   "rss_status": "candidate",
+   "rss_note": "HTTP 500 on 26 Oct; retry"
+  },
+  {
+   "id": "radiookapi",
+   "name": "Radio Okapi",
+   "url": "https://www.radiookapi.net/feed",
+   "group": "african",
+   "owner": "intergovernmental",
+   "lang": "fra",
+   "focus": [
+    "14_DRC_Rwanda"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "radiookapi.net"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "actualite_cd",
+   "name": "Actualite.cd",
+   "url": "https://actualite.cd/feed",
+   "group": "african",
+   "owner": "private",
+   "lang": "fra",
+   "focus": [
+    "14_DRC_Rwanda"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "actualite.cd"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "rfi_afrique",
+   "name": "RFI - Afrique",
+   "url": "https://www.rfi.fr/fr/afrique/rss",
+   "group": "western_public",
+   "owner": "public",
+   "lang": "fra",
+   "focus": [
+    "12_Sahel_West_Africa",
+    "13_Sudan",
+    "14_DRC_Rwanda",
+    "17_Horn_of_Africa"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "rfi.fr"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "premiumtimes_ng",
+   "name": "Premium Times (Nigeria)",
+   "url": "https://www.premiumtimesng.com/feed",
+   "group": "african",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "12_Sahel_West_Africa"
+   ],
+   "expected_minutes": 120,
+   "domains": [
+    "premiumtimesng.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "jeuneafrique",
+   "name": "Jeune Afrique",
+   "url": "https://www.jeuneafrique.com/feed/",
+   "group": "african",
+   "owner": "private",
+   "lang": "fra",
+   "focus": [
+    "12_Sahel_West_Africa",
+    "14_DRC_Rwanda"
+   ],
+   "expected_minutes": 120,
+   "domains": [
+    "jeuneafrique.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "efectococuyo",
+   "name": "Efecto Cocuyo",
+   "url": "https://efectococuyo.com/feed/",
+   "group": "latin_american",
+   "owner": "private",
+   "lang": "spa",
+   "focus": [
+    "05_Venezuela"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "efectococuyo.com"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "blocks automated readers (HTTP 403)"
+  },
+  {
+   "id": "elpais_america",
+   "name": "El Pais - America",
+   "url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/america/portada",
+   "group": "latin_american",
+   "owner": "private",
+   "lang": "spa",
+   "focus": [
+    "05_Venezuela",
+    "15_Cuba"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "elpais.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "14ymedio",
+   "name": "14ymedio",
+   "url": "https://www.14ymedio.com/rss/",
+   "group": "latin_american",
+   "owner": "private",
+   "lang": "spa",
+   "focus": [
+    "15_Cuba"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "14ymedio.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "granma",
+   "name": "Granma",
+   "url": "https://www.granma.cu/feed",
+   "group": "latin_american",
+   "owner": "state",
+   "lang": "spa",
+   "focus": [
+    "15_Cuba"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "granma.cu"
+   ],
+   "rss_status": "candidate",
+   "rss_note": "timed out on 26 Oct; retry"
+  },
+  {
+   "id": "un_news",
+   "name": "UN News",
+   "url": "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
+   "group": "official",
+   "owner": "intergovernmental",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "news.un.org"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "nato_news",
+   "name": "NATO News",
+   "url": "https://www.nato.int/cps/rss/en/natohq/rssFeed.xsl/rssFeed.xml",
+   "group": "official",
+   "owner": "intergovernmental",
+   "lang": "eng",
+   "focus": [
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 1440,
+   "domains": [
+    "nato.int"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "no RSS feed found; NATO statements reach the wires"
+  },
+  {
+   "id": "reliefweb",
+   "name": "ReliefWeb - Updates",
+   "url": "https://reliefweb.int/updates/rss.xml",
+   "group": "official",
+   "owner": "intergovernmental",
+   "lang": "eng",
+   "focus": [
+    "13_Sudan",
+    "14_DRC_Rwanda",
+    "17_Horn_of_Africa",
+    "12_Sahel_West_Africa",
+    "16_Myanmar"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "reliefweb.int"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "crisisgroup",
+   "name": "International Crisis Group",
+   "url": "https://www.crisisgroup.org/rss.xml",
+   "group": "specialist",
+   "owner": "ngo",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 4320,
+   "domains": [
+    "crisisgroup.org"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "defensenews",
+   "name": "Defense News",
+   "url": "https://www.defensenews.com/arc/outboundfeeds/rss/",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "defensenews.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "breakingdefense",
+   "name": "Breaking Defense",
+   "url": "https://breakingdefense.com/feed/",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "breakingdefense.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "twz",
+   "name": "The War Zone",
+   "url": "https://www.twz.com/feed",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "expected_minutes": 1440,
+   "domains": [
+    "twz.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "gcaptain",
+   "name": "gCaptain",
+   "url": "https://gcaptain.com/feed/",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "T3_Undersea_Infrastructure",
+    "T5_Sanctions_Shadow_Fleet",
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "gcaptain.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "maritime_exec",
+   "name": "The Maritime Executive",
+   "url": "https://maritime-executive.com/articles.rss",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "T3_Undersea_Infrastructure",
+    "T5_Sanctions_Shadow_Fleet",
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "maritime-executive.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "splash247",
+   "name": "Splash247",
+   "url": "https://splash247.com/feed/",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "T5_Sanctions_Shadow_Fleet",
+    "T4_GNSS_Counterspace",
+    "11_Iran_Red_Sea"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "splash247.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "spacenews",
+   "name": "SpaceNews",
+   "url": "https://spacenews.com/feed/",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "T4_GNSS_Counterspace"
+   ],
+   "expected_minutes": 1440,
+   "domains": [
+    "spacenews.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "gpsworld",
+   "name": "GPS World",
+   "url": "https://www.gpsworld.com/feed/",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "T4_GNSS_Counterspace"
+   ],
+   "expected_minutes": 1440,
+   "domains": [
+    "gpsworld.com"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "blocks automated readers (HTTP 403)"
+  },
+  {
+   "id": "insidegnss",
+   "name": "Inside GNSS",
+   "url": "https://insidegnss.com/feed/",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "T4_GNSS_Counterspace"
+   ],
+   "expected_minutes": 4320,
+   "domains": [
+    "insidegnss.com"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "mining_com",
+   "name": "MINING.COM",
+   "url": "https://www.mining.com/feed/",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "T1_Critical_Minerals"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "mining.com"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "blocks automated readers (HTTP 403)"
+  },
+  {
+   "id": "reuters",
+   "name": "Reuters",
+   "url": null,
+   "group": "western_wire",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "reuters.com"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "apnews",
+   "name": "Associated Press",
+   "url": null,
+   "group": "western_wire",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "apnews.com"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "afp",
+   "name": "AFP",
+   "url": null,
+   "group": "western_wire",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "afp.com"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "bloomberg",
+   "name": "Bloomberg",
+   "url": null,
+   "group": "western_press",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "bloomberg.com"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "izvestia",
+   "name": "Izvestia",
+   "url": null,
+   "group": "russian_state",
+   "owner": "private",
+   "lang": "rus",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "iz.ru"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "rg_ru",
+   "name": "Rossiyskaya Gazeta",
+   "url": null,
+   "group": "russian_state",
+   "owner": "state",
+   "lang": "rus",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "rg.ru"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "vesti",
+   "name": "Vesti (VGTRK)",
+   "url": null,
+   "group": "russian_state",
+   "owner": "state",
+   "lang": "rus",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "vesti.ru"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "channel_one",
+   "name": "Channel One Russia",
+   "url": null,
+   "group": "russian_state",
+   "owner": "state",
+   "lang": "rus",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "1tv.ru"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "lenta",
+   "name": "Lenta.ru",
+   "url": null,
+   "group": "russian_state",
+   "owner": "private",
+   "lang": "rus",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "lenta.ru"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "sputnik",
+   "name": "Sputnik",
+   "url": null,
+   "group": "russian_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "sputnikglobe.com"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "chinanews",
+   "name": "China News Service",
+   "url": null,
+   "group": "chinese_state",
+   "owner": "state",
+   "lang": "zho",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "chinanews.com.cn",
+    "ecns.cn"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "farsnews",
+   "name": "Fars News",
+   "url": null,
+   "group": "iranian_state",
+   "owner": "state",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "farsnews.ir"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "ifp",
+   "name": "Iran Front Page",
+   "url": null,
+   "group": "iranian_state",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "global"
+   ],
+   "domains": [
+    "ifpnews.com"
+   ],
+   "rss_status": "none",
+   "rss_note": "no feed used; tagged in GDELT by domain"
+  }
+ ]
+}
