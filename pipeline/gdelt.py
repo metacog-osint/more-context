@@ -5,7 +5,6 @@ stream. Downloads are free; nothing here touches BigQuery.
 """
 from __future__ import annotations
 
-import csv
 import html
 import io
 import re
@@ -25,8 +24,6 @@ FILE_NAMES = {
 INDEX_NAMES = {"english": "lastupdate.txt", "translation": "lastupdate-translation.txt"}
 USER_AGENT = "MORE-CONTEXT/0.1 (+https://context.theintelligence.company)"
 GKG_FIELDS = 27
-
-csv.field_size_limit(min(sys.maxsize, 2**31 - 1))
 
 _TITLE = re.compile(r"<PAGE_TITLE>(.*?)</PAGE_TITLE>", re.S)
 _SRC_LANG = re.compile(r"srclc:([a-z]{3})")
@@ -89,12 +86,21 @@ def download(stamp: str, stream: str) -> bytes | None:
         raise
 
 
+def _decode(field: bytes) -> str:
+    # Most fields are UTF-8, but some page titles arrive in Windows-1252 ("K\xf6nig").
+    try:
+        return field.decode("utf-8")
+    except UnicodeDecodeError:
+        return field.decode("cp1252", errors="replace")
+
+
 def parse_zip(data: bytes, stream: str) -> Iterator[Article]:
+    """GKG files are tab-separated with no quoting, so each line splits cleanly on tabs."""
     with zipfile.ZipFile(io.BytesIO(data)) as zf:
         for name in zf.namelist():
             with zf.open(name) as raw:
-                text = io.TextIOWrapper(raw, encoding="utf-8", errors="replace", newline="")
-                for fields in csv.reader(text, delimiter="\t", quoting=csv.QUOTE_NONE):
+                for line in raw:
+                    fields = [_decode(f) for f in line.rstrip(b"\r\n").split(b"\t")]
                     art = parse_row(fields, stream)
                     if art:
                         yield art

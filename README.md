@@ -11,7 +11,7 @@ Publicly available information only. A media signal, not ground truth.
 ## Run the reprint measurement
 
 ```
-python -I -m pipeline.cli measure-reprints --hours 6
+python -I run.py measure-reprints --hours 6
 ```
 
 Downloads the last 6 hours of GDELT GKG files (English and translated streams), keeps articles that

@@ -48,6 +48,16 @@ class ParseRowTests(unittest.TestCase):
             zf.writestr("x.gkg.csv", "\t".join(gkg_row()) + "\n" + "\t".join(gkg_row(f0="b")) + "\n")
         self.assertEqual(len(list(gdelt.parse_zip(buf.getvalue(), "english"))), 2)
 
+    def test_cp1252_title_decoded(self):
+        row = gkg_row(f26="<PAGE_TITLE>König Charles in der Karibik</PAGE_TITLE>", f3="hna.de")
+        line = "\t".join(row[:26]).encode("utf-8") + b"\t" + row[26].encode("cp1252") + b"\n"
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as zf:
+            zf.writestr("x.gkg.csv", line)
+        (a,) = list(gdelt.parse_zip(buf.getvalue(), "english"))
+        self.assertEqual(a.title, "König Charles in der Karibik")
+        self.assertEqual(a.domain, "hna.de")
+
 
 class WindowTests(unittest.TestCase):
     def test_window_stamps(self):
