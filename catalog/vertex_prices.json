@@ -1,0 +1,12 @@
+{
+  "checked": "2026-10-26",
+  "currency": "USD",
+  "unit": "per 1M tokens, text",
+  "source": "https://ai.google.dev/gemini-api/docs/pricing (Gemini API paid tier, page updated 2026-10-26). The Vertex AI pricing page (https://cloud.google.com/vertex-ai/generative-ai/pricing) would not load for checking; third-party Vertex listings show the same 3.1 Flash-Lite rates. Confirm on the Vertex page or the first bill before relying on these.",
+  "notes": "Thinking tokens are billed with output (https://ai.google.dev/gemini-api/docs/thinking, updated 2026-10-14). Batch prediction is half price. Gemini 2.5 models were due to retire on Vertex around 16 Oct 2026 (v4.3 CLAUDE.md), so they are not planned here.",
+  "models": {
+    "gemini-3.1-flash-lite": {"input": 0.25, "output": 1.50, "batch_input": 0.125, "batch_output": 0.75},
+    "gemini-3.5-flash-lite": {"input": 0.30, "output": 2.50, "batch_input": 0.15, "batch_output": 1.25},
+    "gemini-3.6-flash": {"input": 0.75, "output": 3.75, "batch_input": 0.375, "batch_output": 1.875, "until": "2026-12-31", "then": {"input": 1.50, "output": 7.50}}
+  }
+}

@@ -42,6 +42,8 @@ class Article:
     title: str  # PAGE_TITLE from the extras field; '' when GDELT had none
     lang: str  # 'eng', or the source language code for the translation stream
     stream: str
+    killed: int | None = None  # largest KILL count GDELT extracted from the text (V1 Counts), else None
+    wounded: int | None = None  # largest WOUND count, else None
 
     def to_dict(self) -> dict:
         d = self.__dict__.copy()
@@ -112,6 +114,20 @@ def parse_zip(data: bytes, stream: str) -> Iterator[Article]:
                         yield art
 
 
+def casualty_counts(v1_counts: str) -> tuple[int | None, int | None]:
+    """Largest KILL and WOUND numbers in a V1 Counts field (COUNTTYPE#NUMBER#OBJECT#...; entries ';'-separated)."""
+    best = {"KILL": None, "WOUND": None}
+    for item in v1_counts.split(";"):
+        kind, _, rest = item.partition("#")
+        if kind in best:
+            num = rest.split("#", 1)[0]
+            if num.isdigit():
+                n = int(num)
+                if best[kind] is None or n > best[kind]:
+                    best[kind] = n
+    return best["KILL"], best["WOUND"]
+
+
 def parse_row(fields: list[str], stream: str) -> Article | None:
     if len(fields) < GKG_FIELDS:
         return None
@@ -128,6 +144,7 @@ def parse_row(fields: list[str], stream: str) -> Article | None:
     m = _TITLE.search(fields[26])
     title = html.unescape(m.group(1)).strip() if m else ""
     lm = _SRC_LANG.search(fields[25])
+    killed, wounded = casualty_counts(fields[5])
     return Article(
         record_id=fields[0],
         published=published,
@@ -139,4 +156,6 @@ def parse_row(fields: list[str], stream: str) -> Article | None:
         title=title,
         lang=lm.group(1) if lm else "eng",
         stream=stream,
+        killed=killed,
+        wounded=wounded,
     )

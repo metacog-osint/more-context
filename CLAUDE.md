@@ -27,6 +27,11 @@ Serves warning (did something change?) and awareness (what is the picture, how i
 - `catalog/sources.json` - 83 sources in 16 groups: 51 polled RSS feeds, 2 to retry, 17 dropped (reason
   recorded), 13 GDELT-only outlets tagged by domain (wires, Russian/Chinese/Iranian outlets with no usable feed).
 - `catalog/indicators/` - per-zone charters (key questions + indicator ladder). Tom writes these.
+- `catalog/entities.json` also holds a one-sentence `profile` per zone/topic (scope for embeddings and prompts).
+- `catalog/title_terms.json` - multilingual headline terms per entity: the free keyword baseline for relevance.
+- `catalog/eval/` - relevance test sets (`relevance_v1.jsonl`: 278 stories labelled on/off/unclear, Claude's
+  draft awaiting Tom's spot-check) + population files for weighting. Rules and results: `catalog/eval/README.md`.
+- `catalog/vertex_prices.json` - Gemini prices with source and date checked.
 - `pipeline/` - Python, standard library only so far.
   - `gdelt.py` - list, download and parse GDELT GKG 2.1 15-minute files (English + translation streams).
   - `match.py` - zone/topic matching from the catalog.
@@ -38,6 +43,15 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   - `feeds.py` - one RSS poll over the active sources (shared by the CLI and the cloud cycle).
   - `cycle.py` - one 15-minute ingest cycle: new GDELT files (late files retried up to 3 h, never blocking),
     one RSS poll; writes `cycles/YYYY/MM/DD/HHMMSS.jsonl` + `state/state.json`. `sinks.py`: local folder or GCS.
+  - `relevance.py` - scores relevance methods against a labelled set (weighted precision, retention vs v4.3,
+    bootstrap intervals); headline-term matcher. `python -I run.py eval-relevance`.
+  - `coding.py` - story coding schema (PLOVER v0.8 event types + quads, actors, direction, casualties, frame,
+    confidence), prompt builder, answer validation. No calls.
+  - `vertex.py` - Vertex Gemini REST client (global endpoint, gcloud token locally, metadata token on Cloud Run)
+    that refuses to run without a spend cap and stops at it; token and cost estimates with no calls.
+    `python -I run.py vertex-estimate` (free). `python -I run.py code-stories --cap <USD>` is BILLABLE: Tom's yes first.
+  - `measures.py` - attention anomaly (log-scale z vs the entity's previous 28 complete days, weekday-adjusted)
+    and casualty-reporting share (presence of GDELT KILL/WOUND counts; the numbers themselves are unreliable).
   - `daily.py` - daily story build inside the cycle: day D is built on the first run after D+1 03:15 UTC, from
     rows published on D; writes `stories/YYYY/MM/DD/stories.jsonl` + `summary.json` (per-entity totals, reprint
     inflation, source-group counts). Local: `python -I run.py build-stories --day YYYY-MM-DD --root <folder>`.
@@ -66,5 +80,11 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   gate = 7 days of stored data (about 2 Nov) and reprint inflation measured (done: 1.25x overall).
 - First finding: only ~32% of English articles v4.3's rules assign to a zone name that zone in the headline,
   so Phase 2 starts with a relevance check (embeddings + model) before coding.
+- Phase 2 started 26 Oct 2026 (no spend yet). Relevance v1 (Claude-drafted labels): v4.3's rules are on-topic
+  for ~42% of matched stories (90% range 30-53%); a free headline-term filter reaches ~82% while keeping ~78%
+  of on-topic stories (likely flattered: same reviewer wrote terms and labels). Coding all 278 test stories with
+  gemini-3.1-flash-lite: est. $0.07; coding every v4.3 match daily: est. ~$219/month, so code only filtered or top stories.
+- Casualty flags (`killed`/`wounded` on GDELT rows, per-story tallies) and the two measures are in the code but
+  NOT deployed: `mc-ingest` still runs the 26 Oct build until Tom approves a redeploy. Old rows simply lack the fields.
 - Waiting on Tom: indicator charters for four zones (suggested Ukraine, Israel-Gaza-Lebanon, Iran & Red Sea,
   India-Pakistan), decisions on the source list (plan doc, "Source list (draft)" tab), Vertex budget for Phase 2.

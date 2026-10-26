@@ -1,0 +1,82 @@
+{
+ "source": "matched-20261026163000-6h.jsonl",
+ "articles_in_file": 8985,
+ "entities": {
+  "01_Ukraine_Conflict": {
+   "stories": 2128,
+   "articles": 2534
+  },
+  "02_Taiwan_Strait": {
+   "stories": 127,
+   "articles": 157
+  },
+  "03_Korea_Peninsula": {
+   "stories": 108,
+   "articles": 132
+  },
+  "05_Venezuela": {
+   "stories": 230,
+   "articles": 267
+  },
+  "06_India_Pakistan": {
+   "stories": 1049,
+   "articles": 1161
+  },
+  "07_Russia_NATO": {
+   "stories": 546,
+   "articles": 606
+  },
+  "08_South_China_Sea": {
+   "stories": 378,
+   "articles": 411
+  },
+  "10_Israel_Gaza_Lebanon": {
+   "stories": 1116,
+   "articles": 1586
+  },
+  "11_Iran_Red_Sea": {
+   "stories": 1143,
+   "articles": 1676
+  },
+  "12_Sahel_West_Africa": {
+   "stories": 75,
+   "articles": 81
+  },
+  "13_Sudan": {
+   "stories": 67,
+   "articles": 71
+  },
+  "14_DRC_Rwanda": {
+   "stories": 76,
+   "articles": 110
+  },
+  "15_Cuba": {
+   "stories": 31,
+   "articles": 35
+  },
+  "16_Myanmar": {
+   "stories": 10,
+   "articles": 11
+  },
+  "17_Horn_of_Africa": {
+   "stories": 60,
+   "articles": 72
+  },
+  "T1_Critical_Minerals": {
+   "stories": 21,
+   "articles": 28
+  },
+  "T2_Semiconductors": {
+   "stories": 29,
+   "articles": 41
+  },
+  "T3_Undersea_Infrastructure": {
+   "stories": 8,
+   "articles": 8
+  },
+  "T5_Sanctions_Shadow_Fleet": {
+   "stories": 14,
+   "articles": 15
+  }
+ }
+}

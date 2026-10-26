@@ -1,0 +1,96 @@
+"""Measures computed from the daily story build. No model calls; all free.
+
+- attention_anomaly: how unusual today's story count is against the entity's own last 28 complete days,
+  adjusted for day of week. Counts are log-transformed (news volume is skewed), so z is in log units:
+  z = 2 means about two typical day-to-day swings above the expected level for that weekday.
+- casualty_share: share of articles (and stories) whose GDELT counts report people killed or wounded.
+  GDELT extracts these counts from article text (V1 Counts, KILL and WOUND types); a rise in the share
+  means more of the coverage is reporting casualties, not that the true toll rose by that much. Only
+  presence is used: the extracted numbers are unreliable (a live file on 26 Oct 2026 carried KILL 30,000,000
+  on a political story).
+
+Thresholds for Watch / Warning / Crisis belong in each zone's indicator charter, not here.
+"""
+from __future__ import annotations
+
+import math
+from datetime import date, timedelta
+from statistics import mean, pstdev
+
+BASELINE_DAYS = 28
+MIN_BASELINE_DAYS = 14
+SD_FLOOR = 0.15  # log units; stops a very steady baseline from turning small changes into huge z
+
+
+def attention_anomaly(history: dict[date, float], day: date, count: float,
+                      baseline_days: int = BASELINE_DAYS, min_days: int = MIN_BASELINE_DAYS) -> dict | None:
+    """z-score of `count` on `day` against the previous `baseline_days` days in `history` (complete days only).
+
+    Returns None until there are `min_days` baseline days. The weekday adjustment needs at least two
+    baseline days on that weekday; otherwise it is skipped and `weekday_adjusted` is False.
+    """
+    start = day - timedelta(days=baseline_days)
+    base = {d: c for d, c in history.items() if start <= d < day and c is not None}
+    if len(base) < min_days:
+        return None
+    y = {d: math.log1p(c) for d, c in base.items()}
+    level = mean(y.values())
+    by_wd: dict[int, list[float]] = {}
+    for d, v in y.items():
+        by_wd.setdefault(d.weekday(), []).append(v)
+    adjust = {wd: mean(vs) - level for wd, vs in by_wd.items() if len(vs) >= 2}
+    weekday_adjusted = day.weekday() in adjust
+    resid = [v - level - adjust.get(d.weekday(), 0.0) for d, v in y.items()]
+    sd = max(pstdev(resid), SD_FLOOR)
+    expected = level + adjust.get(day.weekday(), 0.0)
+    z = (math.log1p(count) - expected) / sd
+    return {
+        "z": round(z, 2),
+        "expected": round(math.expm1(expected), 1),
+        "ratio": round(count / math.expm1(expected), 2) if math.expm1(expected) > 0 else None,
+        "baseline_days": len(base),
+        "weekday_adjusted": weekday_adjusted,
+    }
+
+
+def casualty_share(articles: list[dict], stories: list[dict] | None = None) -> dict | None:
+    """Share of articles reporting killed / wounded, overall and by source group.
+
+    Only rows that carry the count fields are counted (rows ingested before casualty flags were added
+    have none); returns None when no row has them.
+    """
+    known = [a for a in articles if "killed" in a]
+    if not known:
+        return None
+
+    def share(rows: list[dict], key: str) -> float:
+        return round(sum(1 for a in rows if (a.get(key) or 0) > 0) / len(rows), 3)
+
+    out = {
+        "articles_counted": len(known),
+        "articles_total": len(articles),
+        "killed_share": share(known, "killed"),
+        "wounded_share": share(known, "wounded"),
+        "by_group": {},
+    }
+    groups: dict[str, list[dict]] = {}
+    for a in known:
+        if a.get("group"):
+            groups.setdefault(a["group"], []).append(a)
+    for g, rows in sorted(groups.items()):
+        out["by_group"][g] = {"articles": len(rows), "killed_share": share(rows, "killed")}
+    if stories is not None and len(known) == len(articles) and stories:
+        out["stories_with_killed_share"] = round(sum(1 for s in stories if s.get("killed_articles")) / len(stories), 3)
+    return out
+
+
+def is_partial(summary: dict) -> bool:
+    """A built day is partial when its first cycle file is later than 01:00 UTC on that day."""
+    if "partial" in summary:
+        return bool(summary["partial"])
+    first = summary.get("first_cycle") or ""
+    day = summary.get("day", "")
+    expected_prefix = f"cycles/{day.replace('-', '/')}/"
+    if not first.startswith(expected_prefix):
+        return True
+    return first[len(expected_prefix):len(expected_prefix) + 6] > "010000"

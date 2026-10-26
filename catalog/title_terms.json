@@ -1,0 +1,126 @@
+{
+  "version": "2026-10-26.1",
+  "notes": "Free keyword baseline for relevance: a story counts for an entity when its headline (or URL words) contains one of these terms. Written once from general knowledge of each zone, before scoring; not tuned to the labelled set. Matching folds case and accents. Latin, Cyrillic and Greek terms match whole words; a trailing * allows any ending. Hangul terms match from a word start. Chinese, Japanese, Arabic, Hebrew and Indic terms match anywhere (those scripts attach prefixes or have no spaces).",
+  "terms": {
+    "01_Ukraine_Conflict": [
+      "ukrain*", "ucrain*", "ukrajin*", "ukrajn*", "ukrayn*", "oekra*", "ουκραν*", "украин*", "україн*", "украјин*", "украйн*",
+      "乌克兰", "烏克蘭", "ウクライナ", "우크라이나", "أوكران", "אוקראינ",
+      "kyiv", "kiev", "kiew", "kijow", "kijev", "kyjev", "київ*", "киев*", "кијев*", "基辅",
+      "zelensk*", "zelenskyj", "zelenskij", "selenskyj", "zelenszkij", "зеленськ*", "зеленск*", "泽连斯基", "젤렌스키",
+      "donbas*", "donbass", "донбас*", "crimea", "crimée", "krim", "krym", "крим*", "крым*",
+      "kharkiv", "kharkov", "charkiw", "харків*", "харьков*", "zaporizh*", "zaporozh*", "saporischschja", "запоріж*", "запорож*",
+      "kherson", "cherson", "херсон*", "odesa", "odessa", "одес*", "всу", "зсу", "俄乌"
+    ],
+    "07_Russia_NATO": [
+      "nato", "otan", "нато", "北约", "北約", "나토", "الناتو", "נאט\"ו", "νατο",
+      "kaliningrad", "калининград*", "калінінград*", "suwalki", "suwałki", "narva",
+      "baltic", "báltico", "baltique", "baltico", "ostsee", "baltijos", "baltijas", "балтий*", "балтійськ*",
+      "eastern flank", "ostflanke", "flanc est", "flanco oriental", "східний фланг", "восточный фланг"
+    ],
+    "02_Taiwan_Strait": [
+      "taiwan*", "tayvan*", "tajvan*", "tchaj-wan", "тайван*", "тайвань*", "台湾", "台灣", "臺灣", "대만", "타이완", "تايوان", "טייוואן", "ταϊβαν", "đai loan",
+      "taipei", "taipé", "台北", "台海", "两岸", "兩岸", "共軍", "共军", "解放軍", "解放军", "kinmen", "金门", "金門", "lai ching-te", "賴清德", "赖清德"
+    ],
+    "08_South_China_Sea": [
+      "south china sea", "mar de china meridional", "mar meridional de china", "mer de chine méridionale", "südchinesisch*", "mar cinese meridionale",
+      "mar do sul da china", "южно-китайск*", "південнокитайськ*", "南海", "南中国海", "남중국해", "بحر الصين الجنوبي", "biển đông",
+      "west philippine sea", "spratly", "spratlys", "trường sa", "南沙", "paracel*", "hoàng sa", "西沙", "scarborough", "黄岩岛", "黃岩島",
+      "second thomas", "ayungin", "仁爱礁", "reed bank", "china coast guard", "chinese coast guard", "中国海警", "海警"
+    ],
+    "03_Korea_Peninsula": [
+      "north korea*", "korea del norte", "corée du nord", "coree du nord", "nordkorea*", "corea del nord", "coreia do norte", "kuzey kore*",
+      "severní kore*", "korea północna", "korei północnej", "korea utara", "korut", "северн* коре*", "північн* коре*", "кндр", "ндр корея",
+      "朝鲜", "北韓", "北朝鮮", "북한", "평양", "pyongyang", "平壤", "пхеньян*", "kim jong*", "ким чен*", "кім чен*", "金正恩", "김정은",
+      "dmz", "비무장", "판문점", "panmunjom", "한미", "한-미", "전작권"
+    ],
+    "10_Israel_Gaza_Lebanon": [
+      "israel*", "israël*", "israil*", "izrael*", "израил*", "ізраїл*", "以色列", "이스라엘", "إسرائيل", "اسرائيل", "ישראל", "ισραηλ*",
+      "gaza*", "gazze*", "сектор* газ*", "加沙", "加薩", "가자", "غزة", "עזה", "γαζα",
+      "hamas", "hamás", "хамас*", "哈马斯", "哈瑪斯", "하마스", "حماس", "חמאס", "χαμας",
+      "hezbol*", "hizbul*", "hizbol*", "хезболл*", "хізбол*", "真主党", "真主黨", "헤즈볼라", "حزب الله", "חיזבאללה",
+      "lebanon", "líbano", "liban*", "ливан*", "ліван*", "黎巴嫩", "레바논", "لبنان", "לבנון",
+      "netanyahu*", "netanjahu*", "нетаньях*", "нетаньяг*", "нетанях*", "内塔尼亚胡", "內塔尼亞胡", "네타냐후", "نتنياهو", "נתניהו",
+      "idf", "tsahal", "צה\"ל", "west bank", "cisjordania", "cisjordanie", "westjordanland", "cisgiordania", "الضفة",
+      "palestin*", "palästin*", "palestyn*", "filistin*", "палестин*", "巴勒斯坦", "팔레스타인", "فلسطين", "פלסטינ", "الاحتلال", "october 7", "7 de octubre", "7 octobre", "7. oktober"
+    ],
+    "11_Iran_Red_Sea": [
+      "iran*", "irão", "iraan*", "иран*", "іран*", "伊朗", "이란", "إيران", "ايران", "ایران", "איראן", "ιραν*",
+      "tehran", "teheran", "téhéran", "teherán", "тегеран*", "德黑兰", "테헤란", "طهران", "טהרן",
+      "khamenei", "chamenei", "jamenei", "хаменеи", "хаменеї", "哈梅内伊", "خامنئي", "irgc", "revolutionary guard*", "pasdaran", "الحرس الثوري",
+      "hormuz", "ormuz", "ормуз*", "霍尔木兹", "هرمز", "red sea", "mar rojo", "mer rouge", "rotes meer", "roten meer", "mar rosso", "mar vermelho",
+      "красн* мор*", "червон* мор*", "红海", "홍해", "البحر الأحمر",
+      "houthi*", "huthi*", "huti*", "hutí*", "хусит*", "хуси", "хусі*", "胡塞", "후티", "الحوثي", "חות'ים", "חותים",
+      "yemen*", "jemen*", "yémen*", "iêmen", "йемен*", "ємен*", "也门", "예멘", "اليمن", "תימן", "bab el-mandeb", "bab al-mandab", "باب المندب"
+    ],
+    "06_India_Pakistan": [
+      "pakistan*", "pakistán", "paquistão", "paquistan*", "пакистан*", "巴基斯坦", "파키스탄", "باكستان", "پاکستان", "पाकिस्तान", "పాకిస్తాన్", "పాకిస్థాన్", "પાકિસ્તાન",
+      "kashmir*", "cachemira", "cachemire", "kaschmir", "keşmir", "кашмир*", "克什米尔", "카슈미르", "كشمير", "कश्मीर", "కాశ్మీర్",
+      "jammu", "islamabad", "rawalpindi", "pahalgam", "line of control", "india-pakistan", "indo-pak*", "lashkar*", "jaish*", "sindoor"
+    ],
+    "13_Sudan": [
+      "sudan*", "soudan*", "sudão", "szudán*", "судан*", "苏丹", "蘇丹", "السودان", "סודאן", "σουδαν*",
+      "khartoum", "jartum", "khartum", "chartum", "хартум*", "darfur*", "дарфур*", "el fasher", "el-fasher", "al-fashir", "fasher", "الفاشر",
+      "rsf", "rapid support forces", "forces de soutien rapide", "fuerzas de apoyo rápido", "الدعم السريع", "kordofan", "كردفان", "hemedti", "حميدتي", "nyala", "نيالا"
+    ],
+    "17_Horn_of_Africa": [
+      "ethiopi*", "etiopi*", "äthiopi*", "эфиоп*", "ефіоп*", "埃塞俄比亚", "衣索比亞", "에티오피아", "إثيوبيا", "اثيوبيا", "אתיופי", "αιθιοπ*",
+      "somali*", "сомали*", "сомалі*", "索马里", "소말리아", "الصومال", "סומלי",
+      "eritre*", "érythrée", "эритре*", "еритре*", "厄立特里亚", "에리트레아", "إريتريا",
+      "djibouti", "yibuti", "dschibuti", "джибути", "吉布提", "지부티", "جيبوتي",
+      "tigray*", "тыграй", "amhara", "al-shabaab", "al shabaab", "al-shabab", "shabaab", "mogadishu", "mogadiscio", "mogadischu", "могадишо", "addis ababa", "addis abeba", "abiy"
+    ],
+    "12_Sahel_West_Africa": [
+      "sahel*", "сахел*", "萨赫勒", "الساحل",
+      "mali", "malian*", "malien*", "maliano*", "malier*", "малийск*", "马里", "말리", "مالي",
+      "burkina*", "буркина*", "буркіна*", "布基纳法索", "부르키나", "بوركينا",
+      "niger", "nigerien*", "nigerino*", "nijer*", "нигер", "нігер*", "尼日尔", "니제르", "النيجر",
+      "jnim", "wagner", "africa corps", "africa korps", "африканск* корпус*", "африканськ* корпус*",
+      "goita", "tchiani", "bamako", "niamey", "ouagadougou", "kidal", "timbuktu", "tombouctou", "menaka"
+    ],
+    "14_DRC_Rwanda": [
+      "congo*", "kongo*", "конго", "刚果", "剛果", "콩고", "الكونغو", "rdc", "drc", "dr congo",
+      "rwanda*", "ruanda*", "руанд*", "卢旺达", "盧安達", "르완다", "رواندا",
+      "m23", "goma", "bukavu", "kivu", "kinshasa", "kigali", "kagame", "tshisekedi", "fardc", "adf"
+    ],
+    "16_Myanmar": [
+      "myanmar*", "birmania", "birmanie", "burma", "burmese", "birman*", "мьянм*", "м'янм*", "бирм*", "缅甸", "緬甸", "미얀마", "ميانمار", "מיאנמר", "μιανμαρ",
+      "rohingya*", "рохинджа", "рохінджа", "罗兴亚", "羅興亞", "로힝야", "الروهينغا",
+      "tatmadaw", "naypyidaw", "naypyitaw", "rakhine", "arakan", "sagaing", "kachin", "min aung hlaing", "敏昂莱"
+    ],
+    "05_Venezuela": [
+      "venezuel*", "vénézuél*", "venecuel*", "венесуел*", "венецуел*", "委内瑞拉", "委內瑞拉", "베네수엘라", "فنزويل", "ונצואל", "βενεζουελ*",
+      "caracas", "каракас*", "maduro", "мадуро", "machado", "мачадо", "chavis*"
+    ],
+    "15_Cuba": [
+      "cuba*", "kuba*", "küba*", "куба", "кубы", "кубе", "кубу", "кубинск*", "古巴", "쿠바", "كوبا", "קובה", "κουβα",
+      "havana", "habana", "la havane", "havanna", "гавана", "díaz-canel", "balsero*"
+    ],
+    "T1_Critical_Minerals": [
+      "critical mineral*", "minerales críticos", "minéraux critiques", "minerais críticos", "minerali critici", "kritische rohstoffe", "kritische mineralien",
+      "критическ* минерал*", "критичн* мінерал*", "关键矿产", "关键矿物", "關鍵礦產", "핵심광물", "핵심 광물",
+      "rare earth*", "rare-earth*", "tierras raras", "terres rares", "seltene erden", "terre rare", "terras raras", "редкоземел*", "рідкісноземел*", "稀土", "희토류",
+      "lithium", "litio", "литий", "cobalt", "cobalto", "кобальт", "gallium", "germanium", "antimony", "antimon*", "antimoine", "tungsten", "wolfram*", "graphite"
+    ],
+    "T2_Semiconductors": [
+      "semiconductor*", "semi-conducteur*", "semiconducteur*", "halbleiter*", "semiconduttor*", "полупроводник*", "напівпровідник*",
+      "半导体", "半導體", "芯片", "晶片", "반도체", "أشباه الموصلات",
+      "chip", "chips", "microchip*", "chipmaker*", "tsmc", "asml", "lithography", "export control*"
+    ],
+    "T3_Undersea_Infrastructure": [
+      "undersea", "subsea", "submarine cable*", "cable submarino", "cables submarinos", "câble sous-marin", "câbles sous-marins",
+      "unterseekabel*", "seekabel*", "cavo sottomarino", "cavi sottomarini", "cabo submarino", "cabos submarinos",
+      "подводн* кабел*", "підводн* кабел*", "海底电缆", "海底光缆", "海底電纜", "海缆", "海纜", "해저케이블", "해저 케이블",
+      "nord stream", "северн* поток*", "північн* потік*", "balticconnector", "estlink", "seabed"
+    ],
+    "T4_GNSS_Counterspace": [
+      "gps jamming", "gps-jamming", "gnss", "gps spoofing", "spoofing", "jamming", "brouillage gps", "interferencia gps", "gps-störung*", "gps-stör*",
+      "глушение gps", "глушіння", "anti-satellite", "asat", "counterspace", "satellite jamming"
+    ],
+    "T5_Sanctions_Shadow_Fleet": [
+      "sanction*", "sanción", "sanciones", "sancion*", "sanzion*", "sanções", "sanktion*", "sankcj*", "sankci*", "yaptırım*",
+      "санкци*", "санкці*", "制裁", "제재", "عقوبات", "العقوبات", "סנקציות", "κυρωσ*",
+      "shadow fleet", "flota fantasma", "flotte fantôme", "schattenflotte", "flotta ombra", "теневой флот", "тіньовий флот", "影子船队", "影子舰队", "그림자 선단",
+      "dark fleet", "price cap", "embargo*"
+    ]
+  }
+}
