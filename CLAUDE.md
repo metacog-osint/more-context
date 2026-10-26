@@ -29,7 +29,7 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   - `gdelt.py` - list, download and parse GDELT GKG 2.1 15-minute files (English + translation streams).
   - `match.py` - zone/topic matching from the catalog.
   - `stories.py` - title normalisation, exact + near-duplicate grouping (MinHash LSH) into stories.
-  - `cli.py` - `python -I -m pipeline.cli measure-reprints --hours 6`
+  - `cli.py` - `python -I run.py measure-reprints --hours 6` (run.py makes `python -I` work)
 - `tests/` - `python -m unittest discover -s tests -t .` (CI runs this on every push).
 - `data/` - downloads and reports, git-ignored.
 

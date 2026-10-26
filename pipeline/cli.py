@@ -1,7 +1,7 @@
 """Command line for MORE CONTEXT pipeline steps.
 
-    python -I -m pipeline.cli measure-reprints --hours 6
-    python -I -m pipeline.cli measure-reprints --from-jsonl data/raw/matched-<stamp>.jsonl
+    python -I run.py measure-reprints --hours 6
+    python -I run.py measure-reprints --from-jsonl data/raw/matched-<stamp>.jsonl
 """
 from __future__ import annotations
 
