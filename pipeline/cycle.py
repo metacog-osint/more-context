@@ -7,9 +7,9 @@ GDELT rows carry their zone/topic labels and, when the outlet is catalogued, its
 from __future__ import annotations
 
 from collections import Counter
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
-from . import feeds, gdelt, health
+from . import daily, feeds, gdelt, health
 from .match import Matcher
 from .sources import lookup_domain
 
@@ -63,7 +63,8 @@ def gdelt_rows(stamp: str, stream: str, data: bytes, matcher: Matcher) -> list[d
 
 
 def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool = True,
-              latest=gdelt.latest_stamp, download=gdelt.download, poll=feeds.poll) -> dict:
+              latest=gdelt.latest_stamp, download=gdelt.download, poll=feeds.poll,
+              build_stories: bool = True) -> dict:
     now = now or datetime.now(timezone.utc)
     state = sink.read_json(STATE_KEY) or {}
     gstate = state.setdefault("gdelt", {})
@@ -127,6 +128,20 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
         key = f"cycles/{now:%Y/%m/%d}/{now:%H%M%S}.jsonl"
         sink.write_lines(key, rows)
         summary["written"] = {"key": key, "rows": len(rows)}
+        state.setdefault("first_data_day", f"{now:%Y-%m-%d}")
+
+    if build_stories:
+        sstate = state.setdefault("stories", {})
+        first = state.get("first_data_day")
+        for day in daily.days_to_build(sstate.get("last_day"), now, date.fromisoformat(first) if first else None):
+            try:
+                summary.setdefault("stories_built", []).append(daily.build_day(sink, day))
+                sstate["last_day"] = day.isoformat()
+            except Exception as e:  # leave last_day; the next run retries this day
+                sstate["last_error"] = f"{day}: {e}"[:200]
+                summary["stories_error"] = sstate["last_error"]
+                break
+
     state["last_run"] = summary
     sink.write_json(STATE_KEY, state)
     return summary

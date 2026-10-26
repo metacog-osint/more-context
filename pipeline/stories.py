@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 import random
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from urllib.parse import unquote, urlparse
 
 MIN_TOKENS = 4  # shorter titles only merge on an exact match
@@ -120,9 +120,15 @@ def group_titles(norms: list[str]) -> list[int]:
     return [root_of[uniq[n]] for n in norms]
 
 
-def build_stories(articles: list[dict]) -> list[dict]:
-    """Group article dicts (url, title, domain, published, lang) into story dicts, largest first.
+def _domain(a: dict) -> str:
+    return a.get("domain") or urlparse(a["url"]).netloc.lower().removeprefix("www.")
 
+
+def build_stories(articles: list[dict]) -> list[dict]:
+    """Group article dicts (url, title, published, lang; domain or source) into story dicts, largest first.
+
+    Each story carries a stable id (hash of its normalised title), its article, outlet and language counts,
+    and counts by source group (western_wire, russian_state...) where the articles carry one.
     Articles without a usable title or slug stay as single-article stories.
     """
     by_url: dict[str, dict] = {}
@@ -135,19 +141,24 @@ def build_stories(articles: list[dict]) -> list[dict]:
         norms.append(n or f"__url__ {a['url']}")
     ids = group_titles(norms)
     groups: dict[int, list[dict]] = defaultdict(list)
-    for sid, a in zip(ids, arts):
+    norm_of: dict[int, str] = {}
+    for sid, a, n in zip(ids, arts, norms):
         groups[sid].append(a)
+        norm_of.setdefault(sid, n)
     stories = []
-    for members in groups.values():
-        members.sort(key=lambda a: a["published"])
+    for sid, members in groups.items():
+        members.sort(key=lambda a: a.get("published") or a.get("fetched") or "")
         first = members[0]
+        by_group = Counter(a["group"] for a in members if a.get("group"))
         stories.append({
+            "story_id": hashlib.sha1(norm_of[sid].encode("utf-8")).hexdigest()[:16],
             "title": first.get("title") or title_from_url(first["url"]),
-            "first_seen": first["published"],
+            "first_seen": first.get("published") or first.get("fetched"),
             "articles": len(members),
-            "outlets": len({a["domain"] for a in members}),
+            "outlets": len({_domain(a) for a in members}),
             "languages": sorted({a.get("lang", "eng") for a in members}),
+            "groups": dict(by_group),
             "sample_urls": [a["url"] for a in members[:5]],
         })
-    stories.sort(key=lambda s: (-s["articles"], s["first_seen"]))
+    stories.sort(key=lambda s: (-s["articles"], s["first_seen"] or ""))
     return stories

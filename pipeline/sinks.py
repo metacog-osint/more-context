@@ -33,6 +33,16 @@ class LocalSink:
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(_lines(rows), encoding="utf-8")
 
+    def list(self, prefix: str) -> list[str]:
+        base = self.root / prefix
+        if not base.exists():
+            return []
+        return sorted(str(p.relative_to(self.root)).replace("\\", "/") for p in base.rglob("*") if p.is_file())
+
+    def read_lines(self, key: str) -> list[dict]:
+        p = self.root / key
+        return [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
+
 
 class GCSSink:
     def __init__(self, bucket: str):
@@ -50,3 +60,10 @@ class GCSSink:
 
     def write_lines(self, key: str, rows: list[dict]) -> None:
         self.bucket.blob(key).upload_from_string(_lines(rows), content_type="application/x-ndjson")
+
+    def list(self, prefix: str) -> list[str]:
+        return sorted(b.name for b in self.bucket.client.list_blobs(self.bucket, prefix=prefix))
+
+    def read_lines(self, key: str) -> list[dict]:
+        text = self.bucket.blob(key).download_as_text()
+        return [json.loads(line) for line in text.splitlines() if line.strip()]
