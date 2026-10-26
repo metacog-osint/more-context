@@ -38,6 +38,9 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   - `feeds.py` - one RSS poll over the active sources (shared by the CLI and the cloud cycle).
   - `cycle.py` - one 15-minute ingest cycle: new GDELT files (late files retried up to 3 h, never blocking),
     one RSS poll; writes `cycles/YYYY/MM/DD/HHMMSS.jsonl` + `state/state.json`. `sinks.py`: local folder or GCS.
+  - `daily.py` - daily story build inside the cycle: day D is built on the first run after D+1 03:15 UTC, from
+    rows published on D; writes `stories/YYYY/MM/DD/stories.jsonl` + `summary.json` (per-entity totals, reprint
+    inflation, source-group counts). Local: `python -I run.py build-stories --day YYYY-MM-DD --root <folder>`.
 - `main.py`, `requirements.txt`, `.gcloudignore` - Cloud Run function wrapper (`mc-ingest`).
   `scripts/deploy_ingest.sh` creates bucket, service accounts, private function, one Scheduler job.
   Local dry run: `python -I run.py cycle`. Redeploy after code changes with the `gcloud functions deploy`

@@ -64,6 +64,16 @@ def cmd_cycle(args) -> int:
     return 0
 
 
+def cmd_build_stories(args) -> int:
+    from datetime import date
+
+    from .daily import build_day
+    from .sinks import LocalSink
+
+    print(json.dumps(build_day(LocalSink(Path(args.root)), date.fromisoformat(args.day)), indent=1))
+    return 0
+
+
 def cmd_feed_health(args) -> int:
     now = health.utcnow()
     print("GDELT streams (expected every 15 min):")
@@ -229,6 +239,10 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--root", default=str(DATA / "cloudsim"))
     c.add_argument("--no-rss", action="store_true")
     c.set_defaults(func=cmd_cycle)
+    b = sub.add_parser("build-stories", help="build one day's stories from a local folder of cycle files")
+    b.add_argument("--day", required=True, help="YYYY-MM-DD (UTC)")
+    b.add_argument("--root", default=str(DATA / "cloudsim"))
+    b.set_defaults(func=cmd_build_stories)
     args = p.parse_args(argv)
     return args.func(args)
 
