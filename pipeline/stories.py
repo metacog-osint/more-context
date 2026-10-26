@@ -159,6 +159,8 @@ def build_stories(articles: list[dict]) -> list[dict]:
             "languages": sorted({a.get("lang", "eng") for a in members}),
             "groups": dict(by_group),
             "sample_urls": [a["url"] for a in members[:5]],
+            "killed_articles": sum(1 for a in members if (a.get("killed") or 0) > 0),
+            "wounded_articles": sum(1 for a in members if (a.get("wounded") or 0) > 0),
         })
     stories.sort(key=lambda s: (-s["articles"], s["first_seen"] or ""))
     return stories

@@ -5,13 +5,15 @@ posts late (the translated stream runs about an hour behind; retries last up to 
 assigned to D by publication time, so rows written just after midnight still count for the right day.
 
 Writes `stories/YYYY/MM/DD/stories.jsonl` (one row per story: entity, ids, counts, source groups) and
-`stories/YYYY/MM/DD/summary.json` (per-entity totals and reprint inflation).
+`stories/YYYY/MM/DD/summary.json` (per-entity totals, reprint inflation, casualty-reporting share, and
+attention anomaly against the entity's previous 28 complete days; see pipeline/measures.py).
 """
 from __future__ import annotations
 
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta, timezone
 
+from . import measures
 from .stories import build_stories
 
 BUILD_DELAY = timedelta(hours=3, minutes=15)
@@ -48,8 +50,22 @@ def load_day_rows(sink, day: date) -> tuple[list[dict], list[str]]:
     return [r for k in keys for r in sink.read_lines(k) if _row_day(r) == want], keys
 
 
+def story_history(sink, day: date, days: int = measures.BASELINE_DAYS) -> dict[str, dict[date, int]]:
+    """Stories per entity on each complete day before `day`, from earlier summaries."""
+    out: dict[str, dict[date, int]] = defaultdict(dict)
+    for i in range(1, days + 1):
+        d = day - timedelta(days=i)
+        s = sink.read_json(f"stories/{d:%Y/%m/%d}/summary.json")
+        if not s or measures.is_partial(s):
+            continue
+        for eid, e in s.get("entities", {}).items():
+            out[eid][d] = e.get("stories", 0)
+    return out
+
+
 def build_day(sink, day: date) -> dict:
     rows, keys = load_day_rows(sink, day)
+    history = story_history(sink, day)
     gdelt = [r for r in rows if r.get("kind") == "gdelt"]
     rss = [r for r in rows if r.get("kind") == "rss"]
 
@@ -70,6 +86,8 @@ def build_day(sink, day: date) -> dict:
             "languages": dict(Counter(a.get("lang", "eng") for a in arts).most_common(8)),
             "top": [{k: s[k] for k in ("story_id", "title", "articles", "outlets", "groups")}
                     for s in stories[:TOP_PER_ENTITY]],
+            "casualty": measures.casualty_share(arts, stories),
+            "attention": measures.attention_anomaly(history.get(eid, {}), day, len(stories)),
         }
         story_rows += [{"day": day.isoformat(), "entity": eid, "kind": "gdelt", **s} for s in stories]
 
@@ -87,6 +105,7 @@ def build_day(sink, day: date) -> dict:
         "first_cycle": keys[0] if keys else None,  # later than about 00:15 on the day means a partial day
         "entities": entities,
     }
+    summary["partial"] = measures.is_partial(summary)
     base = f"stories/{day:%Y/%m/%d}/"
     sink.write_lines(base + "stories.jsonl", story_rows)
     sink.write_json(base + "summary.json", summary)
