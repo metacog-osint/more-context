@@ -14,8 +14,9 @@ that zone or topic? v4.3 counts every match as volume, so off-topic matches infl
   The scorer weights each random story by (stories not in the top draw) / (random draws), so estimates cover
   everything v4.3 matched, not just the largest stories.
 - **Labels:** `on`, `off` or `unclear`, with a short note where a reviewer may disagree.
-  `labelled_by: claude-draft-2026-10-26` means Claude drafted them from the headline. They are waiting for
-  Tom's spot-check, and nothing here should be quoted as final until then.
+  `labelled_by: claude-draft-2026-10-26` means Claude drafted them from the headline. Tom reviewed the list
+  on 26 Oct 2026 and accepted it as the working set, to be monitored and extended over time (new sets from
+  other days, corrections as disagreements surface). Treat results as measured against Claude's labels.
 
 ### Labelling rules
 
