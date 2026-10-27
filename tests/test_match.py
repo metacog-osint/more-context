@@ -59,6 +59,8 @@ class CatalogMatchesV43(unittest.TestCase):
         src = V43_SOURCE.read_text(encoding="utf-8").replace("\\\\", "\\")
         cat = load_catalog()
         for e in cat["zones"] + cat["topics"]:
+            if e.get("match_note"):  # a deliberate, documented departure from CONTEXT v4.3
+                continue
             spec = e["match_v43"]
             pats = [spec.get(k) for k in ("loc", "themes", "not_themes", "url", "url_broad", "url_context")]
             alt = spec.get("loc_alt") or {}

@@ -157,7 +157,7 @@ class OnDemandTests(unittest.TestCase):
 
 class AlarmTests(unittest.TestCase):
     def test_alarm_reasons(self):
-        e = {"stories": 10, "attention": {"z": 2.4}, "casualty": {"anomaly": {"z": 1.0}}}
+        e = {"stories": 10, "attention": {"z": 2.4}, "casualty": {"anomaly": {"z": 9.0}}}  # old field: ignored
         self.assertEqual(measures.alarm_reasons(e), ["attention z 2.4"])
         self.assertEqual(measures.alarm_reasons({**e, "stories": 3}), [])
         h = {date(2026, 11, 19) - timedelta(days=i): 0.10 + (i % 2) * 0.01 for i in range(20)}
@@ -237,10 +237,11 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(out["days"], ["2026-11-19"])
         st, out = self.call("GET", "/summary")
         e = out["entities"]["13_Sudan"]
-        self.assertEqual((st, e["name"], e["killed_share"], e["alarms"]), (200, "Sudan", 0.2, ["attention z 2.5"]))
+        self.assertEqual((st, e["name"], e["alarms"]), (200, "Sudan", ["attention z 2.5"]))
+        self.assertNotIn("killed_share", e)
         self.assertEqual(self.call("GET", "/summary", {"day": "2026-11-18"})[0], 404)
         st, out = self.call("GET", "/entities")
-        self.assertEqual(len(out["zones"]) + len(out["topics"]), 20)
+        self.assertEqual(len(out["zones"]) + len(out["topics"]), 21)
         st, out = self.call("GET", "/status")
         self.assertIn("ingest", out)
 

@@ -789,7 +789,7 @@
    "owner": "private",
    "lang": "eng",
    "focus": [
-    "17_Horn_of_Africa"
+    "18_Ethiopia_Eritrea"
    ],
    "expected_minutes": 360,
    "domains": [
@@ -806,7 +806,7 @@
    "owner": "private",
    "lang": "eng",
    "focus": [
-    "17_Horn_of_Africa"
+    "19_Somalia"
    ],
    "expected_minutes": 360,
    "domains": [
@@ -858,7 +858,8 @@
     "12_Sahel_West_Africa",
     "13_Sudan",
     "14_DRC_Rwanda",
-    "17_Horn_of_Africa"
+    "18_Ethiopia_Eritrea",
+    "19_Somalia"
    ],
    "expected_minutes": 60,
    "domains": [
@@ -1009,7 +1010,8 @@
    "focus": [
     "13_Sudan",
     "14_DRC_Rwanda",
-    "17_Horn_of_Africa",
+    "18_Ethiopia_Eritrea",
+    "19_Somalia",
     "12_Sahel_West_Africa",
     "16_Myanmar"
    ],

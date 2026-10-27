@@ -42,25 +42,9 @@ class AttentionTests(unittest.TestCase):
         self.assertLess(abs(r["z"]), 1)
 
 
-class CasualtyTests(unittest.TestCase):
-    def test_counts_only_rows_with_fields(self):
-        arts = [{"killed": 3, "wounded": None, "group": "western_wire"}, {"killed": None, "wounded": 2, "group": "russian_state"},
-                {"killed": None, "wounded": None, "group": "western_wire"}, {"url": "old row without fields"}]
-        c = measures.casualty_share(arts)
-        self.assertEqual((c["articles_counted"], c["articles_total"]), (3, 4))
-        self.assertEqual(c["killed_share"], round(1 / 3, 3))
-        self.assertEqual(c["wounded_share"], round(1 / 3, 3))
-        self.assertEqual(c["by_group"]["western_wire"], {"articles": 2, "killed_share": 0.5})
-        self.assertNotIn("stories_with_killed_share", c)  # not every row carries the fields
-
-    def test_none_before_flags_exist(self):
-        self.assertIsNone(measures.casualty_share([{"url": "a"}]))
-
-    def test_story_share(self):
-        arts = [{"killed": 1}, {"killed": None}]
-        c = measures.casualty_share(arts, [{"killed_articles": 1}, {"killed_articles": 0}, {"killed_articles": 0}])
-        self.assertEqual(c["stories_with_killed_share"], round(1 / 3, 3))
-
+class CountsTests(unittest.TestCase):
+    # GDELT's KILL/WOUND counts are still parsed onto each row (a story's coding can quote a toll); the
+    # casualty-reporting share built on them was removed on 27 Oct 2026.
     def test_parse_v1_counts(self):
         f = "KILL#6##1#Ukraine#UP#UP#49#32#UP;WOUND#12##1#Ukraine#UP#UP#49#32#UP;KILL#2##1#X#;ARREST#4##;KILL#many##"
         self.assertEqual(gdelt.casualty_counts(f), (6, 12))
@@ -91,7 +75,7 @@ class DailyMeasuresTests(unittest.TestCase):
             sink.write_lines("cycles/2026/11/30/000500.jsonl", rows)
             daily.build_day(sink, day)
             e = sink.read_json("stories/2026/11/30/summary.json")["entities"]["13_Sudan"]
-            self.assertEqual(e["casualty"]["killed_share"], 0.5)
+            self.assertNotIn("casualty", e)
             self.assertEqual(e["attention"]["baseline_days"], 20)
             self.assertGreater(e["attention"]["z"], 3)
             self.assertFalse(sink.read_json("stories/2026/11/30/summary.json")["partial"])

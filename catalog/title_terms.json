@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-26.1",
-  "notes": "Free keyword baseline for relevance: a story counts for an entity when its headline (or URL words) contains one of these terms. Written once from general knowledge of each zone, before scoring; not tuned to the labelled set. Matching folds case and accents. Latin, Cyrillic and Greek terms match whole words; a trailing * allows any ending. Hangul terms match from a word start. Chinese, Japanese, Arabic, Hebrew and Indic terms match anywhere (those scripts attach prefixes or have no spaces).",
+  "version": "2026-10-27.1",
+  "notes": "Free keyword baseline for relevance: a story counts for an entity when its headline (or URL words) contains one of these terms. Written once from general knowledge of each zone, before scoring; not tuned to the labelled set. Matching folds case and accents. Latin, Cyrillic and Greek terms match whole words; a trailing * allows any ending. Hangul terms match from a word start. Chinese, Japanese, Arabic, Hebrew and Indic terms match anywhere (those scripts attach prefixes or have no spaces). 18 and 19 were split from 17 on 27 Oct 2026 (17 kept so the 26 Oct labelled set still scores); the TPLF, Fano, Oromia, Isaias, Somaliland, Puntland, Jubaland and AUSSOM terms were added then.",
   "terms": {
     "01_Ukraine_Conflict": [
       "ukrain*", "ucrain*", "ukrajin*", "ukrajn*", "ukrayn*", "oekra*", "ουκραν*", "украин*", "україн*", "украјин*", "украйн*",
@@ -61,6 +61,18 @@
       "sudan*", "soudan*", "sudão", "szudán*", "судан*", "苏丹", "蘇丹", "السودان", "סודאן", "σουδαν*",
       "khartoum", "jartum", "khartum", "chartum", "хартум*", "darfur*", "дарфур*", "el fasher", "el-fasher", "al-fashir", "fasher", "الفاشر",
       "rsf", "rapid support forces", "forces de soutien rapide", "fuerzas de apoyo rápido", "الدعم السريع", "kordofan", "كردفان", "hemedti", "حميدتي", "nyala", "نيالا"
+    ],
+    "18_Ethiopia_Eritrea": [
+      "ethiopi*", "etiopi*", "äthiopi*", "эфиоп*", "ефіоп*", "埃塞俄比亚", "衣索比亞", "에티오피아", "إثيوبيا", "اثيوبيا", "אתיופי", "αιθιοπ*",
+      "eritre*", "érythrée", "эритре*", "еритре*", "厄立特里亚", "에리트레아", "إريتريا",
+      "tigray*", "тыграй", "amhara", "afar", "oromia", "oromiya", "oromo", "tplf", "fano", "mekelle", "mekele",
+      "addis ababa", "addis abeba", "asmara", "abiy", "isaias"
+    ],
+    "19_Somalia": [
+      "somali*", "сомали*", "сомалі*", "索马里", "소말리아", "الصومال", "סומלי",
+      "djibouti", "yibuti", "dschibuti", "джибути", "吉布提", "지부티", "جيبوتي",
+      "al-shabaab", "al shabaab", "al-shabab", "shabaab", "mogadishu", "mogadiscio", "mogadischu", "могадишо",
+      "somaliland", "puntland", "jubaland", "aussom"
     ],
     "17_Horn_of_Africa": [
       "ethiopi*", "etiopi*", "äthiopi*", "эфиоп*", "ефіоп*", "埃塞俄比亚", "衣索比亞", "에티오피아", "إثيوبيا", "اثيوبيا", "אתיופי", "αιθιοπ*",
