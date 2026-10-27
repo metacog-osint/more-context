@@ -27,7 +27,10 @@ class CatalogShapeTests(unittest.TestCase):
             with self.subTest(source=s["id"]):
                 self.assertIn(s["group"], groups)
                 self.assertIn(s["rss_status"], {"active", "candidate", "dropped", "none"})
-                self.assertTrue(s["domains"])
+                if s["group"] == "search":  # a saved search spans many publishers: no domain of its own
+                    self.assertTrue(s.get("entity") and s.get("query"))
+                else:
+                    self.assertTrue(s["domains"])
                 if s["rss_status"] in {"active", "candidate"}:
                     self.assertTrue(s["url"].startswith("http"))
                     self.assertGreater(s["expected_minutes"], 0)

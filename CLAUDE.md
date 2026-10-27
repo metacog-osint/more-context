@@ -102,6 +102,17 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   war (from 23 Sep) was lost inside it. Next (planned with Tom): main-location relevance, a per-country baseline
   and a "Rising" list so new crises surface without a catalog edit.
 
+## Feeds and saved searches (27 Oct 2026)
+- Feed items (RSS, Telegram, saved searches) get zone labels when the day is built (`pipeline/feedlabels.py`):
+  a saved search (source with `"entity"`) belongs to its zone; other items count for each zone whose headline
+  terms they contain, within the source's `focus` when it lists zones. They become `kind: "feed"` stories,
+  shown on the zone page under "From news feeds and searches" and kept out of the GDELT counts and baselines.
+- 21 Google News searches (`group: "search"`, ids `gn_<entity>`, readable `query` field) are polled hourly
+  (`poll_minutes`). Google News headlines end in " - Publisher"; that becomes the outlet. Google's terms are
+  understood (secondary sources only, 27 Oct 2026) to allow personal, non-commercial use: review before
+  Watchfloor earns money.
+- A partial day (ingest started or stopped mid-day) gets no attention z and no alarm.
+
 ## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
 Most stories are never read by a person, so model work waits for a reason to spend:
 - **Always on, $0:** ingest, stories, headline-term filter, counts, attention z.

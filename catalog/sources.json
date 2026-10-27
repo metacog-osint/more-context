@@ -19,7 +19,8 @@
   "specialist": "Defense, maritime, space and research outlets",
   "western_wire": "Western news wires",
   "russian_independent": "Russian independent and exile media",
-  "russian_milblog": "Russian military bloggers (pro-war Telegram channels)"
+  "russian_milblog": "Russian military bloggers (pro-war Telegram channels)",
+  "search": "Saved news searches (Google News, one query per zone or topic)"
  },
  "sources": [
   {
@@ -1624,6 +1625,363 @@
    "domains": [
     "t.me/wargonzo"
    ],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_01_ukraine_conflict",
+   "name": "Google News search: Ukraine Conflict",
+   "url": "https://news.google.com/rss/search?q=Ukraine%20%28offensive%20OR%20front%20OR%20missile%20OR%20drone%20OR%20shelling%20OR%20ceasefire%20OR%20%22peace%20talks%22%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "01_Ukraine_Conflict",
+   "focus": [
+    "01_Ukraine_Conflict"
+   ],
+   "query": "Ukraine (offensive OR front OR missile OR drone OR shelling OR ceasefire OR \"peace talks\")",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_07_russia_nato",
+   "name": "Google News search: Russia-NATO Border",
+   "url": "https://news.google.com/rss/search?q=Russia%20%28NATO%20OR%20Baltic%20OR%20Poland%20OR%20Finland%20OR%20Romania%29%20%28drone%20OR%20airspace%20OR%20sabotage%20OR%20border%20OR%20jets%20OR%20%22hybrid%20attack%22%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "07_Russia_NATO",
+   "focus": [
+    "07_Russia_NATO"
+   ],
+   "query": "Russia (NATO OR Baltic OR Poland OR Finland OR Romania) (drone OR airspace OR sabotage OR border OR jets OR \"hybrid attack\")",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_02_taiwan_strait",
+   "name": "Google News search: Taiwan Strait",
+   "url": "https://news.google.com/rss/search?q=Taiwan%20%28PLA%20OR%20%22Chinese%20military%22%20OR%20%22Taiwan%20Strait%22%20OR%20drills%20OR%20incursion%20OR%20blockade%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "02_Taiwan_Strait",
+   "focus": [
+    "02_Taiwan_Strait"
+   ],
+   "query": "Taiwan (PLA OR \"Chinese military\" OR \"Taiwan Strait\" OR drills OR incursion OR blockade)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_08_south_china_sea",
+   "name": "Google News search: South China Sea",
+   "url": "https://news.google.com/rss/search?q=%22South%20China%20Sea%22%20OR%20%22Scarborough%20Shoal%22%20OR%20%22Second%20Thomas%20Shoal%22%20OR%20%22West%20Philippine%20Sea%22%20OR%20Spratly%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "08_South_China_Sea",
+   "focus": [
+    "08_South_China_Sea"
+   ],
+   "query": "\"South China Sea\" OR \"Scarborough Shoal\" OR \"Second Thomas Shoal\" OR \"West Philippine Sea\" OR Spratly",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_03_korea_peninsula",
+   "name": "Google News search: Korea Peninsula",
+   "url": "https://news.google.com/rss/search?q=%22North%20Korea%22%20%28missile%20OR%20launch%20OR%20military%20OR%20%22Kim%20Jong%20Un%22%20OR%20DMZ%20OR%20nuclear%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "03_Korea_Peninsula",
+   "focus": [
+    "03_Korea_Peninsula"
+   ],
+   "query": "\"North Korea\" (missile OR launch OR military OR \"Kim Jong Un\" OR DMZ OR nuclear)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_10_israel_gaza_lebanon",
+   "name": "Google News search: Israel, Gaza & Lebanon",
+   "url": "https://news.google.com/rss/search?q=%28Gaza%20OR%20%22West%20Bank%22%20OR%20Hezbollah%20OR%20Lebanon%29%20%28Israel%20OR%20strike%20OR%20ceasefire%20OR%20killed%20OR%20hostages%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "10_Israel_Gaza_Lebanon",
+   "focus": [
+    "10_Israel_Gaza_Lebanon"
+   ],
+   "query": "(Gaza OR \"West Bank\" OR Hezbollah OR Lebanon) (Israel OR strike OR ceasefire OR killed OR hostages)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_11_iran_red_sea",
+   "name": "Google News search: Iran & Red Sea",
+   "url": "https://news.google.com/rss/search?q=%28Iran%20OR%20IRGC%20OR%20Houthi%20OR%20Houthis%20OR%20%22Red%20Sea%22%20OR%20%22Strait%20of%20Hormuz%22%29%20%28strike%20OR%20attack%20OR%20missile%20OR%20nuclear%20OR%20shipping%20OR%20war%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "11_Iran_Red_Sea",
+   "focus": [
+    "11_Iran_Red_Sea"
+   ],
+   "query": "(Iran OR IRGC OR Houthi OR Houthis OR \"Red Sea\" OR \"Strait of Hormuz\") (strike OR attack OR missile OR nuclear OR shipping OR war)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_06_india_pakistan",
+   "name": "Google News search: India-Pakistan",
+   "url": "https://news.google.com/rss/search?q=India%20Pakistan%20%28Kashmir%20OR%20%22Line%20of%20Control%22%20OR%20border%20OR%20military%20OR%20strike%20OR%20terror%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "06_India_Pakistan",
+   "focus": [
+    "06_India_Pakistan"
+   ],
+   "query": "India Pakistan (Kashmir OR \"Line of Control\" OR border OR military OR strike OR terror)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_13_sudan",
+   "name": "Google News search: Sudan",
+   "url": "https://news.google.com/rss/search?q=Sudan%20%28RSF%20OR%20%22Rapid%20Support%20Forces%22%20OR%20Darfur%20OR%20%22El%20Fasher%22%20OR%20Kordofan%20OR%20army%20OR%20famine%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "13_Sudan",
+   "focus": [
+    "13_Sudan"
+   ],
+   "query": "Sudan (RSF OR \"Rapid Support Forces\" OR Darfur OR \"El Fasher\" OR Kordofan OR army OR famine)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_18_ethiopia_eritrea",
+   "name": "Google News search: Ethiopia & Eritrea",
+   "url": "https://news.google.com/rss/search?q=%28Ethiopia%20OR%20Eritrea%20OR%20Tigray%20OR%20Amhara%20OR%20Oromia%29%20%28fighting%20OR%20attack%20OR%20killed%20OR%20TPLF%20OR%20Fano%20OR%20army%20OR%20war%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "18_Ethiopia_Eritrea",
+   "focus": [
+    "18_Ethiopia_Eritrea"
+   ],
+   "query": "(Ethiopia OR Eritrea OR Tigray OR Amhara OR Oromia) (fighting OR attack OR killed OR TPLF OR Fano OR army OR war)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_19_somalia",
+   "name": "Google News search: Somalia",
+   "url": "https://news.google.com/rss/search?q=%28Somalia%20OR%20al-Shabaab%20OR%20Mogadishu%20OR%20Somaliland%20OR%20Puntland%20OR%20Jubaland%29%20%28attack%20OR%20strike%20OR%20army%20OR%20killed%20OR%20election%20OR%20clashes%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "19_Somalia",
+   "focus": [
+    "19_Somalia"
+   ],
+   "query": "(Somalia OR al-Shabaab OR Mogadishu OR Somaliland OR Puntland OR Jubaland) (attack OR strike OR army OR killed OR election OR clashes)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_12_sahel_west_africa",
+   "name": "Google News search: Sahel & West Africa",
+   "url": "https://news.google.com/rss/search?q=%28Mali%20OR%20%22Burkina%20Faso%22%20OR%20Niger%20OR%20Sahel%29%20%28jihadist%20OR%20JNIM%20OR%20attack%20OR%20junta%20OR%20%22Africa%20Corps%22%20OR%20army%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "12_Sahel_West_Africa",
+   "focus": [
+    "12_Sahel_West_Africa"
+   ],
+   "query": "(Mali OR \"Burkina Faso\" OR Niger OR Sahel) (jihadist OR JNIM OR attack OR junta OR \"Africa Corps\" OR army)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_14_drc_rwanda",
+   "name": "Google News search: DRC-Rwanda (M23)",
+   "url": "https://news.google.com/rss/search?q=%28Congo%20OR%20DRC%20OR%20Goma%20OR%20%22North%20Kivu%22%20OR%20%22South%20Kivu%22%29%20%28M23%20OR%20Rwanda%20OR%20fighting%20OR%20attack%20OR%20rebels%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "14_DRC_Rwanda",
+   "focus": [
+    "14_DRC_Rwanda"
+   ],
+   "query": "(Congo OR DRC OR Goma OR \"North Kivu\" OR \"South Kivu\") (M23 OR Rwanda OR fighting OR attack OR rebels)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_16_myanmar",
+   "name": "Google News search: Myanmar",
+   "url": "https://news.google.com/rss/search?q=Myanmar%20%28junta%20OR%20military%20OR%20resistance%20OR%20airstrike%20OR%20%22Arakan%20Army%22%20OR%20election%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "16_Myanmar",
+   "focus": [
+    "16_Myanmar"
+   ],
+   "query": "Myanmar (junta OR military OR resistance OR airstrike OR \"Arakan Army\" OR election)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_05_venezuela",
+   "name": "Google News search: Venezuela",
+   "url": "https://news.google.com/rss/search?q=Venezuela%20%28military%20OR%20sanctions%20OR%20oil%20OR%20opposition%20OR%20Machado%20OR%20election%20OR%20strike%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "05_Venezuela",
+   "focus": [
+    "05_Venezuela"
+   ],
+   "query": "Venezuela (military OR sanctions OR oil OR opposition OR Machado OR election OR strike)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_15_cuba",
+   "name": "Google News search: Cuba",
+   "url": "https://news.google.com/rss/search?q=Cuba%20%28blackout%20OR%20protest%20OR%20sanctions%20OR%20embargo%20OR%20%22power%20grid%22%20OR%20migrants%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "15_Cuba",
+   "focus": [
+    "15_Cuba"
+   ],
+   "query": "Cuba (blackout OR protest OR sanctions OR embargo OR \"power grid\" OR migrants)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_t1_critical_minerals",
+   "name": "Google News search: Critical Minerals & Rare Earths",
+   "url": "https://news.google.com/rss/search?q=%28%22rare%20earths%22%20OR%20%22rare%20earth%22%20OR%20%22critical%20minerals%22%29%20%28export%20OR%20controls%20OR%20supply%20OR%20ban%20OR%20deal%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "T1_Critical_Minerals",
+   "focus": [
+    "T1_Critical_Minerals"
+   ],
+   "query": "(\"rare earths\" OR \"rare earth\" OR \"critical minerals\") (export OR controls OR supply OR ban OR deal)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_t2_semiconductors",
+   "name": "Google News search: Chips & Export Controls",
+   "url": "https://news.google.com/rss/search?q=%28semiconductor%20OR%20chips%20OR%20chipmaking%29%20%28%22export%20controls%22%20OR%20ban%20OR%20China%20OR%20TSMC%20OR%20ASML%20OR%20Nvidia%29%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "T2_Semiconductors",
+   "focus": [
+    "T2_Semiconductors"
+   ],
+   "query": "(semiconductor OR chips OR chipmaking) (\"export controls\" OR ban OR China OR TSMC OR ASML OR Nvidia)",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_t3_undersea_infrastructure",
+   "name": "Google News search: Undersea Cables & Infrastructure",
+   "url": "https://news.google.com/rss/search?q=%22undersea%20cable%22%20OR%20%22subsea%20cable%22%20OR%20%22submarine%20cable%22%20OR%20%22seabed%20cable%22%20OR%20%22pipeline%20sabotage%22%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "T3_Undersea_Infrastructure",
+   "focus": [
+    "T3_Undersea_Infrastructure"
+   ],
+   "query": "\"undersea cable\" OR \"subsea cable\" OR \"submarine cable\" OR \"seabed cable\" OR \"pipeline sabotage\"",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_t4_gnss_counterspace",
+   "name": "Google News search: GPS Jamming & Counterspace",
+   "url": "https://news.google.com/rss/search?q=%22GPS%20jamming%22%20OR%20%22GPS%20spoofing%22%20OR%20%22GNSS%20interference%22%20OR%20%22satellite%20jamming%22%20OR%20%22anti-satellite%22%20OR%20%22electronic%20warfare%22%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "T4_GNSS_Counterspace",
+   "focus": [
+    "T4_GNSS_Counterspace"
+   ],
+   "query": "\"GPS jamming\" OR \"GPS spoofing\" OR \"GNSS interference\" OR \"satellite jamming\" OR \"anti-satellite\" OR \"electronic warfare\"",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
+   "rss_status": "active"
+  },
+  {
+   "id": "gn_t5_sanctions_shadow_fleet",
+   "name": "Google News search: Sanctions & Shadow Fleet",
+   "url": "https://news.google.com/rss/search?q=%22shadow%20fleet%22%20OR%20%22sanctioned%20tanker%22%20OR%20%22dark%20fleet%22%20OR%20%22oil%20sanctions%22%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "group": "search",
+   "owner": "private",
+   "lang": "eng",
+   "entity": "T5_Sanctions_Shadow_Fleet",
+   "focus": [
+    "T5_Sanctions_Shadow_Fleet"
+   ],
+   "query": "\"shadow fleet\" OR \"sanctioned tanker\" OR \"dark fleet\" OR \"oil sanctions\"",
+   "expected_minutes": 120,
+   "poll_minutes": 60,
+   "domains": [],
    "rss_status": "active"
   }
  ]

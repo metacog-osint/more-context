@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta, timezone
 
-from . import measures
+from . import feedlabels, measures
 from .relevance import TermMatcher
 from .stories import build_stories
 
@@ -99,6 +99,13 @@ def build_day(sink, day: date) -> dict:
     rss_stories = build_stories(rss)
     story_rows += [{"day": day.isoformat(), "entity": None, "kind": "rss", **s} for s in rss_stories]
 
+    # Feed and saved-search items per zone (pipeline/feedlabels.py); kept out of the GDELT counts above.
+    feed_counts = {}
+    for eid, items in sorted(feedlabels.prepared(rss).items()):
+        fstories = build_stories(items)
+        feed_counts[eid] = len(fstories)
+        story_rows += [{"day": day.isoformat(), "entity": eid, "kind": "feed", **s} for s in fstories]
+
     summary = {
         "day": day.isoformat(),
         "built_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -109,9 +116,15 @@ def build_day(sink, day: date) -> dict:
         "cycle_files": len(keys),
         "first_cycle": keys[0] if keys else None,  # later than about 00:15 on the day means a partial day
         "entities": entities,
+        "feed_stories": feed_counts,
         "alarms": {eid: e["alarms"] for eid, e in entities.items() if e["alarms"]},
     }
     summary["partial"] = measures.is_partial(summary)
+    if summary["partial"]:
+        # Part of a day against whole-day baselines reads as a collapse (26 Oct 2026 showed z -4.4): no z, no alarm.
+        for e in entities.values():
+            e["attention"], e["alarms"] = None, []
+        summary["alarms"] = {}
     base = f"stories/{day:%Y/%m/%d}/"
     sink.write_lines(base + "stories.jsonl", story_rows)
     sink.write_json(base + "summary.json", summary)

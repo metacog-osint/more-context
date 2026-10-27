@@ -25,6 +25,8 @@ from .relevance import TermMatcher
 
 MAX_AGE_DAYS = 120
 STORY_FIELDS = ("story_id", "title", "first_seen", "articles", "outlets", "languages", "groups", "killed_articles")
+FEED_FIELDS = ("story_id", "title", "first_seen", "articles", "outlets", "outlet_names", "groups")
+MAX_FEED_STORIES = 20
 CODING_FIELDS = ("relevance", "belongs_to", "event_type", "quad", "direction", "source_actor", "target_actor",
                  "place", "country", "killed", "wounded", "casualty_source", "indicator_ids", "frame",
                  "confidence", "gist", "model", "coded_at", "source")
@@ -87,6 +89,12 @@ def _story(s: dict, coding: dict | None, passes: bool) -> dict:
     return out
 
 
+def _feed(s: dict) -> dict:
+    out = {k: s.get(k) for k in FEED_FIELDS}
+    out["sample_urls"] = [u for u in (s.get("sample_urls") or [])[:3] if u.startswith(("http://", "https://"))]
+    return out
+
+
 def built_days(sink) -> list[str]:
     keys = sink.list("stories/")
     days = {k[len("stories/"):len("stories/") + 10].replace("/", "-") for k in keys if k.endswith("/summary.json")}
@@ -117,7 +125,7 @@ def _summary(sink, d: str, catalog) -> dict | None:
             "name": names.get(eid, eid), "articles": e.get("articles"), "stories": e.get("stories"),
             "filtered_stories": e.get("filtered_stories"), "filtered_articles": e.get("filtered_articles"),
             "inflation": e.get("inflation"), "attention": e.get("attention"),
-            "alarms": e.get("alarms") or [],
+            "alarms": e.get("alarms") or [], "feed_stories": (s.get("feed_stories") or {}).get(eid),
             "by_group": e.get("by_group"), "top": (e.get("top") or [])[:5],
         }
     return {"day": s["day"], "partial": s.get("partial"), "backfill": bool(s.get("backfill")),
@@ -171,7 +179,8 @@ def handle(method: str, path: str, params: dict, body: dict | None, sink, *, ai_
             cached = ondemand.load_codings(sink, eid, d)
             return 200, {"entity": eid, "day": d.isoformat(), "filter": "terms" if filtered else "all",
                          "stories": [_story(s, cached.get(s["story_id"]), p) for s, p in shown],
-                         "coded": sum(1 for s, _ in shown if s["story_id"] in cached)}
+                         "coded": sum(1 for s, _ in shown if s["story_id"] in cached),
+                         "feeds": [_feed(s) for s in ondemand.day_feed_stories(sink, eid, d)[:MAX_FEED_STORIES]]}
         if method == "POST" and path == "/code":
             body = body or {}
             eid, d = _entity(body.get("entity"), catalog), _day(body.get("day"), today)
