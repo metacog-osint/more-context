@@ -51,13 +51,19 @@ def day_stories(sink, entity: str, day: date) -> list[dict]:
 
 
 def code_entity_day(sink, entity: str, day: date, source: str, ledger: Ledger | None = None,
-                    coder_factory=vertex.Coder, top: int = MAX_STORIES, catalog: dict | None = None) -> dict:
-    """Code the top `top` uncached stories of one entity-day. Raises budget.BudgetExceeded when the cap says no."""
+                    coder_factory=vertex.Coder, top: int = MAX_STORIES, catalog: dict | None = None,
+                    story_ids: list[str] | None = None) -> dict:
+    """Code the top `top` uncached stories of one entity-day (or the given `story_ids` of that day, at most
+    MAX_STORIES). Raises budget.BudgetExceeded when the cap says no."""
     catalog = catalog or load_catalog()
     if entity not in {e["id"] for e in catalog["zones"] + catalog["topics"]}:
         raise ValueError(f"unknown entity {entity}")
     ledger = ledger or Ledger(sink)
-    stories = day_stories(sink, entity, day)[:min(top, MAX_STORIES)]
+    stories = day_stories(sink, entity, day)
+    if story_ids is not None:
+        wanted = set(story_ids[:MAX_STORIES])
+        stories = [s for s in stories if s["story_id"] in wanted]
+    stories = stories[:min(top, MAX_STORIES)]
     cached = load_codings(sink, entity, day)
     todo = [s for s in stories if s["story_id"] not in cached]
     out = {"entity": entity, "day": day.isoformat(), "source": source, "stories": len(stories),

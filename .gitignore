@@ -19,3 +19,8 @@ dist/
 
 # Run logs
 *.log
+
+# Firebase CLI cache; generated site data (scripts/build_web.py writes them before each deploy)
+.firebase/
+web/build.json
+web/data/

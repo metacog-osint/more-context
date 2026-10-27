@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Watchfloor</title>
+<meta name="description" content="Open-source warning for 15 conflict zones and 5 strategic topics, from publicly available reporting.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23101a2b'/%3E%3Cpath d='M6 22h20M9 18h14M12 14h8' stroke='%23f2b33d' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="tic-time.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-inner">
+    <a class="brand" href="#/"><span class="mark" aria-hidden="true"></span>Watchfloor <span class="beta">beta</span></a>
+    <nav aria-label="Main">
+      <a href="#/" data-nav="home">Zones</a>
+      <a href="#/status" data-nav="status">Status</a>
+      <a href="#/about" data-nav="about">About</a>
+      <span id="time-settings"></span>
+    </nav>
+  </div>
+</header>
+<main id="app" class="wrap" aria-live="polite"><p class="muted">Loading…</p></main>
+<footer class="foot">
+  <div class="wrap">
+    <p>A project of <a href="https://theintelligence.company">The Intelligence Company</a>. Updated <span id="updated">recently</span>.
+      Built only from publicly available information. <a href="#/terms">Terms of use</a>.</p>
+    <p>News data: <a href="https://www.gdeltproject.org/">The GDELT Project</a> and publishers' own feeds and public channels;
+      headlines and links belong to their publishers. Story codings: Google Gemini on Vertex AI, machine-generated and sometimes wrong.
+      Every source and its terms: <a href="#/sources">Sources</a>.</p>
+  </div>
+</footer>
+<script src="tic-time.js"></script>
+<script src="app.js" type="module"></script>
+</body>
+</html>

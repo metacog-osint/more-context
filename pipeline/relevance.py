@@ -72,7 +72,7 @@ class TermMatcher:
 
 def load_set(path: str | Path) -> tuple[list[dict], dict]:
     path = Path(path)
-    rows = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = [json.loads(l) for l in path.read_text(encoding="utf-8").split("\n") if l.strip()]
     pop = json.loads(path.with_name(path.stem + ".population.json").read_text(encoding="utf-8"))
     return rows, pop
 
@@ -159,7 +159,7 @@ def bootstrap(rows: list[dict], w: list[float], keep: list[bool], iters: int = 2
 def load_codings(path: str | Path) -> dict[str, dict]:
     """Model codings (code-stories output), keyed like set rows: '<entity>:<story_id>'."""
     out = {}
-    for line in Path(path).read_text(encoding="utf-8").splitlines():
+    for line in Path(path).read_text(encoding="utf-8").split("\n"):
         if line.strip():
             c = json.loads(line)
             out[f"{c['entity']}:{c['story_id']}"] = c

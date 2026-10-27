@@ -7,13 +7,13 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
-from . import health, rss
+from . import health, rss, telegram
 
 SOURCES = Path(__file__).resolve().parent.parent / "catalog" / "sources.json"
 
 
 def load_sources(include_candidates: bool = False) -> list[dict]:
-    """RSS sources to poll: rss_status active, plus candidates when asked."""
+    """Feeds to poll (RSS, Atom, RDF, or Telegram previews): rss_status active, plus candidates when asked."""
     cat = json.loads(SOURCES.read_text(encoding="utf-8"))
     keep = {"active", "candidate"} if include_candidates else {"active"}
     return [s for s in cat["sources"] if s.get("url") and s.get("rss_status") in keep]
@@ -30,7 +30,7 @@ def _fetch_one(src: dict, entry: dict):
     items, err = None, res.error
     if res.ok:
         try:
-            items = rss.parse_feed(res.body)
+            items = telegram.parse_preview(res.body) if src.get("format") == "telegram" else rss.parse_feed(res.body)
         except ValueError as e:
             err = str(e)[:200]
     if items:
