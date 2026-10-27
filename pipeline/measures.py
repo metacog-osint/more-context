@@ -3,11 +3,9 @@
 - attention_anomaly: how unusual today's story count is against the entity's own last 28 complete days,
   adjusted for day of week. Counts are log-transformed (news volume is skewed), so z is in log units:
   z = 2 means about two typical day-to-day swings above the expected level for that weekday.
-- casualty_share: share of articles (and stories) whose GDELT counts report people killed or wounded.
-  GDELT extracts these counts from article text (V1 Counts, KILL and WOUND types); a rise in the share
-  means more of the coverage is reporting casualties, not that the true toll rose by that much. Only
-  presence is used: the extracted numbers are unreliable (a live file on 26 Oct 2026 carried KILL 30,000,000
-  on a political story).
+- (removed 27 Oct 2026) casualty_share, the share of articles where GDELT extracted a KILL/WOUND count. It
+  could not tell whose deaths, where or when: 20-26 Oct, Taiwan Strait ran 6-12% and raised two alarms, and a
+  sanctions topic hit 50% from a story about Sudan. Planned replacement: violent events located inside the zone.
 
 Thresholds for Watch / Warning / Crisis belong in each zone's indicator charter, not here.
 """
@@ -58,40 +56,9 @@ def attention_anomaly(history: dict[date, float], day: date, count: float,
     }
 
 
-def casualty_share(articles: list[dict], stories: list[dict] | None = None) -> dict | None:
-    """Share of articles reporting killed / wounded, overall and by source group.
-
-    Only rows that carry the count fields are counted (rows ingested before casualty flags were added
-    have none); returns None when no row has them.
-    """
-    known = [a for a in articles if "killed" in a]
-    if not known:
-        return None
-
-    def share(rows: list[dict], key: str) -> float:
-        return round(sum(1 for a in rows if (a.get(key) or 0) > 0) / len(rows), 3)
-
-    out = {
-        "articles_counted": len(known),
-        "articles_total": len(articles),
-        "killed_share": share(known, "killed"),
-        "wounded_share": share(known, "wounded"),
-        "by_group": {},
-    }
-    groups: dict[str, list[dict]] = {}
-    for a in known:
-        if a.get("group"):
-            groups.setdefault(a["group"], []).append(a)
-    for g, rows in sorted(groups.items()):
-        out["by_group"][g] = {"articles": len(rows), "killed_share": share(rows, "killed")}
-    if stories is not None and len(known) == len(articles) and stories:
-        out["stories_with_killed_share"] = round(sum(1 for s in stories if s.get("killed_articles")) / len(stories), 3)
-    return out
-
-
 def share_anomaly(history: dict[date, float], day: date, value: float,
                   baseline_days: int = BASELINE_DAYS, min_days: int = MIN_BASELINE_DAYS) -> dict | None:
-    """z of a share (e.g. casualty-reporting share) against the previous `baseline_days` days."""
+    """z of a share (0-1) against the previous `baseline_days` days."""
     start = day - timedelta(days=baseline_days)
     base = [v for d, v in history.items() if start <= d < day and v is not None]
     if len(base) < min_days:
@@ -108,9 +75,6 @@ def alarm_reasons(entity: dict) -> list[str]:
     att = entity.get("attention")
     if att and att["z"] >= ALARM_Z:
         out.append(f"attention z {att['z']}")
-    cas = (entity.get("casualty") or {}).get("anomaly")
-    if cas and cas["z"] >= ALARM_Z:
-        out.append(f"casualty share z {cas['z']}")
     return out
 
 

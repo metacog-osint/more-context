@@ -37,8 +37,10 @@ class FoldAndTermTests(unittest.TestCase):
 
     def test_catalog_terms_compile_and_cover_entities(self):
         m = relevance.TermMatcher()
-        ids = {e["id"] for e in load_catalog()["zones"] + load_catalog()["topics"]}
-        self.assertEqual(set(m.rx), ids)
+        cat = load_catalog()
+        ids = {e["id"] for e in cat["zones"] + cat["topics"]}
+        retired = {r["id"] for r in cat.get("retired", [])}  # kept so older labelled sets still score
+        self.assertEqual(set(m.rx), ids | retired)
         self.assertTrue(m.hit("01_Ukraine_Conflict", "Зеленський заявив"))
         self.assertTrue(m.hit("10_Israel_Gaza_Lebanon", "İsrail'de seçim"))
 

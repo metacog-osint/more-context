@@ -5,7 +5,7 @@ posts late (the translated stream runs about an hour behind; retries last up to 
 assigned to D by publication time, so rows written just after midnight still count for the right day.
 
 Writes `stories/YYYY/MM/DD/stories.jsonl` (one row per story: entity, ids, counts, source groups) and
-`stories/YYYY/MM/DD/summary.json` (per-entity totals, reprint inflation, casualty-reporting share, and
+`stories/YYYY/MM/DD/summary.json` (per-entity totals, reprint inflation and
 attention anomaly against the entity's previous 28 complete days; see pipeline/measures.py).
 """
 from __future__ import annotations
@@ -51,11 +51,9 @@ def load_day_rows(sink, day: date) -> tuple[list[dict], list[str]]:
     return [r for k in keys for r in sink.read_lines(k) if _row_day(r) == want], keys
 
 
-def history(sink, day: date, days: int = measures.BASELINE_DAYS) -> tuple[dict, dict]:
-    """From earlier complete days' summaries: stories per entity-day, and killed-share per entity-day
-    (only days where every row carried the casualty fields)."""
+def history(sink, day: date, days: int = measures.BASELINE_DAYS) -> dict:
+    """From earlier complete days' summaries: stories per entity-day."""
     stories: dict[str, dict[date, int]] = defaultdict(dict)
-    killed: dict[str, dict[date, float]] = defaultdict(dict)
     for i in range(1, days + 1):
         d = day - timedelta(days=i)
         s = sink.read_json(f"stories/{d:%Y/%m/%d}/summary.json")
@@ -63,15 +61,12 @@ def history(sink, day: date, days: int = measures.BASELINE_DAYS) -> tuple[dict, 
             continue
         for eid, e in s.get("entities", {}).items():
             stories[eid][d] = e.get("stories", 0)
-            c = e.get("casualty")
-            if c and c.get("articles_counted") == c.get("articles_total"):
-                killed[eid][d] = c["killed_share"]
-    return stories, killed
+    return stories
 
 
 def build_day(sink, day: date) -> dict:
     rows, keys = load_day_rows(sink, day)
-    story_hist, killed_hist = history(sink, day)
+    story_hist = history(sink, day)
     matcher = TermMatcher()
     gdelt = [r for r in rows if r.get("kind") == "gdelt"]
     rss = [r for r in rows if r.get("kind") == "rss"]
@@ -93,12 +88,8 @@ def build_day(sink, day: date) -> dict:
             "languages": dict(Counter(a.get("lang", "eng") for a in arts).most_common(8)),
             "top": [{k: s[k] for k in ("story_id", "title", "articles", "outlets", "groups")}
                     for s in stories[:TOP_PER_ENTITY]],
-            "casualty": measures.casualty_share(arts, stories),
             "attention": measures.attention_anomaly(story_hist.get(eid, {}), day, len(stories)),
         }
-        cas = entities[eid]["casualty"]
-        if cas and cas["articles_counted"] == cas["articles_total"]:
-            cas["anomaly"] = measures.share_anomaly(killed_hist.get(eid, {}), day, cas["killed_share"])
         kept = [s for s in stories if matcher.hit(eid, s.get("title") or "")]
         entities[eid]["filtered_stories"] = len(kept)  # headline names the zone (catalog/title_terms.json)
         entities[eid]["filtered_articles"] = sum(s["articles"] for s in kept)

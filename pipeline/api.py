@@ -113,13 +113,11 @@ def _summary(sink, d: str, catalog) -> dict | None:
     names = {e["id"]: e["name"] for e in catalog["zones"] + catalog["topics"]}
     ents = {}
     for eid, e in s.get("entities", {}).items():
-        cas = e.get("casualty") or {}
         ents[eid] = {
             "name": names.get(eid, eid), "articles": e.get("articles"), "stories": e.get("stories"),
             "filtered_stories": e.get("filtered_stories"), "filtered_articles": e.get("filtered_articles"),
             "inflation": e.get("inflation"), "attention": e.get("attention"),
-            "killed_share": cas.get("killed_share"), "wounded_share": cas.get("wounded_share"),
-            "casualty_anomaly": cas.get("anomaly"), "alarms": e.get("alarms") or [],
+            "alarms": e.get("alarms") or [],
             "by_group": e.get("by_group"), "top": (e.get("top") or [])[:5],
         }
     return {"day": s["day"], "partial": s.get("partial"), "backfill": bool(s.get("backfill")),

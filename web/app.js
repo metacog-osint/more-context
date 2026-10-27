@@ -83,7 +83,6 @@ function zoneRows(list, sum, day) {
       h("td", { class: "num" }, e ? stories.toLocaleString() : "—"),
       h("td", { class: "num hide-sm" }, e ? e.stories.toLocaleString() : "—"),
       h("td", null, e ? attentionBadge(e.attention) : "—"),
-      h("td", { class: "num hide-sm" }, e ? pct(e.killed_share) : "—"),
       h("td", null, alarms ? h("span", { class: "badge hot", title: `Alarm: ${e.alarms.join("; ")}` }, "alarm") : ""));
   });
 }
@@ -97,7 +96,6 @@ function zoneTable(title, list, sum, day) {
         h("th", { class: "num", title: "Stories whose headline names the zone or topic" }, "Stories"),
         h("th", { class: "num hide-sm", title: "Every story v4.3's matching rules assign here" }, "All matches"),
         h("th", null, "Attention vs typical"),
-        h("th", { class: "num hide-sm", title: "Share of articles whose text reports deaths" }, "Reporting deaths"),
         h("th", null, ""))),
       h("tbody", null, zoneRows(list, sum, day)))),
   ];
@@ -117,7 +115,7 @@ async function viewHome(params) {
   if (!filtered) notes.push(h("p", { class: "note" }, "Headline-filtered counts are not available for this day; \"Stories\" shows every match."));
   show(
     h("h1", null, "Conflict zones and watch topics"),
-    h("p", { class: "lede" }, "Daily story counts after reprints are merged, how unusual each day's attention is against the zone's own last 28 days, and how much of the coverage reports deaths. Open a zone for its stories."),
+    h("p", { class: "lede" }, "Daily story counts after reprints are merged, and how unusual each day's attention is against the zone's own last 28 days. Open a zone for its stories."),
     h("div", { class: "bar" }, h("label", null, "UTC day ", picker),
       h("span", { class: "muted small" }, `${sum.gdelt_articles?.toLocaleString() ?? "—"} matched articles · built ${when(sum.built_at)}`)),
     notes,
@@ -229,7 +227,7 @@ function viewAbout() {
       li("Every 15 minutes it reads GDELT's article files (English and machine-translated) and more than 50 news feeds."),
       li("Articles become stories: reprints and near-identical headlines are merged, so one wire story is counted once."),
       li("A free headline filter keeps stories that name the zone. In a first test on 278 stories it raised the on-topic share from 42% (the matching rules alone) to about 82%; the test set will grow."),
-      li("Free measures run on everything: attention against each zone's own last 28 days (adjusted for the day of the week), and the share of coverage reporting deaths."),
+      li("Free measures run on everything: attention against each zone's own last 28 days (adjusted for the day of the week)."),
       li("Google Gemini codes a story only when someone opens a zone or a free alarm fires: relevance, event type (PLOVER), direction, and a plain-English gist. Every coding is cached, and spending is capped at $5 a month."),
       li("Warning ladders (Watch, Warning, Crisis) with headline-observable indicators are being written for each zone and will be backtested against known onsets.")),
     h("h2", null, "Two-source rule"),

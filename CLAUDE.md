@@ -27,7 +27,7 @@ the repo `more-context`, functions `mc-ingest` / `mc-api`, bucket `more-context-
 
 ## What it does
 Turns GDELT articles into stories (reprints grouped), codes each story with Gemini, tracks warning
-indicators per zone, and measures attention, escalation, casualty reporting and framing divergence.
+indicators per zone, and measures attention, escalation and framing divergence.
 Serves warning (did something change?) and awareness (what is the picture, how is each side telling it?).
 
 ## Rules that carry over from v4.3
@@ -81,7 +81,8 @@ Serves warning (did something change?) and awareness (what is the picture, how i
     that refuses to run without a spend cap and stops at it; token and cost estimates with no calls.
     `python -I run.py vertex-estimate` (free). `python -I run.py code-stories --cap <USD>` is BILLABLE: Tom's yes first.
   - `measures.py` - attention anomaly (log-scale z vs the entity's previous 28 complete days, weekday-adjusted)
-    and casualty-reporting share (presence of GDELT KILL/WOUND counts; the numbers themselves are unreliable).
+    The casualty-reporting share was removed on 27 Oct 2026 (it flagged deaths from other places and times;
+    see the module docstring); violent events located inside the zone are the planned replacement.
   - `daily.py` - daily story build inside the cycle: day D is built on the first run after D+1 03:15 UTC, from
     rows published on D; writes `stories/YYYY/MM/DD/stories.jsonl` + `summary.json` (per-entity totals, reprint
     inflation, source-group counts). Local: `python -I run.py build-stories --day YYYY-MM-DD --root <folder>`.
@@ -90,10 +91,21 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   Local dry run: `python -I run.py cycle`. Redeploy after code changes with the `gcloud functions deploy`
   line from that script (needs Tom's yes, like any deploy).
 
+## Changing the watchlist
+- Zones and topics live in `catalog/entities.json` (order matters: first zone match wins). A retired id goes in
+  its `"retired"` list with what replaced it; its headline terms stay in `catalog/title_terms.json` so older
+  labelled sets still score. A zone that departs from CONTEXT v4.3's rules carries a `match_note`.
+- Splitting a zone: if the new rules are a subset of the old one (same themes, places from its list), run
+  `scripts/relabel.py` on the stored rows and rebuild the days; no download. Anything wider needs
+  `scripts/backfill.py`, because rows the old rules never matched were not kept.
+- 27 Oct 2026 (Tom): 17_Horn_of_Africa split into 18_Ethiopia_Eritrea and 19_Somalia after Ethiopia's renewed
+  war (from 23 Sep) was lost inside it. Next (planned with Tom): main-location relevance, a per-country baseline
+  and a "Rising" list so new crises surface without a catalog edit.
+
 ## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
 Most stories are never read by a person, so model work waits for a reason to spend:
-- **Always on, $0:** ingest, stories, headline-term filter, counts, attention z, casualty share.
-- **Alarm:** the daily build flags an entity-day when attention z >= 2 or casualty-share z >= 2 (and >= 5
+- **Always on, $0:** ingest, stories, headline-term filter, counts, attention z.
+- **Alarm:** the daily build flags an entity-day when attention z >= 2 (and >= 5
   stories); the 15-minute cycle codes up to 2 flagged entity-days per run (`state.ai.pending`). A spending
   trigger only; Watch / Warning / Crisis come from the charters.
 - **On view:** `POST /code` on the public API (`pipeline/api.py`, function `mc-api`) codes one entity-day's
