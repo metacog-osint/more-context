@@ -20,6 +20,9 @@ Serves warning (did something change?) and awareness (what is the picture, how i
 - No secrets in files. Keys live in Secret Manager or GitHub secrets; Tom sets them.
 - One scheduler per job, defined in this repo. v4.3 once ran a duplicate Scheduler job for months.
 - Windows: use `python`, not `python3`; run downloaded-data tooling with `python -I`.
+- Current-situation research (charters, briefs): MORE CONTEXT's own stories first (`mc-api` `/zone`), then
+  extended web searches with month, year, outlets and conflict trackers in the query; a date and source on every
+  claim; say when nothing recent turns up, never call a zone quiet for lack of results (26 Oct 2026 lesson).
 
 ## Layout
 - `catalog/entities.json` - zones and Watch Topics. `match_v43` holds v4.3's exact rules (baseline for
@@ -30,7 +33,7 @@ Serves warning (did something change?) and awareness (what is the picture, how i
 - `catalog/entities.json` also holds a one-sentence `profile` per zone/topic (scope for embeddings and prompts).
 - `catalog/title_terms.json` - multilingual headline terms per entity: the free keyword baseline for relevance.
 - `catalog/eval/` - relevance test sets (`relevance_v1.jsonl`: 278 stories labelled on/off/unclear, Claude's
-  draft awaiting Tom's spot-check) + population files for weighting. Rules and results: `catalog/eval/README.md`.
+  draft, accepted by Tom 26 Oct 2026 as the working set) + population files for weighting. Rules and results: `catalog/eval/README.md`.
 - `catalog/vertex_prices.json` - Gemini prices with source and date checked.
 - `pipeline/` - Python, standard library only so far.
   - `gdelt.py` - list, download and parse GDELT GKG 2.1 15-minute files (English + translation streams).
@@ -113,5 +116,8 @@ Most stories are never read by a person, so model work waits for a reason to spe
 - Casualty flags (`killed`/`wounded` on GDELT rows, per-story tallies) and the two measures deployed 26 Oct 2026
   20:57 UTC (revision mc-ingest-00004-yuq, approved by Tom). Rows before that lack the fields; measures count
   only rows that have them. Attention z needs 14 complete days, so it first appears around 10 Nov.
-- Waiting on Tom: indicator charters for four zones (suggested Ukraine, Israel-Gaza-Lebanon, Iran & Red Sea,
-  India-Pakistan), decisions on the source list (plan doc, "Source list (draft)" tab), Vertex budget for Phase 2.
+- Charters: Claude drafted four (Ukraine, Israel-Gaza-Lebanon, Iran & Red Sea, India-Pakistan) on 26 Oct 2026 in
+  the plan doc's "Indicator charters (draft)" tab; Tom marks them up, then an interview settles open questions;
+  the final versions go to `catalog/indicators/` as catalog data. Budget decided: $5/month AI cap (see above);
+  a Cloud Billing budget alert ($5, project context-484804, 50/90/100% actual + 100% forecast) emails billing admins.
+- Waiting on Tom: charter mark-up and interview; decisions on the source list (plan doc, "Source list (draft)" tab).
