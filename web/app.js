@@ -66,7 +66,8 @@ function fail(e) {
 }
 
 // ---------- Zones (home) ----------
-function attentionBadge(att) {
+function attentionBadge(att, partial) {
+  if (partial) return h("span", { class: "badge cool", title: "Ingest covered only part of this UTC day, so it is not compared with full days" }, "partial day");
   if (!att) return h("span", { class: "badge cool", title: "Needs 14 complete days of history" }, "baseline building");
   const cls = att.z >= 2 ? "hot" : att.z >= 1 ? "warm" : "cool";
   const ratio = att.ratio === null || att.ratio === undefined ? "" : `${att.ratio}× `;
@@ -82,7 +83,7 @@ function zoneRows(list, sum, day) {
       h("td", null, h("a", { class: "zone-link", href: `#/zone/${ent.id}?day=${day}` }, ent.name)),
       h("td", { class: "num" }, e ? stories.toLocaleString() : "—"),
       h("td", { class: "num hide-sm" }, e ? e.stories.toLocaleString() : "—"),
-      h("td", null, e ? attentionBadge(e.attention) : "—"),
+      h("td", null, e ? attentionBadge(e.attention, sum.partial) : "—"),
       h("td", null, alarms ? h("span", { class: "badge hot", title: `Alarm: ${e.alarms.join("; ")}` }, "alarm") : ""));
   });
 }
@@ -149,6 +150,18 @@ function storyItem(s) {
     codingView(s.coding));
 }
 
+function feedItem(s) {
+  const url = safeUrl((s.sample_urls || [])[0]);
+  const title = s.title || "(no headline)";
+  const names = (s.outlet_names || []).join(", ");
+  return h("li", { class: "story" },
+    url ? h("a", { class: "story-title", href: url, target: "_blank", rel: "noopener noreferrer nofollow" }, title) : h("span", { class: "story-title" }, title),
+    h("div", { class: "meta" },
+      names || `${s.outlets} outlet${s.outlets === 1 ? "" : "s"}`,
+      s.articles > 1 ? ` · ${s.articles} items` : "",
+      s.first_seen ? ` · ${when(s.first_seen)}` : ""));
+}
+
 async function viewZone(id, params) {
   setNav("home");
   const ents = await entities();
@@ -192,6 +205,11 @@ async function viewZone(id, params) {
       ? h("ul", { class: "stories panel" }, z.stories.map(storyItem))
       : h("p", { class: "muted" }, filter === "terms" ? "No headline names this zone for that day. Untick the filter to see every match." : "No stories for that day."),
     h("p", { class: "muted small" }, `Showing up to 25 stories, largest first. ${z.coded} coded. Coding is capped at $5 a month for the whole site; this page has $${left.toFixed(2)} left today.`),
+    h("h2", null, "From news feeds and searches"),
+    h("p", { class: "muted small" }, "A saved Google News search for this zone, plus items from Watchfloor's own feeds and Telegram channels whose headlines name it. Kept apart from the counts above."),
+    (z.feeds || []).length
+      ? h("ul", { class: "stories panel" }, z.feeds.map(feedItem))
+      : h("p", { class: "muted" }, "No feed items for that day yet."),
   );
 }
 

@@ -215,6 +215,17 @@ class ApiTests(unittest.TestCase):
         st, out = self.call("GET", "/status")
         self.assertEqual((out["ai"], out["budget"]["spent_usd"]), ("on", 0.003))
 
+    def test_zone_lists_feed_stories_apart(self):
+        rows = self.sink.read_lines("stories/2026/11/19/stories.jsonl")
+        rows.append({"day": "2026-11-19", "entity": "13_Sudan", "kind": "feed", "story_id": "f1", "title": "RSF shells El Fasher",
+                     "first_seen": "2026-11-19T09:00:00Z", "articles": 2, "outlets": 2, "outlet_names": ["AP News", "BBC"],
+                     "groups": {"search": 2}, "sample_urls": ["https://news.google.com/x", "javascript:alert(1)"]})
+        self.sink.write_lines("stories/2026/11/19/stories.jsonl", rows)
+        st, out = self.call("GET", "/zone", {"entity": "13_Sudan", "day": "2026-11-19", "filter": "all"})
+        self.assertEqual(len(out["stories"]), 25)  # feed stories never mix into the GDELT list
+        self.assertEqual([(f["story_id"], f["outlet_names"], f["sample_urls"]) for f in out["feeds"]],
+                         [("f1", ["AP News", "BBC"], ["https://news.google.com/x"])])
+
     def test_headline_filter_and_code_match(self):
         rows = self.sink.read_lines("stories/2026/11/19/stories.jsonl")
         for i in (3, 7, 28):

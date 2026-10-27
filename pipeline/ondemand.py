@@ -13,7 +13,7 @@ from __future__ import annotations
 import os
 from datetime import date, datetime, timezone
 
-from . import vertex
+from . import feedlabels, vertex
 from .budget import Ledger
 from .daily import load_day_rows
 from .match import load_catalog
@@ -48,6 +48,16 @@ def day_stories(sink, entity: str, day: date) -> list[dict]:
     rows, _ = load_day_rows(sink, day)
     arts = [r for r in rows if r.get("kind") == "gdelt" and entity in r.get("labels", [])]
     return build_stories(arts)
+
+
+def day_feed_stories(sink, entity: str, day: date) -> list[dict]:
+    """The entity's news-feed and saved-search stories for `day`, largest first (pipeline/feedlabels.py)."""
+    key = f"stories/{day:%Y/%m/%d}/stories.jsonl"
+    if sink.exists(key):
+        return [r for r in sink.read_lines(key) if r.get("entity") == entity and r.get("kind") == "feed"]
+    rows, _ = load_day_rows(sink, day)
+    items = feedlabels.prepared([r for r in rows if r.get("kind") == "rss"]).get(entity, [])
+    return build_stories(items)
 
 
 def code_entity_day(sink, entity: str, day: date, source: str, ledger: Ledger | None = None,

@@ -156,6 +156,7 @@ def build_stories(articles: list[dict]) -> list[dict]:
             "first_seen": first.get("published") or first.get("fetched"),
             "articles": len(members),
             "outlets": len({_domain(a) for a in members}),
+            "outlet_names": list(dict.fromkeys(_domain(a) for a in members))[:5],
             "languages": sorted({a.get("lang", "eng") for a in members}),
             "groups": dict(by_group),
             "sample_urls": [a["url"] for a in members[:5]],

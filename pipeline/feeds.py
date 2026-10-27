@@ -19,6 +19,16 @@ def load_sources(include_candidates: bool = False) -> list[dict]:
     return [s for s in cat["sources"] if s.get("url") and s.get("rss_status") in keep]
 
 
+def is_due(src: dict, entry: dict | None, now: datetime) -> bool:
+    """A source with poll_minutes (saved searches: hourly, to stay polite) waits that long after its last try."""
+    every = src.get("poll_minutes")
+    if not every or not entry:
+        return True
+    tried = [health.from_iso(entry.get(k)) for k in ("last_ok", "last_attempt_error_at")]
+    last = max((t for t in tried if t), default=None)
+    return last is None or (now - last).total_seconds() >= every * 60 - 30
+
+
 def median_gap_minutes(items: list[dict]) -> float | None:
     times = sorted((i["published"] for i in items if i["published"]), reverse=True)
     gaps = [(a - b).total_seconds() / 60 for a, b in zip(times, times[1:])]
@@ -41,12 +51,20 @@ def _fetch_one(src: dict, entry: dict):
 def poll(state: dict, now: datetime, include_candidates: bool = False, workers: int = 8,
          fetch_one=_fetch_one) -> tuple[list[dict], list[dict]]:
     """Returns (new item rows, per-source probe rows). Mutates state["rss"] (health, ETags, seen URLs)."""
-    sources = load_sources(include_candidates)
+    all_sources = load_sources(include_candidates)
     feeds = state.setdefault("rss", {})
+    sources = [s for s in all_sources if is_due(s, feeds.get(s["id"]), now)]
     with ThreadPoolExecutor(workers) as ex:
         results = list(ex.map(lambda s: (s, *fetch_one(s, feeds.get(s["id"], {}))), sources))
 
     new_rows, probe = [], []
+    for src in all_sources:
+        if src in sources:
+            continue
+        entry = feeds.get(src["id"], {})  # not due yet (poll_minutes): keep its health, fetch nothing
+        probe.append({"id": src["id"], "group": src["group"], "status": health.status(entry, src["expected_minutes"], now),
+                      "http": None, "items": None, "new": 0, "newest_age_h": None, "median_gap_min": None,
+                      "error": entry.get("last_error", ""), "skipped": True})
     for src, res, items, err in results:
         entry = feeds.setdefault(src["id"], {})
         new: list[dict] = []
