@@ -42,7 +42,7 @@ class LocalSink:
 
     def read_lines(self, key: str) -> list[dict]:
         p = self.root / key
-        return [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
+        return [json.loads(line) for line in p.read_text(encoding="utf-8").split("\n") if line.strip()]
 
     def exists(self, key: str) -> bool:
         return (self.root / key).exists()
@@ -85,7 +85,7 @@ class GCSSink:
 
     def read_lines(self, key: str) -> list[dict]:
         text = self.bucket.blob(key).download_as_text()
-        return [json.loads(line) for line in text.splitlines() if line.strip()]
+        return [json.loads(line) for line in text.split("\n") if line.strip()]
 
     def exists(self, key: str) -> bool:
         return self.bucket.blob(key).exists()

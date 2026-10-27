@@ -14,6 +14,7 @@ from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta, timezone
 
 from . import measures
+from .relevance import TermMatcher
 from .stories import build_stories
 
 BUILD_DELAY = timedelta(hours=3, minutes=15)
@@ -71,6 +72,7 @@ def history(sink, day: date, days: int = measures.BASELINE_DAYS) -> tuple[dict, 
 def build_day(sink, day: date) -> dict:
     rows, keys = load_day_rows(sink, day)
     story_hist, killed_hist = history(sink, day)
+    matcher = TermMatcher()
     gdelt = [r for r in rows if r.get("kind") == "gdelt"]
     rss = [r for r in rows if r.get("kind") == "rss"]
 
@@ -97,6 +99,9 @@ def build_day(sink, day: date) -> dict:
         cas = entities[eid]["casualty"]
         if cas and cas["articles_counted"] == cas["articles_total"]:
             cas["anomaly"] = measures.share_anomaly(killed_hist.get(eid, {}), day, cas["killed_share"])
+        kept = [s for s in stories if matcher.hit(eid, s.get("title") or "")]
+        entities[eid]["filtered_stories"] = len(kept)  # headline names the zone (catalog/title_terms.json)
+        entities[eid]["filtered_articles"] = sum(s["articles"] for s in kept)
         entities[eid]["alarms"] = measures.alarm_reasons(entities[eid])
         story_rows += [{"day": day.isoformat(), "entity": eid, "kind": "gdelt", **s} for s in stories]
 

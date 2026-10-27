@@ -74,7 +74,7 @@ class CycleTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             sink, s = self.run_cycle(d, {"20261026160000": zipped(UKRAINE, UNMATCHED)})
             key = s["written"]["key"]
-            rows = (sink.root / key).read_text(encoding="utf-8").splitlines()
+            rows = [l for l in (sink.root / key).read_text(encoding="utf-8").split("\n") if l.strip()]
             self.assertEqual(len(rows), 1)
             self.assertIn('"group": "chinese_state"', rows[0])
             self.assertIn('"labels": ["01_Ukraine_Conflict"]', rows[0])

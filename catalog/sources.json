@@ -1,6 +1,6 @@
 {
- "catalog_version": "2026-10-26.2",
- "notes": "Draft list for Tom's approval. group = the perspective a source speaks from (used for framing divergence); owner = state | public | private | intergovernmental | ngo. domains tag GDELT articles with the same groups, so outlets without a usable feed still count. rss_status: active (polled) | candidate (retry) | dropped (reason in rss_note) | none (GDELT only). expected_minutes = normal gap between new items, calibrated from the 26 Oct probe. clock_skew_hours = hours to subtract from a feed that labels local time as UTC.",
+ "catalog_version": "2026-10-27.1",
+ "notes": "Draft list for Tom's approval. group = the perspective a source speaks from (used for framing divergence); owner = state | public | private | intergovernmental | ngo. domains tag GDELT articles with the same groups, so outlets without a usable feed still count. rss_status: active (polled) | candidate (retry) | dropped (reason in rss_note) | none (GDELT only). expected_minutes = normal gap between new items, calibrated from the 26 Oct probe. clock_skew_hours = hours to subtract from a feed that labels local time as UTC. format: telegram = a public channel's web preview (t.me/s/<channel>), parsed by pipeline/telegram.py. Front-line sources added 27 Oct 2026 (Tom); two-source rule: an indicator hit counts once two independent sources report it (different outlets, not both from the same government).",
  "groups": {
   "western_public": "Western public broadcasters",
   "western_press": "Western private press",
@@ -17,7 +17,9 @@
   "latin_american": "Latin American outlets",
   "official": "Intergovernmental and official sources",
   "specialist": "Defense, maritime, space and research outlets",
-  "western_wire": "Western news wires"
+  "western_wire": "Western news wires",
+  "russian_independent": "Russian independent and exile media",
+  "russian_milblog": "Russian military bloggers (pro-war Telegram channels)"
  },
  "sources": [
   {
@@ -1409,6 +1411,218 @@
    ],
    "rss_status": "none",
    "rss_note": "no feed used; tagged in GDELT by domain"
+  },
+  {
+   "id": "suspilne",
+   "name": "Suspilne (Ukrainian public broadcaster)",
+   "url": "https://suspilne.media/rss/all.rss",
+   "group": "ukrainian",
+   "owner": "public",
+   "lang": "ukr",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 15,
+   "domains": [
+    "suspilne.media"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "rbc_ua",
+   "name": "RBC-Ukraine",
+   "url": "https://www.rbc.ua/static/rss/all.ukr.rss.xml",
+   "group": "ukrainian",
+   "owner": "private",
+   "lang": "ukr",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 10,
+   "domains": [
+    "rbc.ua"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "meduza_ru",
+   "name": "Meduza (Russian)",
+   "url": "https://meduza.io/rss/all",
+   "group": "russian_independent",
+   "owner": "private",
+   "lang": "rus",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "meduza.io"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "meduza_en",
+   "name": "Meduza (English)",
+   "url": "https://meduza.io/rss/en/all",
+   "group": "russian_independent",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 120,
+   "domains": [
+    "meduza.io/en"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "isw",
+   "name": "Institute for the Study of War",
+   "url": "https://understandingwar.org/feed/",
+   "group": "specialist",
+   "owner": "ngo",
+   "lang": "eng",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 1440,
+   "domains": [
+    "understandingwar.org"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "every feed address answers HTTP 403 to automated requests (26 Oct 2026); GDELT may still carry it by domain"
+  },
+  {
+   "id": "tg_kpszsu",
+   "name": "Ukrainian Air Force (Telegram)",
+   "url": "https://t.me/s/kpszsu",
+   "format": "telegram",
+   "group": "ukrainian",
+   "owner": "state",
+   "lang": "ukr",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "t.me/kpszsu"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "tg_generalstaffzsu",
+   "name": "General Staff of the Armed Forces of Ukraine (Telegram)",
+   "url": "https://t.me/s/GeneralStaffZSU",
+   "format": "telegram",
+   "group": "ukrainian",
+   "owner": "state",
+   "lang": "ukr",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 240,
+   "domains": [
+    "t.me/GeneralStaffZSU"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "tg_mod_russia",
+   "name": "Russian Ministry of Defence (Telegram)",
+   "url": "https://t.me/s/mod_russia",
+   "format": "telegram",
+   "group": "russian_state",
+   "owner": "state",
+   "lang": "rus",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "t.me/mod_russia"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "tg_deepstateua",
+   "name": "DeepState (Telegram)",
+   "url": "https://t.me/s/DeepStateUA",
+   "format": "telegram",
+   "group": "ukrainian",
+   "owner": "private",
+   "lang": "ukr",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 240,
+   "domains": [
+    "t.me/DeepStateUA"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "tg_rybar",
+   "name": "Rybar (Telegram)",
+   "url": "https://t.me/s/rybar",
+   "format": "telegram",
+   "group": "russian_milblog",
+   "owner": "private",
+   "lang": "rus",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "t.me/rybar"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "tg_dva_majors",
+   "name": "Two Majors (Telegram)",
+   "url": "https://t.me/s/dva_majors",
+   "format": "telegram",
+   "group": "russian_milblog",
+   "owner": "private",
+   "lang": "rus",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 60,
+   "domains": [
+    "t.me/dva_majors"
+   ],
+   "rss_status": "active"
+  },
+  {
+   "id": "tg_wargonzo",
+   "name": "WarGonzo (Telegram)",
+   "url": "https://t.me/s/wargonzo",
+   "format": "telegram",
+   "group": "russian_milblog",
+   "owner": "private",
+   "lang": "rus",
+   "focus": [
+    "01_Ukraine_Conflict",
+    "07_Russia_NATO"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "t.me/wargonzo"
+   ],
+   "rss_status": "active"
   }
  ]
 }

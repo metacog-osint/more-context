@@ -1,11 +1,29 @@
-# MORE CONTEXT - Claude Context
+# Watchfloor (working name MORE CONTEXT) - Claude Context
 
-MORE CONTEXT is Tom's parallel rebuild of CONTEXT (v4.3, `[local path]`, live at
+Watchfloor is Tom's parallel rebuild of CONTEXT (v4.3, `[local path]`, live at
 https://context.theintelligence.company). Both will be fully built and scored side by side; the better
 parts win. Private work of The Intelligence Company: publicly available information only, no
 classification markings anywhere, no references to other work.
 
-**Plan (read first):** https://claude.ai/artifact/ShyAN6L2qhb6MBiq5284kk ("MORE CONTEXT: Build Plan").
+**Name (Tom, 27 Oct 2026):** the public name is Watchfloor. Internal ids keep the working name on purpose:
+the repo `more-context`, functions `mc-ingest` / `mc-api`, bucket `more-context-484804`, Scheduler job
+`mc-ingest-15min`. Do not rename them; that would mean redeploys and new URLs for nothing.
+
+**Plan (read first):** https://claude.ai/artifact/ShyAN6L2qhb6MBiq5284kk ("Watchfloor: Build Plan").
+
+## Website (deployed 27 Oct 2026, approved by Tom)
+- https://watchfloor.web.app: Firebase Hosting site `watchfloor` in project context-484804 (free tier: 10 GB stored,
+  360 MB/day transfer). Static files in `web/` (no build tool, no dependencies; `web/app.js` inserts API text as
+  text, never HTML). Reads the public API https://mc-api-odg3xhcd4a-uc.a.run.app.
+- Hidden from search engines until Tom says public: `noindex` meta, `X-Robots-Tag`, and `robots.txt` Disallow.
+  To go public, remove all three and add a link from CONTEXT.
+- Custom domain `watchfloor.theintelligence.company`: Tom adds it in the Firebase console (Hosting, watchfloor site,
+  Add custom domain) and puts the records it shows at the registrar. The auto-mode classifier blocks Claude from
+  DNS and domain changes.
+- Deploy (needs Tom's yes): `python -I scripts/build_web.py` (sources list + "Updated" date), then
+  `firebase deploy --only hosting:watchfloor --project context-484804`. Pages revalidate on every load (no-cache).
+- Footer pattern (shared with Tom's noisefloor): "A project of The Intelligence Company. Updated <date>." + terms
+  link + data credits (GDELT requires a citation and link) + a Sources page.
 
 ## What it does
 Turns GDELT articles into stories (reprints grouped), codes each story with Gemini, tracks warning
@@ -27,8 +45,15 @@ Serves warning (did something change?) and awareness (what is the picture, how i
 ## Layout
 - `catalog/entities.json` - zones and Watch Topics. `match_v43` holds v4.3's exact rules (baseline for
   comparison); MORE CONTEXT's own matching replaces them in Phase 2.
-- `catalog/sources.json` - 83 sources in 16 groups: 51 polled RSS feeds, 2 to retry, 17 dropped (reason
-  recorded), 13 GDELT-only outlets tagged by domain (wires, Russian/Chinese/Iranian outlets with no usable feed).
+- `catalog/sources.json` - 95 sources in 18 groups: 51 polled RSS feeds, 2 to retry, 17 dropped (reason
+  recorded), 13 GDELT-only outlets tagged by domain (wires, Russian/Chinese/Iranian outlets with no usable feed),
+  plus 12 front-line sources Tom approved on 27 Oct 2026: Suspilne, RBC-Ukraine, Meduza (ru, en), ISW (dropped:
+  HTTP 403 to automated requests), and 7 Telegram channels (`format: telegram`): Ukrainian Air Force (nightly
+  tallies), General Staff, Russian MoD, DeepState, Rybar, Two Majors, WarGonzo. New groups: russian_independent,
+  russian_milblog.
+- **Two-source rule (Tom, 27 Oct 2026):** an indicator hit counts once two independent sources report it
+  (different outlets, not both from the same government); an official claim counts once an outlet outside that
+  government reports it. Single-source hits are shown as "claimed" and do not move the ladder. Use `owner` + `group`.
 - `catalog/indicators/` - per-zone charters (key questions + indicator ladder). Tom writes these.
 - `catalog/entities.json` also holds a one-sentence `profile` per zone/topic (scope for embeddings and prompts).
 - `catalog/title_terms.json` - multilingual headline terms per entity: the free keyword baseline for relevance.
@@ -44,6 +69,8 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   - `sources.py` - domain -> source group lookup, so GDELT articles get the same groups as RSS items.
   - `cli.py` - `python -I run.py measure-reprints --hours 6`, `rss-poll`, `feed-health` (run.py makes `python -I` work)
   - `feeds.py` - one RSS poll over the active sources (shared by the CLI and the cloud cycle).
+  - `telegram.py` - public Telegram channels via the web preview `t.me/s/<channel>` (no account or key); latest
+    ~20 posts per poll, so very busy channels can drop posts between 15-minute polls.
   - `cycle.py` - one 15-minute ingest cycle: new GDELT files (late files retried up to 3 h, never blocking),
     one RSS poll; writes `cycles/YYYY/MM/DD/HHMMSS.jsonl` + `state/state.json`. `sinks.py`: local folder or GCS.
   - `relevance.py` - scores relevance methods against a labelled set (weighted precision, retention vs v4.3,

@@ -24,7 +24,7 @@ def population_path(dest: str) -> Path:
 
 
 def main(src: str, dest: str, population_only: bool = False) -> None:
-    rows = [json.loads(l) for l in Path(src).read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = [json.loads(l) for l in Path(src).read_text(encoding="utf-8").split("\n") if l.strip()]
     by_entity = defaultdict(list)
     for r in rows:
         for label in r["labels"]:

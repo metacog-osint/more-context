@@ -119,7 +119,7 @@ def cmd_eval_relevance(args) -> int:
 
 def _set_stories(path: str) -> tuple[list[dict], dict | None]:
     """Stories to code: a relevance set (with its population file) or a daily stories.jsonl."""
-    rows = [json.loads(l) for l in Path(path).read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = [json.loads(l) for l in Path(path).read_text(encoding="utf-8").split("\n") if l.strip()]
     pop_path = Path(path).with_name(Path(path).stem + ".population.json")
     pop = json.loads(pop_path.read_text(encoding="utf-8")) if pop_path.exists() else None
     out = []
@@ -308,7 +308,7 @@ def cmd_measure_reprints(args) -> int:
     matcher = Matcher()
     if args.from_jsonl:
         path = Path(args.from_jsonl)
-        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").split("\n") if line.strip()]
         stats = {"source": str(path)}
         tag = path.stem.replace("matched-", "")
     else:

@@ -198,21 +198,51 @@ class ApiTests(unittest.TestCase):
         self.tmp.cleanup()
 
     def call(self, method, path, params=None, body=None, ai_on=True):
-        def code(sink, eid, day, source, ledger):
-            return ondemand.code_entity_day(sink, eid, day, source, ledger=ledger, coder_factory=FakeCoder)
+        def code(sink, eid, day, source, ledger, story_ids=None):
+            return ondemand.code_entity_day(sink, eid, day, source, ledger=ledger, coder_factory=FakeCoder,
+                                            story_ids=story_ids)
         return api.handle(method, path, params or {}, body, self.sink, ai_on=ai_on, ledger=self.led, code=code,
                           today=date(2026, 11, 20))
 
     def test_zone_then_code_then_zone(self):
-        st, out = self.call("GET", "/zone", {"entity": "13_Sudan", "day": "2026-11-19"})
+        st, out = self.call("GET", "/zone", {"entity": "13_Sudan", "day": "2026-11-19", "filter": "all"})
         self.assertEqual((st, len(out["stories"]), out["coded"]), (200, 25, 0))
         self.assertIsNone(out["stories"][0]["coding"])
-        st, out = self.call("POST", "/code", body={"entity": "13_Sudan", "day": "2026-11-19"})
+        st, out = self.call("POST", "/code", body={"entity": "13_Sudan", "day": "2026-11-19", "filter": "all"})
         self.assertEqual((st, out["coded"]), (200, 25))
-        st, out = self.call("GET", "/zone", {"entity": "13_Sudan", "day": "2026-11-19"})
+        st, out = self.call("GET", "/zone", {"entity": "13_Sudan", "day": "2026-11-19", "filter": "all"})
         self.assertEqual(out["stories"][0]["coding"]["event_type"], "ASSAULT")
         st, out = self.call("GET", "/status")
         self.assertEqual((out["ai"], out["budget"]["spent_usd"]), ("on", 0.003))
+
+    def test_headline_filter_and_code_match(self):
+        rows = self.sink.read_lines("stories/2026/11/19/stories.jsonl")
+        for i in (3, 7, 28):
+            rows[i]["title"] = f"RSF drone strike in Sudan number {i}"
+        self.sink.write_lines("stories/2026/11/19/stories.jsonl", rows)
+        st, out = self.call("GET", "/zone", {"entity": "13_Sudan", "day": "2026-11-19"})
+        self.assertEqual([s["story_id"] for s in out["stories"]], ["s03", "s07", "s28"])
+        self.assertTrue(all(s["passes_filter"] for s in out["stories"]))
+        st, out = self.call("POST", "/code", body={"entity": "13_Sudan", "day": "2026-11-19"})
+        self.assertEqual(out["coded"], 3)  # codes what the page shows, not the unfiltered top 25
+        self.assertEqual(self.call("GET", "/zone", {"entity": "13_Sudan", "filter": "x"})[0], 400)
+
+    def test_days_summary_entities(self):
+        self.sink.write_json("stories/2026/11/19/summary.json", {
+            "day": "2026-11-19", "partial": False, "gdelt_articles": 10, "rss_items": 2,
+            "entities": {"13_Sudan": {"articles": 10, "stories": 8, "attention": {"z": 2.5}, "alarms": ["attention z 2.5"],
+                                      "casualty": {"killed_share": 0.2, "wounded_share": 0.1}, "top": []}}})
+        api._CACHE.clear()
+        st, out = self.call("GET", "/days")
+        self.assertEqual(out["days"], ["2026-11-19"])
+        st, out = self.call("GET", "/summary")
+        e = out["entities"]["13_Sudan"]
+        self.assertEqual((st, e["name"], e["killed_share"], e["alarms"]), (200, "Sudan", 0.2, ["attention z 2.5"]))
+        self.assertEqual(self.call("GET", "/summary", {"day": "2026-11-18"})[0], 404)
+        st, out = self.call("GET", "/entities")
+        self.assertEqual(len(out["zones"]) + len(out["topics"]), 20)
+        st, out = self.call("GET", "/status")
+        self.assertIn("ingest", out)
 
     def test_errors(self):
         self.assertEqual(self.call("GET", "/zone", {"entity": "nope"})[0], 400)
@@ -222,7 +252,7 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.call("POST", "/code", body={"entity": "13_Sudan", "day": "2026-11-19"}, ai_on=False)[0], 503)
         self.led.cap = 0.0001
         self.led.alarm_reserve = 0.0
-        st, out = self.call("POST", "/code", body={"entity": "13_Sudan", "day": "2026-11-19"})
+        st, out = self.call("POST", "/code", body={"entity": "13_Sudan", "day": "2026-11-19", "filter": "all"})
         self.assertEqual(st, 429)
         self.assertEqual(FakeCoder.calls, 0)
 
