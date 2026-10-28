@@ -17,9 +17,9 @@ the repo `more-context`, functions `mc-ingest` / `mc-api`, bucket `more-context-
   text, never HTML). Reads the public API https://mc-api-odg3xhcd4a-uc.a.run.app.
 - Hidden from search engines until Tom says public: `noindex` meta, `X-Robots-Tag`, and `robots.txt` Disallow.
   To go public, remove all three and add a link from CONTEXT.
-- Custom domain `watchfloor.theintelligence.company`: Tom adds it in the Firebase console (Hosting, watchfloor site,
-  Add custom domain) and puts the records it shows at the registrar. The auto-mode classifier blocks Claude from
-  DNS and domain changes.
+- Custom domain `watchfloor.theintelligence.company`: live since 28 Oct 2026 (Firebase custom domain on the
+  watchfloor site, CNAME `watchfloor` → `watchfloor.web.app` in Squarespace DNS). Claude set it up at Tom's request;
+  method in `[local path]` §3.11.
 - Deploy (needs Tom's yes): `python -I scripts/build_web.py` (sources list + "Updated" date), then
   `firebase deploy --only hosting:watchfloor --project context-484804`. Pages revalidate on every load (no-cache).
 - Footer pattern (shared with Tom's noisefloor): "A project of The Intelligence Company. Updated <date>." + terms
