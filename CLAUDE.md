@@ -116,6 +116,13 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   So a failed search is retried next run (`RETRY_MINUTES` 15), and each run tries one search first and holds the
   rest when it is refused (probe row `held`), keeping refused requests to one per run. A fixed egress address
   (Cloud NAT) would cost money; not done.
+- Retrying alone did not help: a healthy function reuses one warm instance, and its address stays refused (four
+  runs in a row after the fix). Today's successes all came while the function was crashing, when every run got a
+  fresh instance (19 instances, about 4 in 10 got through). So after a run whose searches were all refused
+  (`summary.rss.searches_refused`), `pipeline/instance.py` sends SIGTERM to the gunicorn server 3 s after the
+  response, and the next run starts on a new instance (`restart_instance: true` in the run log). Only when
+  `K_SERVICE` is set (Cloud Run). If Google ever refuses every address, this restarts every run: harmless (free
+  cold starts), but then switch to another search source.
 - Also failing from the cloud (139 failures in a row by 28 Oct 2026): france24_en, rfi_afrique, timesofisrael
   (HTTP 403) and reliefweb (empty body). suspilne has returned 403 since 28 Oct 03:05 UTC.
 - A partial day (ingest started or stopped mid-day) gets no attention z and no alarm.

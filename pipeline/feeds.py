@@ -40,6 +40,12 @@ def is_due(src: dict, entry: dict | None, now: datetime) -> bool:
     return last is None or (now - last).total_seconds() >= wait * 60 - 30
 
 
+def searches_refused(probe: list[dict]) -> bool:
+    """True when every saved search fetched this run was refused (REFUSED): this run's egress address is turned away."""
+    tried = [p for p in probe if p.get("group") == SEARCH_GROUP and not p.get("skipped")]
+    return bool(tried) and all(p.get("http") in REFUSED for p in tried)
+
+
 def _probe_first(searches: list[dict], feeds: dict) -> dict:
     """The due search tried longest ago (never-tried first), so one bad query cannot hold the others every run."""
     def last_try(s):

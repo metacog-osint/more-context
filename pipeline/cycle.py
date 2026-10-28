@@ -124,7 +124,8 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
         for r in new_rows:
             r["kind"] = "rss"
         rows += new_rows
-        summary["rss"] = {"new": len(new_rows), "status": dict(Counter(p["status"] for p in probe))}
+        summary["rss"] = {"new": len(new_rows), "status": dict(Counter(p["status"] for p in probe)),
+                          "searches_refused": feeds.searches_refused(probe)}
         state["feed_health"] = {"at": health.iso(now), "sources": probe}
 
     if rows:
