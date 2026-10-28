@@ -12,6 +12,7 @@ import time
 import functions_framework
 
 from pipeline import api as api_handler
+from pipeline import instance
 from pipeline.cycle import run_cycle
 from pipeline.sinks import GCSSink
 
@@ -30,6 +31,8 @@ def ingest(request):
     started = time.time()
     summary = run_cycle(_get_sink())
     summary["elapsed_s"] = round(time.time() - started, 1)
+    # Searches refused: stop this instance once the response is out, so the next run gets a new address.
+    summary["restart_instance"] = instance.restart_if_refused(summary)
     print(json.dumps({"severity": "INFO", "message": "mc-ingest cycle", "summary": summary}))
     return json.dumps(summary), 200, {"Content-Type": "application/json"}
 
