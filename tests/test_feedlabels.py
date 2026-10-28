@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from datetime import date, datetime, timedelta, timezone
+from unittest import mock
 
 from pipeline import daily, feedlabels, feeds
 from pipeline.relevance import TermMatcher
@@ -53,7 +54,57 @@ class PollTimingTests(unittest.TestCase):
         self.assertTrue(feeds.is_due({}, {"last_ok": "2026-10-27T11:55:00Z"}, now))  # no poll_minutes: every cycle
         self.assertFalse(feeds.is_due(src, {"last_ok": "2026-10-27T11:30:00Z"}, now))
         self.assertTrue(feeds.is_due(src, {"last_ok": "2026-10-27T11:00:00Z"}, now))
-        self.assertFalse(feeds.is_due(src, {"last_ok": "2026-10-27T10:00:00Z", "last_attempt_error_at": "2026-10-27T11:45:00Z"}, now))
+        # After a failure: the next run (15 minutes), not the full hour.
+        self.assertFalse(feeds.is_due(src, {"last_ok": "2026-10-27T10:00:00Z", "last_attempt_error_at": "2026-10-27T11:50:00Z"}, now))
+        self.assertTrue(feeds.is_due(src, {"last_ok": "2026-10-27T10:00:00Z", "last_attempt_error_at": "2026-10-27T11:45:00Z"}, now))
+        self.assertTrue(feeds.is_due(src, {"last_attempt_error_at": "2026-10-27T11:45:00Z"}, now))
+        # A success after an older failure waits the full hour.
+        self.assertFalse(feeds.is_due(src, {"last_ok": "2026-10-27T11:45:00Z", "last_attempt_error_at": "2026-10-27T10:00:00Z"}, now))
+
+
+class _Res:
+    def __init__(self, status):
+        self.status, self.ok, self.not_modified = status, status == 200, False
+        self.etag = self.last_modified = None
+        self.error = "" if status == 200 else f"HTTP {status}"
+
+
+SEARCHES = [{"id": f"gn_{i}", "group": "search", "owner": "private", "lang": "eng", "expected_minutes": 120,
+             "poll_minutes": 60, "url": f"https://news.google.com/rss/search?q={i}"} for i in range(3)]
+PLAIN = {"id": "bbc", "group": "western_public", "owner": "public", "lang": "eng", "expected_minutes": 60,
+         "url": "https://feeds.bbci.co.uk/news/world/rss.xml"}
+
+
+class SearchProbeTests(unittest.TestCase):
+    def run_poll(self, first_status):
+        now = datetime(2026, 10, 28, 20, 0, tzinfo=timezone.utc)
+        state = {"rss": {"gn_1": {"last_attempt_error_at": "2026-10-28T19:00:00Z", "consecutive_failures": 4}}}
+        tried = []
+
+        def fetch_one(src, entry):
+            tried.append(src["id"])
+            status = first_status if len(tried) == 1 else 200
+            items = [] if status != 200 else [{"url": f"https://x/{src['id']}", "title": "t", "summary": "",
+                                               "published": now}]
+            return _Res(status), (items if status == 200 else None), (None if status == 200 else f"HTTP {status}")
+
+        with mock.patch.object(feeds, "load_sources", lambda include_candidates=False: SEARCHES + [PLAIN]):
+            rows, probe = feeds.poll(state, now, fetch_one=fetch_one)
+        return tried, rows, {p["id"]: p for p in probe}, state
+
+    def test_refused_probe_holds_the_other_searches(self):
+        tried, rows, probe, state = self.run_poll(503)
+        self.assertEqual(tried, ["gn_0", "bbc"])  # gn_0 has never been tried, so it goes first
+        self.assertEqual(set(r["source"] for r in rows), {"bbc"})
+        self.assertTrue(probe["gn_1"].get("held") and probe["gn_2"].get("held"))
+        self.assertEqual(state["rss"]["gn_1"]["consecutive_failures"], 4)  # held, not counted as a failure
+        self.assertEqual(state["rss"]["gn_0"]["consecutive_failures"], 1)
+
+    def test_accepted_probe_lets_the_rest_through(self):
+        tried, rows, probe, _ = self.run_poll(200)
+        self.assertEqual(sorted(tried), ["bbc", "gn_0", "gn_1", "gn_2"])
+        self.assertEqual(tried[0], "gn_0")
+        self.assertFalse(any(p.get("held") for p in probe.values()))
 
 
 class BuildDayFeedTests(unittest.TestCase):
