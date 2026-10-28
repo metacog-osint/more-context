@@ -111,6 +111,13 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   (`poll_minutes`). Google News headlines end in " - Publisher"; that becomes the outlet. Google's terms are
   understood (secondary sources only, 27 Oct 2026) to allow personal, non-commercial use: review before
   Watchfloor earns money.
+- From Cloud Run, Google News answers 503 to some runs and 200 to others, all 21 searches together (28 Oct 2026:
+  about 25 of 62 runs got through; from Tom's machine every try works). The egress address changes between runs.
+  So a failed search is retried next run (`RETRY_MINUTES` 15), and each run tries one search first and holds the
+  rest when it is refused (probe row `held`), keeping refused requests to one per run. A fixed egress address
+  (Cloud NAT) would cost money; not done.
+- Also failing from the cloud (139 failures in a row by 28 Oct 2026): france24_en, rfi_afrique, timesofisrael
+  (HTTP 403) and reliefweb (empty body). suspilne has returned 403 since 28 Oct 03:05 UTC.
 - A partial day (ingest started or stopped mid-day) gets no attention z and no alarm.
 
 ## Relevance and attention (28 Oct 2026)

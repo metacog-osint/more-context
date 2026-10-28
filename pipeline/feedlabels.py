@@ -11,11 +11,9 @@ import json
 from collections import defaultdict
 from functools import lru_cache
 
-from .feeds import SOURCES
+from .feeds import SEARCH_GROUP, SOURCES
 from .match import load_catalog
 from .relevance import TermMatcher
-
-SEARCH_GROUP = "search"
 
 
 @lru_cache(maxsize=1)
