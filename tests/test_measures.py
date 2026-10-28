@@ -68,8 +68,9 @@ class DailyMeasuresTests(unittest.TestCase):
                 prev = day - timedelta(days=i)
                 sink.write_json(f"stories/{prev:%Y/%m/%d}/summary.json", {
                     "day": prev.isoformat(), "first_cycle": f"cycles/{prev:%Y/%m/%d}/000500.jsonl",
-                    "entities": {"13_Sudan": {"stories": 2 + i % 2}}})
-            rows = [{"kind": "gdelt", "url": f"https://a{i}.com/x", "title": f"k{i}a k{i}b k{i}c k{i}d k{i}e",  # distinct headlines, so 30 stories
+                    "entities": {"13_Sudan": {"stories": 9, "filtered_stories": 2 + i % 2}}})
+            # Distinct headlines that name the zone, so 30 stories pass the headline filter attention now counts.
+            rows = [{"kind": "gdelt", "url": f"https://a{i}.com/x", "title": f"Sudan k{i}a k{i}b k{i}c k{i}d k{i}e",
                      "published": "2026-11-30T10:00:00Z", "labels": ["13_Sudan"], "domain": f"a{i}.com", "lang": "eng",
                      "killed": 5 if i % 2 else None, "wounded": None} for i in range(30)]
             sink.write_lines("cycles/2026/11/30/000500.jsonl", rows)

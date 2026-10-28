@@ -113,6 +113,19 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   Watchfloor earns money.
 - A partial day (ingest started or stopped mid-day) gets no attention z and no alarm.
 
+## Relevance and attention (28 Oct 2026)
+- `scripts/eval_location.py` scored "where + what" rules on relevance_v1 (zones only, weighted): v4.3 rules 42% on
+  topic; headline terms 82% precision / 78% retention; main location (GDELT V2 mention counts) 42% / 57%; main
+  location AND headline terms 99% / 55%. Main location alone is not a fix; the headline filter is the balance.
+- Attention and alarms therefore count headline-filtered stories (`filtered_stories`), and `history()` reads that
+  count. On 12-26 Oct this removed Somalia's Ilhan Omar alarms and raised Ukraine (16 Oct strikes, Starlink),
+  Somalia (Djibouti boat sinking) and DRC (Ebola past 9,000 cases). Known noise: Vietnamese weather headlines
+  naming "Bien Dong" (the South China Sea).
+- Incident, 28 Oct 2026: the first full-day cloud build (27 Oct) ran out of memory, and since state was saved after
+  the build, every run from 03:20 UTC repeated the same ingest and died. Fixes: the MinHash token cache is compact
+  and cleared per call (full-day peak 475 -> 200 MiB, nothing kept between runs), `load_day_rows` keeps only
+  `BUILD_FIELDS`, and `run_cycle` saves state before building.
+
 ## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
 Most stories are never read by a person, so model work waits for a reason to spend:
 - **Always on, $0:** ingest, stories, headline-term filter, counts, attention z.

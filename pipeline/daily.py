@@ -42,17 +42,28 @@ def _row_day(r: dict) -> str:
     return (r.get("published") or r.get("fetched") or "")[:10]
 
 
+# Only what a build or a zone page needs. GDELT's theme and location strings are most of a row's size; a full day
+# kept whole peaked near 475 MiB of Python objects, and the 512 MiB cloud function died on 28 Oct 2026.
+BUILD_FIELDS = ("kind", "url", "title", "published", "fetched", "lang", "domain", "group", "owner", "source",
+                "labels", "killed", "wounded", "stream")
+
+
 def load_day_rows(sink, day: date) -> tuple[list[dict], list[str]]:
-    """Rows published on `day` (from that day's cycle files and the next day's first hours), and the keys read."""
+    """Rows published on `day` (from that day's cycle files and the next day's first hours), and the keys read.
+    Each row keeps only BUILD_FIELDS."""
     nxt = day + timedelta(days=1)
     keys = sink.list(f"cycles/{day:%Y/%m/%d}/")
     keys += [k for k in sink.list(f"cycles/{nxt:%Y/%m/%d}/") if k.rsplit("/", 1)[-1] < "040000"]
     want = day.isoformat()
-    return [r for k in keys for r in sink.read_lines(k) if _row_day(r) == want], keys
+    rows = []
+    for k in keys:
+        rows += [{f: r[f] for f in BUILD_FIELDS if f in r} for r in sink.read_lines(k) if _row_day(r) == want]
+    return rows, keys
 
 
 def history(sink, day: date, days: int = measures.BASELINE_DAYS) -> dict:
-    """From earlier complete days' summaries: stories per entity-day."""
+    """From earlier complete days' summaries: headline-filtered stories per entity-day (days built before the
+    filter count existed are skipped)."""
     stories: dict[str, dict[date, int]] = defaultdict(dict)
     for i in range(1, days + 1):
         d = day - timedelta(days=i)
@@ -60,7 +71,8 @@ def history(sink, day: date, days: int = measures.BASELINE_DAYS) -> dict:
         if not s or measures.is_partial(s):
             continue
         for eid, e in s.get("entities", {}).items():
-            stories[eid][d] = e.get("stories", 0)
+            if e.get("filtered_stories") is not None:
+                stories[eid][d] = e["filtered_stories"]
     return stories
 
 
@@ -80,6 +92,9 @@ def build_day(sink, day: date) -> dict:
     for eid, arts in sorted(by_entity.items()):
         stories = build_stories(arts)
         urls = {a["url"] for a in arts}
+        # Attention and alarms count stories whose headline names the zone: on the 26 Oct labelled set that is
+        # 82% on topic against 42% for every v4.3 match (scripts/eval_location.py; Tom, 27 Oct 2026).
+        kept = [s for s in stories if matcher.hit(eid, s.get("title") or "")]
         entities[eid] = {
             "articles": len(urls),
             "stories": len(stories),
@@ -88,9 +103,8 @@ def build_day(sink, day: date) -> dict:
             "languages": dict(Counter(a.get("lang", "eng") for a in arts).most_common(8)),
             "top": [{k: s[k] for k in ("story_id", "title", "articles", "outlets", "groups")}
                     for s in stories[:TOP_PER_ENTITY]],
-            "attention": measures.attention_anomaly(story_hist.get(eid, {}), day, len(stories)),
+            "attention": measures.attention_anomaly(story_hist.get(eid, {}), day, len(kept)),
         }
-        kept = [s for s in stories if matcher.hit(eid, s.get("title") or "")]
         entities[eid]["filtered_stories"] = len(kept)  # headline names the zone (catalog/title_terms.json)
         entities[eid]["filtered_articles"] = sum(s["articles"] for s in kept)
         entities[eid]["alarms"] = measures.alarm_reasons(entities[eid])

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import random
+from array import array
 import re
 from collections import Counter, defaultdict
 from urllib.parse import unquote, urlparse
@@ -52,14 +53,16 @@ def tokens(norm: str) -> frozenset[str]:
     return frozenset(w for w in norm.split() if len(w) > 1 and w not in _STOP)
 
 
-_token_cache: dict[str, list[int]] = {}
+# Per-word hash values, cleared at the start of each group_titles call. Stored as 64-bit arrays (values are below
+# 2**61): as lists of Python ints a full day's words took 194 MiB and outlived the call (28 Oct 2026).
+_token_cache: dict[str, array] = {}
 
 
-def _token_hashes(tok: str) -> list[int]:
+def _token_hashes(tok: str) -> array:
     vals = _token_cache.get(tok)
     if vals is None:
         h = int.from_bytes(hashlib.blake2b(tok.encode("utf-8"), digest_size=8).digest(), "little")
-        vals = [(a * h + b) % _P for a, b in _PARAMS]
+        vals = array("Q", ((a * h + b) % _P for a, b in _PARAMS))
         _token_cache[tok] = vals
     return vals
 
@@ -90,6 +93,7 @@ class _UnionFind:
 
 def group_titles(norms: list[str]) -> list[int]:
     """Story id for each normalised title. Equal titles share an id; near duplicates are merged."""
+    _token_cache.clear()
     uniq: dict[str, int] = {}
     for n in norms:
         uniq.setdefault(n, len(uniq))

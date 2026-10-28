@@ -133,6 +133,11 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
         summary["written"] = {"key": key, "rows": len(rows)}
         state.setdefault("first_data_day", f"{now:%Y-%m-%d}")
 
+    # Save ingest progress first: a build that dies (28 Oct 2026: out of memory) must not make the next run
+    # repeat this ingest.
+    state["last_run"] = summary
+    sink.write_json(STATE_KEY, state)
+
     if build_stories:
         sstate = state.setdefault("stories", {})
         first = state.get("first_data_day")

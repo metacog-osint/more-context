@@ -69,7 +69,7 @@ def share_anomaly(history: dict[date, float], day: date, value: float,
 
 def alarm_reasons(entity: dict) -> list[str]:
     """Why an entity-day should be coded by the model, from its free measures; [] when it should not."""
-    if entity.get("stories", 0) < ALARM_MIN_STORIES:
+    if entity.get("filtered_stories", entity.get("stories", 0)) < ALARM_MIN_STORIES:
         return []
     out = []
     att = entity.get("attention")
