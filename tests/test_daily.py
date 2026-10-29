@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from datetime import date, datetime, timezone
 
-from pipeline import daily
+from pipeline import daily, events
 from pipeline.sinks import LocalSink
 
 
@@ -74,7 +74,10 @@ class BuildDayTests(unittest.TestCase):
             search = {**item, "source": "gn_01_ukraine_conflict"}  # same link from a saved search: kept
             reused = {**a, "url": "https://b.com/2", "group": None}  # GDELT reused the record id: kept
             sink.write_lines("cycles/2026/10/26/120500.jsonl", [a, a, item])
-            sink.write_lines("cycles/2026/10/26/122000.jsonl", [a, item, search, reused])
+            # Events records share the cycle file since 30 Oct 2026; the story build leaves them to countries.py.
+            ev = events.as_row({"stamp": "20261026120000", "stream": "english", "rows": 1, "countries": {},
+                                "samples": {}, "violent": [], "published": "2026-10-26T12:00:00Z"})
+            sink.write_lines("cycles/2026/10/26/122000.jsonl", [a, item, search, reused, ev])
             rows, _ = daily.load_day_rows(sink, date(2026, 10, 26))
             self.assertEqual(len(rows), 4)
             summary = daily.build_day(sink, date(2026, 10, 26))

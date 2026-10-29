@@ -14,6 +14,10 @@ One file becomes one compact record:
   and the in-zone violence measure. GDELT's coding is noisy (28 Oct sample: a Seville traffic report and an
   Italian strike notice coded as fights), so consumers filter them further.
 Events dated more than two days before the file are references to the past ("a year ago...") and are skipped.
+
+Since 30 Oct 2026 the records ride in the run's cycle file as rows with `"kind": "events"` first (`as_row`), so a
+run makes one data write, not two. Older records stay in `events/YYYY/MM/DD/HHMMSS.json` (`{"files": [...]}`),
+where `scripts/backfill_events.py` still writes; `countries.py` reads both.
 """
 from __future__ import annotations
 
@@ -31,6 +35,13 @@ COUNTRY_LEVEL = frozenset({"", "0", "1"})  # no location, or the country's centr
 MAX_AGE_DAYS = 2
 SAMPLES_PER_COUNTRY = 2
 METRICS = ("ev", "urls", "root", "place", "violent")
+# How an Events row's line starts in a cycle file, so a reader can skip the article rows unparsed.
+ROW_PREFIX = '{"kind": "events"'
+
+
+def as_row(rec: dict) -> dict:
+    """A record as a cycle-file row; `kind` comes first so its line starts with ROW_PREFIX."""
+    return {"kind": "events", **rec}
 
 # Field positions in the Events 2.0 export.
 ID, DAY, A1NAME, A2NAME, ROOT, CODE, BASE, ROOTCODE, QUAD = 0, 1, 6, 16, 25, 26, 27, 28, 29

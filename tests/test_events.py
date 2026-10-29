@@ -116,9 +116,50 @@ class CycleEventsTests(unittest.TestCase):
                                       ai_on=False, latest=lambda s: "20261028121500", download=lambda st, s: empty,
                                       download_events=dl_events)
             self.assertIn(("20261028121500", "english"), asked)
-            self.assertEqual(summary["events"]["english"]["ok"], len([a for a in asked if a[1] == "english"]))
-            keys = sink.list("events/2026/10/28/")
-            self.assertEqual(len(keys), 1)
+            ok = summary["events"]["english"]["ok"]
+            self.assertEqual(ok, len([a for a in asked if a[1] == "english"]))
+            # One data write a run: the records ride in the cycle file, no events/ object (30 Oct 2026).
+            self.assertEqual(sink.list("events/"), [])
+            key = summary["written"]["key"]
+            self.assertEqual(summary["written"]["events_files"], ok)
+            self.assertEqual(summary["written"]["rows"], 0)  # the fake GKG files held no articles
+            recs = sink.read_lines(key, events.ROW_PREFIX)
+            self.assertEqual(len(recs), ok)
+            self.assertTrue(all(r["kind"] == "events" for r in recs))
+            self.assertEqual(countries.day_records(sink, date(2026, 10, 28))[0]["countries"]["ET"][1], 1)
+
+
+class EventsStorageTests(unittest.TestCase):
+    """Records written before 30 Oct 2026 (and by backfills) sit in events/; newer ones in cycle files."""
+
+    def rec(self, stamp, stream="english"):
+        return {"stamp": stamp, "stream": stream, "rows": 1, "countries": {"ET": [1, 1, 1, 1, 1]},
+                "samples": {}, "violent": []}
+
+    def test_records_are_read_from_both_places_once(self):
+        with tempfile.TemporaryDirectory() as td:
+            sink = LocalSink(td)
+            sink.write_json("events/2026/10/30/101500.json", {"files": [self.rec("20261030100000")]})
+            sink.write_json("events/2026/10/30/20261030101500.json", {"files": [self.rec("20261030101500")]})
+            sink.write_lines("cycles/2026/10/30/103000.jsonl", [
+                {"kind": "gdelt", "url": "https://a/1", "published": "2026-10-30T10:20:00Z"},
+                events.as_row(self.rec("20261030101500")),  # also in events/: counted once
+                events.as_row(self.rec("20261030103000"))])
+            # The next day's first runs fetch the day's last files; backfill names carry the full stamp or a "t".
+            sink.write_lines("cycles/2026/10/31/001500.jsonl", [events.as_row(self.rec("20261030234500"))])
+            sink.write_json("events/2026/10/31/20261031001500.json", {"files": [self.rec("20261030233000")]})
+            sink.write_lines("cycles/2026/10/31/003000t.jsonl", [events.as_row(self.rec("20261030231500"))])
+            sink.write_lines("cycles/2026/10/31/050000.jsonl", [events.as_row(self.rec("20261030230000"))])  # too late
+            stamps = sorted(r["stamp"] for r in countries.day_records(sink, date(2026, 10, 30)))
+            self.assertEqual(stamps, ["20261030100000", "20261030101500", "20261030103000", "20261030231500",
+                                      "20261030233000", "20261030234500"])
+
+    def test_row_line_starts_with_the_prefix(self):
+        with tempfile.TemporaryDirectory() as td:
+            sink = LocalSink(td)
+            sink.write_lines("cycles/x.jsonl", [{"kind": "rss", "url": "u"}, events.as_row(self.rec("1"))])
+            self.assertEqual([r["stamp"] for r in sink.read_lines("cycles/x.jsonl", events.ROW_PREFIX)], ["1"])
+            self.assertEqual(len(sink.read_lines("cycles/x.jsonl")), 2)
 
 
 class ApiTests(unittest.TestCase):

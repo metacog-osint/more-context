@@ -1,9 +1,10 @@
 """One ingest cycle, run every 15 minutes: new GDELT files since the last run, plus one RSS poll.
 
-Writes one data object per run (`cycles/YYYY/MM/DD/HHMMSS.jsonl`, rows tagged kind=gdelt|rss) and the
+Writes one data object per run (`cycles/YYYY/MM/DD/HHMMSS.jsonl`, rows tagged kind=gdelt|rss|events) and the
 state object (`state/state.json`: last GDELT stamp per stream, feed health, the last run's summary).
 For each GKG slot read, the matching GDELT Events files are read too (events.py; ~100 KB each) and kept as one
-compact record per file in `events/YYYY/MM/DD/HHMMSS.json`; the daily build turns them into country counts.
+compact record per file, a kind=events row in the same cycle file (in `events/YYYY/MM/DD/HHMMSS.json` before
+30 Oct 2026: one write a run saved); the daily build turns them into country counts.
 GDELT rows carry their zone/topic labels and, when the outlet is catalogued, its source group.
 """
 from __future__ import annotations
@@ -127,8 +128,7 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
         summary["gdelt"][stream] = {"files": len(todo), "ok": ok, "missing": missing, "failed": failed,
                                     "waiting": waiting, "matched": scanned_rows, "through": s.get("last_stamp")}
 
-    if download_events:
-        ingest_events(sink, state, summary, now, done, download_events)
+    event_recs = ingest_events(state, summary, now, done, download_events) if download_events else []
 
     if poll_rss:
         new_rows, probe = poll(state, now)
@@ -139,10 +139,10 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
                           "searches_refused": feeds.searches_refused(probe)}
         state["feed_health"] = {"at": health.iso(now), "sources": probe}
 
-    if rows:
+    if rows or event_recs:
         key = f"cycles/{now:%Y/%m/%d}/{now:%H%M%S}.jsonl"
-        sink.write_lines(key, rows)
-        summary["written"] = {"key": key, "rows": len(rows)}
+        sink.write_lines(key, rows + [events.as_row(r) for r in event_recs])
+        summary["written"] = {"key": key, "rows": len(rows), "events_files": len(event_recs)}
         state.setdefault("first_data_day", f"{now:%Y-%m-%d}")
 
     days = []
@@ -179,8 +179,9 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
     return summary
 
 
-def ingest_events(sink, state: dict, summary: dict, now: datetime, done: dict[str, list[str]], download) -> None:
-    """Events files for the GKG slots read this run, plus earlier ones not published then (kept up to 3 h)."""
+def ingest_events(state: dict, summary: dict, now: datetime, done: dict[str, list[str]], download) -> list[dict]:
+    """Records of the Events files for the GKG slots read this run, plus earlier ones not published then (kept up
+    to 3 h). The caller writes them into the run's cycle file."""
     estate = state.setdefault("events", {})
     recs, out = [], {}
     for stream in events.FILE_NAMES:
@@ -208,9 +209,8 @@ def ingest_events(sink, state: dict, summary: dict, now: datetime, done: dict[st
         s["pending"] = pending
         s["missing_total"] = s.get("missing_total", 0) + missing
         out[stream] = {"files": len(todo), "ok": ok, "waiting": len(pending)}
-    if recs:
-        sink.write_json(f"events/{now:%Y/%m/%d}/{now:%H%M%S}.json", {"files": recs})
     summary["events"] = out
+    return recs
 
 
 def run_alarms(sink, state: dict, summary: dict, ai_on: bool, code_alarm) -> None:
