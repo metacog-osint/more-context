@@ -127,7 +127,12 @@ Serves warning (did something change?) and awareness (what is the picture, how i
 - `main.py`, `requirements.txt`, `.gcloudignore` - Cloud Run function wrapper (`mc-ingest`).
   `scripts/deploy_ingest.sh` creates bucket, service accounts, private function, one Scheduler job.
   Local dry run: `python -I run.py cycle`. Redeploy after code changes with the `gcloud functions deploy`
-  line from that script (needs Tom's yes, like any deploy).
+  line from that script (needs Tom's yes, like any deploy). **In PowerShell, single-quote the env-var argument:**
+  `'--set-env-vars=MC_BUCKET=more-context-484804,MC_AI=on'`. PowerShell runs `gcloud.ps1`, which turns an
+  unquoted `a,b` into a list and rejoins it with a space: on 29 Oct 2026 that deployed `MC_BUCKET` as
+  `more-context-484804 MC_AI=on` and every run failed with "Invalid bucket name" until redeployed. After any
+  deploy, check `gcloud functions describe mc-ingest --gen2 --region=us-central1 --project=context-484804
+  --format="json(serviceConfig.environmentVariables)"` shows the two variables separately.
 
 ## Changing the watchlist
 - Zones and topics live in `catalog/entities.json` (order matters: first zone match wins). A retired id goes in
