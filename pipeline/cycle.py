@@ -2,6 +2,8 @@
 
 Writes one data object per run (`cycles/YYYY/MM/DD/HHMMSS.jsonl`, rows tagged kind=gdelt|rss) and the
 state object (`state/state.json`: last GDELT stamp per stream, feed health, the last run's summary).
+For each GKG slot read, the matching GDELT Events files are read too (events.py; ~100 KB each) and kept as one
+compact record per file in `events/YYYY/MM/DD/HHMMSS.json`; the daily build turns them into country counts.
 GDELT rows carry their zone/topic labels and, when the outlet is catalogued, its source group.
 """
 from __future__ import annotations
@@ -9,7 +11,7 @@ from __future__ import annotations
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 
-from . import daily, feeds, gdelt, health, ondemand
+from . import countries, daily, events, feeds, gdelt, health, ondemand
 from .budget import BudgetExceeded
 from .match import Matcher
 from .sources import lookup_domain
@@ -67,8 +69,13 @@ def gdelt_rows(stamp: str, stream: str, data: bytes, matcher: Matcher) -> list[d
 
 def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool = True,
               latest=gdelt.latest_stamp, download=gdelt.download, poll=feeds.poll,
-              build_stories: bool = True, ai_on: bool | None = None, code_alarm=ondemand.code_entity_day) -> dict:
+              build_stories: bool = True, ai_on: bool | None = None, code_alarm=ondemand.code_entity_day,
+              download_events=None) -> dict:
     now = now or datetime.now(timezone.utc)
+    # Events follow the live GKG downloader; a test that fakes GKG files gets no Events unless it passes a fake.
+    if download_events is None and download is gdelt.download:
+        download_events = events.download
+    done: dict[str, list[str]] = {}
     state = sink.read_json(STATE_KEY) or {}
     gstate = state.setdefault("gdelt", {})
     matcher = Matcher()
@@ -109,6 +116,7 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
             rows += got
             scanned_rows += len(got)
             ok += 1
+            done.setdefault(stream, []).append(stamp)
         if todo:
             s["last_stamp"] = max(todo[-1], s.get("last_stamp") or "")
         s["pending"] = pending
@@ -118,6 +126,9 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
         s["missing_total"] = s.get("missing_total", 0) + len(missing)
         summary["gdelt"][stream] = {"files": len(todo), "ok": ok, "missing": missing, "failed": failed,
                                     "waiting": waiting, "matched": scanned_rows, "through": s.get("last_stamp")}
+
+    if download_events:
+        ingest_events(sink, state, summary, now, done, download_events)
 
     if poll_rss:
         new_rows, probe = poll(state, now)
@@ -150,11 +161,49 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
                 sstate["last_error"] = f"{day}: {e}"[:200]
                 summary["stories_error"] = sstate["last_error"]
                 break
+            try:  # country counts never hold up the story build
+                summary.setdefault("countries_built", []).append(countries.build_day(sink, day))
+            except Exception as e:
+                summary["countries_error"] = f"{day}: {e}"[:200]
 
     run_alarms(sink, state, summary, ondemand.ai_enabled() if ai_on is None else ai_on, code_alarm)
     state["last_run"] = summary
     sink.write_json(STATE_KEY, state)
     return summary
+
+
+def ingest_events(sink, state: dict, summary: dict, now: datetime, done: dict[str, list[str]], download) -> None:
+    """Events files for the GKG slots read this run, plus earlier ones not published then (kept up to 3 h)."""
+    estate = state.setdefault("events", {})
+    recs, out = [], {}
+    for stream in events.FILE_NAMES:
+        s = estate.setdefault(stream, {})
+        todo = sorted(set(s.get("pending", [])) | set(done.get(stream, [])))
+        pending, ok, missing = [], 0, 0
+        for stamp in todo:
+            young = now - stamp_time(stamp) < NOT_YET_PUBLISHED
+            try:
+                data = download(stamp, stream)
+            except Exception as e:
+                s["last_error"] = f"{stamp}: {e}"[:200]
+                data = None
+            if data is None:
+                if young:
+                    pending.append(stamp)
+                else:
+                    missing += 1
+                continue
+            try:
+                recs.append(events.record(events.parse_zip(data), stamp, stream))
+                ok += 1
+            except Exception as e:  # a damaged file: skip it
+                s["last_error"] = f"{stamp}: {e}"[:200]
+        s["pending"] = pending
+        s["missing_total"] = s.get("missing_total", 0) + missing
+        out[stream] = {"files": len(todo), "ok": ok, "waiting": len(pending)}
+    if recs:
+        sink.write_json(f"events/{now:%Y/%m/%d}/{now:%H%M%S}.json", {"files": recs})
+    summary["events"] = out
 
 
 def run_alarms(sink, state: dict, summary: dict, ai_on: bool, code_alarm) -> None:

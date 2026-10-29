@@ -27,7 +27,7 @@ a { color: var(--link); }
 nav { display: flex; gap: 4px; }
 nav a { color: var(--top-ink); text-decoration: none; padding: 6px 10px; border-radius: 6px; opacity: .8; }
 nav a.on, nav a:hover { background: rgba(255,255,255,.1); opacity: 1; }
-nav { align-items: center; }
+nav { align-items: center; flex-wrap: wrap; }
 nav .tic-time-btn { color: var(--top-ink); border-color: rgba(255,255,255,.25); margin-left: 6px; }
 main { padding-top: 24px; padding-bottom: 40px; min-height: 60vh; }
 h1 { font-size: 24px; margin: 0 0 4px; }
@@ -81,3 +81,30 @@ tr.alarm td { background: var(--alarm-soft); }
   th, td { padding: 8px; }
   h1 { font-size: 21px; }
 }
+
+/* Rising and map (28 Oct 2026) */
+:root { --z3: #b3261e; --z2: #e06c3a; --z1: #f2b766; --z0: #dfe6ee; --zlow: #9fc3e6; --nodata: #eef1f5; --land-line: #ffffff; --sea: #e8eef5; --event: #6a1b9a; }
+@media (prefers-color-scheme: dark) {
+  :root { --z3: #ff6f61; --z2: #e98a4f; --z1: #9c7a3c; --z0: #2a3448; --zlow: #2f557d; --nodata: #1a2232; --land-line: #0d131f; --sea: #0f1826; --event: #e1a6ff; }
+}
+.teaser { padding: 10px 14px; margin: 0 0 8px; font-size: 14px; }
+.heads { margin: 0; padding-left: 16px; font-size: 13px; }
+.heads li { margin: 2px 0; }
+.map { height: 560px; margin: 0 0 10px; overflow: hidden; background: var(--sea); }
+.leaflet-container { background: var(--sea); font: inherit; }
+.land { fill-opacity: 1; stroke: var(--land-line); }
+.land.z3 { fill: var(--z3); } .land.z2 { fill: var(--z2); } .land.z1 { fill: var(--z1); }
+.land.z0 { fill: var(--z0); } .land.zlow { fill: var(--zlow); } .land.nodata { fill: var(--nodata); }
+.land:hover { stroke: var(--ink); stroke-width: 1.2; }
+.zone-dot { stroke: var(--ink); fill-opacity: 1; cursor: pointer; }
+.zone-dot.z3 { fill: var(--z3); } .zone-dot.z2 { fill: var(--z2); } .zone-dot.z1 { fill: var(--z1); }
+.zone-dot.z0, .zone-dot.zlow { fill: var(--panel); } .zone-dot.nodata { fill: var(--nodata); }
+.event-dot { fill: var(--event); stroke: var(--panel); fill-opacity: .85; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0 0 8px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.sw { display: inline-block; width: 14px; height: 10px; border-radius: 2px; border: 1px solid var(--line); }
+.sw.z3 { background: var(--z3); } .sw.z2 { background: var(--z2); } .sw.z1 { background: var(--z1); }
+.sw.z0 { background: var(--z0); } .sw.zlow { background: var(--zlow); } .sw.nodata { background: var(--nodata); }
+.sw.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--event); }
+.leaflet-tooltip, .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--panel); color: var(--ink); }
+@media (max-width: 640px) { .map { height: 420px; } nav a { padding: 6px 7px; } .top-inner { gap: 6px; padding-top: 6px; padding-bottom: 6px; } }

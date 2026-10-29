@@ -82,10 +82,18 @@ Serves warning (did something change?) and awareness (what is the picture, how i
     `python -I run.py vertex-estimate` (free). `python -I run.py code-stories --cap <USD>` is BILLABLE: Tom's yes first.
   - `measures.py` - attention anomaly (log-scale z vs the entity's previous 28 complete days, weekday-adjusted)
     The casualty-reporting share was removed on 27 Oct 2026 (it flagged deaths from other places and times;
-    see the module docstring); violent events located inside the zone are the planned replacement.
+    see the module docstring); zone violence in `countries.py` replaced it on 28 Oct 2026.
   - `daily.py` - daily story build inside the cycle: day D is built on the first run after D+1 03:15 UTC, from
     rows published on D; writes `stories/YYYY/MM/DD/stories.jsonl` + `summary.json` (per-entity totals, reprint
     inflation, source-group counts). Local: `python -I run.py build-stories --day YYYY-MM-DD --root <folder>`.
+  - `events.py` - GDELT Events 2.0 files (~100 KB per stream per 15 minutes, against ~20 MB for GKG): one
+    compact record per file with per-country article counts, sample links and placed violent events.
+  - `countries.py` - per-country days (`stories/YYYY/MM/DD/countries.json`), the Rising and Elevated lists, zone
+    violence, and `violent.jsonl` for the map. See "Rising, map and zone violence" below.
+  - `instance.py` - restarts the Cloud Run instance after a run whose saved searches were refused.
+- `scripts/backfill_events.py` (Events history, free), `scripts/eval_rising.py` (compares country counts),
+  `scripts/eval_xlang.py` (cross-language grouping test), `scripts/build_fips_names.py` (catalog/fips_countries.json),
+  `scripts/dev_server.py` (local preview of web/ against a local data folder; AI off).
 - `main.py`, `requirements.txt`, `.gcloudignore` - Cloud Run function wrapper (`mc-ingest`).
   `scripts/deploy_ingest.sh` creates bucket, service accounts, private function, one Scheduler job.
   Local dry run: `python -I run.py cycle`. Redeploy after code changes with the `gcloud functions deploy`
@@ -99,8 +107,8 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   `scripts/relabel.py` on the stored rows and rebuild the days; no download. Anything wider needs
   `scripts/backfill.py`, because rows the old rules never matched were not kept.
 - 27 Oct 2026 (Tom): 17_Horn_of_Africa split into 18_Ethiopia_Eritrea and 19_Somalia after Ethiopia's renewed
-  war (from 23 Sep) was lost inside it. Next (planned with Tom): main-location relevance, a per-country baseline
-  and a "Rising" list so new crises surface without a catalog edit.
+  war (from 23 Sep) was lost inside it. Main-location relevance was tested and dropped (see below); the
+  per-country baseline and the Rising list followed on 28 Oct, so new crises surface without a catalog edit.
 
 ## Feeds and saved searches (27 Oct 2026)
 - Feed items (RSS, Telegram, saved searches) get zone labels when the day is built (`pipeline/feedlabels.py`):
@@ -139,6 +147,36 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   the build, every run from 03:20 UTC repeated the same ingest and died. Fixes: the MinHash token cache is compact
   and cleared per call (full-day peak 475 -> 200 MiB, nothing kept between runs), `load_day_rows` keeps only
   `BUILD_FIELDS`, and `run_cycle` saves state before building.
+
+## Rising, map and zone violence (28 Oct 2026, Tom: "start the rising list, then the map, violent events...")
+- Source: GDELT Events 2.0 export files, not GKG: ~100 KB per stream per 15 minutes against ~20 MB, so every
+  country is counted live and 90 days back for free (`scripts/backfill_events.py`: 8,832 slots, 29 Jul-28 Oct,
+  ~20 minutes, ~550 MB local). Each ingest run fetches the Events files for the GKG slots it read and writes
+  `events/YYYY/MM/DD/HHMMSS.json`; the daily build writes `stories/.../countries.json` and `violent.jsonl`.
+- Counts per country-day: distinct articles with an event located there (`urls`, attention) and with an assault,
+  fight or mass-violence event there (`violent`, CAMEO 18-20). Scored against the country's own last 28 complete
+  days (log z, weekday-adjusted) and its 90-day median. Rising: z >= 2.5, >= 1.5x expected, >= 40 articles
+  (violence: 15). Elevated: >= 2x the 90-day median. Country names: `catalog/fips_countries.json` (FIPS 10-4, as
+  GDELT; "RI" is Serbia, "CG" DR Congo, "NG" Niger, "NI" Nigeria).
+- Test (`scripts/eval_rising.py`, 63 scored days, 26 Aug-27 Oct): countries flagged per day, violence 4.5 (max
+  9), attention 7.1, events 8.4, lead-paragraph articles 7.0, placed articles 5.6. Ethiopia on 23 Sep (war restart):
+  violence z 5.6 (18x expected), attention z 4.8. Violence leads the page; attention is noisier (GDELT geocodes
+  names: "Guadalupe" became Guadeloupe; routine Finnish and Norwegian news). Codes GDELT uses for non-countries
+  ("OS", oceans) are never listed. On 27 Oct the 90-day reference keeps Ethiopia on "violence elevated for weeks"
+  (5.6x its 90-day median) while its 28-day z reads normal.
+- Zone violence replaces the casualty share: violent events placed inside the zone (`countries`, or `violence`
+  for Russia-NATO: NATO states + Kaliningrad RS23) in articles whose headline names the zone, z against 28 days.
+  Display only, not an alarm reason (yet). Ethiopia & Eritrea on 23 Sep: 37 articles against 0.7 expected (z 6.6).
+  The map's event layer (`/violent?zone=`) shows the same events the measure counts.
+- Local preview: `scripts/dev_server.py` (launch config `watchfloor-dev`, port 8734) serves web/ and the API from
+  `data/backfill/baseline`; the site switches to it on localhost.
+- Map (`#/map`): Leaflet 1.9.4 served from `web/vendor/leaflet/` (identical from cdnjs and unpkg, sha256 db49d009...),
+  Natural Earth 110m outlines in `web/geo/world.json` (public domain, FIPS codes added). No tile server, so the
+  site's CSP stays self-only. Zone positions in `entities.json` `map` (CONTEXT v4.3's, plus the two Horn zones).
+- Cross-language grouping via GDELT mentions (`scripts/eval_xlang.py`, 26 Oct): too noisy and too sparse. It joined
+  the UN crimes-against-humanity finding across English and Ukrainian, but chained unrelated Ukraine stories through
+  broad events, and most events sit in one story only (about 2% of Ukraine's stories could merge). Multilingual
+  embeddings (Vertex, billable) remain the route; needs Tom's yes after a measured sample.
 
 ## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
 Most stories are never read by a person, so model work waits for a reason to spend:

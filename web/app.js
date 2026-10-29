@@ -1,7 +1,8 @@
 // Watchfloor web app: a static page over the public API (pipeline/api.py). No build step, no dependencies.
 // Every string from the API is inserted as text (never as HTML): headlines are third-party content.
 
-const API = "https://mc-api-odg3xhcd4a-uc.a.run.app";
+// On localhost the site reads scripts/dev_server.py's local API instead of the cloud one.
+const API = ["localhost", "127.0.0.1"].includes(location.hostname) ? `${location.origin}/api` : "https://mc-api-odg3xhcd4a-uc.a.run.app";
 const COST_PER_STORY = 0.0002; // measured 26 Oct 2026: $0.0049 for 25 stories
 
 const app = document.getElementById("app");
@@ -15,7 +16,7 @@ function h(tag, attrs, ...kids) {
     else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
     else el.setAttribute(k, v === true ? "" : v);
   }
-  for (const kid of kids.flat()) {
+  for (const kid of kids.flat(Infinity)) {
     if (kid === null || kid === undefined || kid === false) continue;
     el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
   }
@@ -56,7 +57,7 @@ function setNav(name) {
 }
 
 function show(...nodes) {
-  app.replaceChildren(...nodes.flat().filter((n) => n !== null && n !== undefined && n !== false));
+  app.replaceChildren(...nodes.flat(Infinity).filter((n) => n !== null && n !== undefined && n !== false));
   window.scrollTo(0, 0);
 }
 
@@ -74,6 +75,15 @@ function attentionBadge(att, partial) {
   return h("span", { class: `badge ${cls}`, title: `z ${att.z} against ${att.baseline_days} days, expected ${att.expected}` }, `${ratio}(z ${att.z})`);
 }
 
+function violenceCell(e, partial) {
+  const v = e && e.violence;
+  if (!v) return h("span", { class: "muted small" }, "—");
+  const s = v.named_score;
+  if (partial || !s || s.z === undefined || s.ratio === null || s.ratio === undefined) return h("span", { class: "muted small", title: "Articles reporting violence placed in the zone whose headline names it" }, `${v.named}`);
+  const cls = s.z >= 2 ? "hot" : s.z >= 1 ? "warm" : "cool";
+  return h("span", { class: `badge ${cls}`, title: `${v.named} articles reporting violence placed in the zone whose headline names it (of ${v.articles}); z ${s.z} against the last 28 days, expected ${s.expected}` }, `${v.named} · ${s.ratio ?? "?"}×`);
+}
+
 function zoneRows(list, sum, day) {
   return list.map((ent) => {
     const e = sum.entities[ent.id];
@@ -84,6 +94,7 @@ function zoneRows(list, sum, day) {
       h("td", { class: "num" }, e ? stories.toLocaleString() : "—"),
       h("td", { class: "num hide-sm" }, e ? e.stories.toLocaleString() : "—"),
       h("td", null, e ? attentionBadge(e.attention, sum.partial) : "—"),
+      h("td", { class: "hide-sm" }, violenceCell(e, sum.partial)),
       h("td", null, alarms ? h("span", { class: "badge hot", title: `Alarm: ${e.alarms.join("; ")}` }, "alarm") : ""));
   });
 }
@@ -97,6 +108,7 @@ function zoneTable(title, list, sum, day) {
         h("th", { class: "num", title: "Stories whose headline names the zone or topic" }, "Stories"),
         h("th", { class: "num hide-sm", title: "Every story v4.3's matching rules assign here" }, "All matches"),
         h("th", null, "Attention vs typical"),
+        h("th", { class: "hide-sm", title: "GDELT events of assault, fighting or mass violence placed in the zone, in articles whose headline names it" }, "Violence"),
         h("th", null, ""))),
       h("tbody", null, zoneRows(list, sum, day)))),
   ];
@@ -114,15 +126,211 @@ async function viewHome(params) {
   if (sum.partial) notes.push(h("p", { class: "note" }, "This day is incomplete: ingest started partway through it, so counts are low."));
   const filtered = Object.values(sum.entities).some((e) => e.filtered_stories !== null && e.filtered_stories !== undefined);
   if (!filtered) notes.push(h("p", { class: "note" }, "Headline-filtered counts are not available for this day; \"Stories\" shows every match."));
+  const teaser = await risingTeaser(ents, day);
   show(
     h("h1", null, "Conflict zones and watch topics"),
     h("p", { class: "lede" }, "Daily counts of stories whose headline names the zone (reprints merged), and how unusual each day is against the zone's own last 28 days. Open a zone for its stories."),
     h("div", { class: "bar" }, h("label", null, "UTC day ", picker),
       h("span", { class: "muted small" }, `${sum.gdelt_articles?.toLocaleString() ?? "—"} matched articles · built ${when(sum.built_at)}`)),
     notes,
+    teaser,
     zoneTable("Conflict zones", ents.zones, sum, day),
     zoneTable("Watch topics", ents.topics, sum, day),
   );
+}
+
+// ---------- Rising (every country against its own normal) ----------
+const MEASURES = {
+  violent: { label: "Violence", noun: "articles reporting violence located there", short: "violence" },
+  urls: { label: "Attention", noun: "articles reporting events located there", short: "attention" },
+};
+const MEASURE_ORDER = ["violent", "urls"];
+
+function zoneLinks(c, ents, day) {
+  const ids = c.zones || [];
+  if (!ids.length) return h("span", { class: "badge warm", title: "No Watchfloor zone covers this country" }, "not watched");
+  return ids.map((id) => {
+    const z = ents.zones.find((e) => e.id === id);
+    return h("a", { class: "zone-link small", href: `#/zone/${id}?day=${day}` }, z ? z.name : id);
+  });
+}
+
+function scoreBadge(s, kind) {
+  if (!s || s.z === undefined) return h("span", { class: "badge cool", title: "Needs 14 complete days of history" }, "—");
+  if (kind === "elevated") {
+    return h("span", { class: "badge warm", title: `${s.ratio90}× the median of the last 90 days (${s.median90})` }, `${s.ratio90}× 90-day`);
+  }
+  const cls = s.z >= 3 ? "hot" : s.z >= 2 ? "warm" : "cool";
+  return h("span", { class: `badge ${cls}`, title: `z ${s.z} against the last 28 days (expected ${s.expected})` }, `${s.ratio ?? "?"}× (z ${s.z})`);
+}
+
+function countryRows(ccs, data, metric, kind, ents) {
+  return ccs.map((cc) => {
+    const c = data.countries[cc] || {};
+    const s = c[`${metric}_score`] || {};
+    const heads = (data.samples[cc] || []).slice(0, 2);
+    return h("tr", null,
+      h("td", null, h("strong", null, c.name || cc), h("div", { class: "meta" }, zoneLinks(c, ents, data.day))),
+      h("td", { class: "num" }, (c[metric] ?? 0).toLocaleString()),
+      h("td", null, scoreBadge(s, kind), kind === "rising" && s.ratio90 ? h("div", { class: "meta" }, `${s.ratio90}× 90-day median`) : null),
+      h("td", { class: "hide-sm" }, heads.length
+        ? h("ul", { class: "heads" }, heads.map((x) => {
+          const u = safeUrl(x.url);
+          return h("li", null, u ? h("a", { href: u, target: "_blank", rel: "noopener noreferrer nofollow" }, x.title || new URL(u).hostname) : x.title);
+        }))
+        : h("span", { class: "muted small" }, "—")));
+  });
+}
+
+function countryTable(title, sub, ccs, data, metric, kind, ents) {
+  return [
+    h("h2", null, title),
+    h("p", { class: "muted small" }, sub),
+    ccs.length
+      ? h("div", { class: "panel" }, h("table", null,
+        h("thead", null, h("tr", null, h("th", null, "Country"), h("th", { class: "num" }, "Articles"),
+          h("th", null, kind === "rising" ? "Vs normal" : "Vs 90 days"), h("th", { class: "hide-sm" }, "Sample headlines"))),
+        h("tbody", null, countryRows(ccs, data, metric, kind, ents))))
+      : h("p", { class: "muted" }, "None today."),
+  ];
+}
+
+async function viewRising(params) {
+  setNav("rising");
+  const ents = await entities();
+  const data = await get(`/countries${params.get("day") ? `?day=${params.get("day")}` : ""}`);
+  const picker = h("select", { "aria-label": "Day (UTC)", onchange: (ev) => { location.hash = `#/rising?day=${ev.target.value}`; } },
+    data.days.map((d) => h("option", { value: d, selected: d === data.day }, dayLabel(d))));
+  const sections = [];
+  if (data.partial) sections.push(h("p", { class: "note" }, "This day is incomplete (GDELT files missing), so it is counted but not compared with normal."));
+  for (const m of MEASURE_ORDER) {
+    const l = data.lists[m] || { rising: [], elevated: [] };
+    const M = MEASURES[m];
+    sections.push(countryTable(`${M.label} rising`, `Countries where ${M.noun} jumped against their own last 28 days (z 2.5 or more, at least 1.5× expected).`, l.rising, data, m, "rising", ents));
+    sections.push(countryTable(`${M.label} elevated for weeks`, `Not a new jump, but at least twice the country's median of the last 90 days.`, l.elevated, data, m, "elevated", ents));
+  }
+  show(
+    h("h1", null, "Rising"),
+    h("p", { class: "lede" }, "Every country, not just the watched zones, compared with its own normal, so a new crisis shows up before anyone adds a zone. Counts are articles in GDELT's event data whose events are located in the country."),
+    h("div", { class: "bar" }, h("label", null, "UTC day ", picker), h("a", { href: `#/map?day=${data.day}` }, "See it on the map")),
+    sections,
+    h("p", { class: "muted small" }, "Headlines are read from article links and may be shortened. GDELT's automated event coding is noisy: treat a row as a pointer to check, not a finding."),
+  );
+}
+
+async function risingTeaser(ents, day) {
+  let data;
+  try { data = await get(`/countries?day=${day}`); } catch (_) { return null; }
+  const pick = (m) => ((data.lists[m] || {}).rising || []).slice(0, 4);
+  const items = MEASURE_ORDER.flatMap((m) => pick(m).map((cc) => ({ cc, m })));
+  if (!items.length) return null;
+  return h("div", { class: "panel teaser" },
+    h("strong", null, "Rising today: "),
+    items.flatMap(({ cc, m }, i) => {
+      const c = data.countries[cc] || {};
+      return [i ? " · " : "", h("a", { href: `#/rising?day=${data.day}` }, c.name || cc), h("span", { class: "muted small" }, ` ${MEASURES[m].short}${c.zones ? "" : ", not watched"}`)];
+    }));
+}
+
+// ---------- Map ----------
+let leafletLoading = null;
+function loadLeaflet() {
+  if (window.L) return Promise.resolve(window.L);
+  if (!leafletLoading) {
+    leafletLoading = new Promise((resolve, reject) => {
+      const css = h("link", { rel: "stylesheet", href: "vendor/leaflet/leaflet.css" });
+      const js = h("script", { src: "vendor/leaflet/leaflet.js" });
+      js.addEventListener("load", () => resolve(window.L));
+      js.addEventListener("error", () => reject(new Error("map library failed to load")));
+      document.head.append(css, js);
+    });
+  }
+  return leafletLoading;
+}
+
+let WORLD = null;
+async function world() {
+  if (!WORLD) WORLD = await (await fetch("geo/world.json")).json();
+  return WORLD;
+}
+
+const zBucket = (z) => (z === undefined || z === null ? "nodata" : z >= 3 ? "z3" : z >= 2 ? "z2" : z >= 1 ? "z1" : z <= -1.5 ? "zlow" : "z0");
+
+async function viewMap(params) {
+  setNav("map");
+  const metric = params.get("measure") === "urls" ? "urls" : "violent";
+  const [L, ents, geo, data] = await Promise.all([loadLeaflet(), entities(), world(), get(`/countries${params.get("day") ? `?day=${params.get("day")}` : ""}`)]);
+  const day = data.day;
+  let sum = null;
+  try { sum = await get(`/summary?day=${day}`); } catch (_) { /* zone markers then show without attention */ }
+  const zoneSel = params.get("zone") || "";
+  const go = (changes) => {
+    const p = new URLSearchParams({ day, measure: metric, zone: zoneSel, ...changes });
+    if (!p.get("zone")) p.delete("zone");
+    location.hash = `#/map?${p}`;
+  };
+  const el = h("div", { id: "map", class: "map panel", role: "region", "aria-label": "World map" });
+  const info = h("p", { class: "muted small" });
+  show(
+    h("h1", null, "Map"),
+    h("p", { class: "lede" }, `Countries shaded by ${MEASURES[metric].short} against their own last 28 days; circles are Watchfloor's zones, coloured by attention on the zone's headline-filtered stories.`),
+    h("div", { class: "bar" },
+      h("label", null, "UTC day ", h("select", { onchange: (ev) => go({ day: ev.target.value }) }, data.days.map((d) => h("option", { value: d, selected: d === day }, dayLabel(d))))),
+      h("label", null, "Shade by ", h("select", { onchange: (ev) => go({ measure: ev.target.value }) },
+        MEASURE_ORDER.map((m) => h("option", { value: m, selected: m === metric }, MEASURES[m].label)))),
+      h("label", null, "Violent events in ", h("select", { onchange: (ev) => go({ zone: ev.target.value }) },
+        h("option", { value: "", selected: !zoneSel }, "no zone"),
+        h("option", { value: "all", selected: zoneSel === "all" }, "all zones"),
+        ents.zones.map((z) => h("option", { value: z.id, selected: z.id === zoneSel }, z.name))))),
+    el,
+    h("div", { class: "legend small" },
+      ["z3", "z2", "z1", "z0", "zlow", "nodata"].map((b) => h("span", null, h("i", { class: `sw ${b}` }),
+        { z3: "z 3+", z2: "z 2-3", z1: "z 1-2", z0: "typical", zlow: "well below", nodata: "no data or partial day" }[b])),
+      h("span", null, h("i", { class: "sw dot" }), "violent event (GDELT, unverified)")),
+    info,
+  );
+  const map = L.map(el, { worldCopyJump: true, minZoom: 1, maxZoom: 8, zoomSnap: 0.5 }).setView([20, 15], 2);
+  map.attributionControl.setPrefix(false);
+  map.attributionControl.addAttribution("Country outlines: Natural Earth · Events: The GDELT Project");
+  const layer = L.geoJSON(geo, {
+    style: (f) => {
+      const c = data.countries[f.properties.cc];
+      const s = c && !data.partial ? c[`${metric}_score`] : null;
+      return { className: `land ${zBucket(s ? s.z : null)}`, weight: 0.6 };
+    },
+    onEachFeature: (f, lyr) => {
+      const c = data.countries[f.properties.cc];
+      const s = c ? c[`${metric}_score`] || {} : {};
+      lyr.bindTooltip(h("span", null, c ? `${c.name || f.properties.name}: ${(c[metric] ?? 0).toLocaleString()} ${MEASURES[metric].short} articles${s.z !== undefined ? `, z ${s.z}` : ""}` : `${f.properties.name}: no data`), { sticky: true });
+      lyr.on("click", () => { location.hash = `#/rising?day=${day}`; });
+    },
+  }).addTo(map);
+  for (const z of ents.zones) {
+    if (!z.map) continue;
+    const e = sum && sum.entities[z.id];
+    const att = e && !sum.partial ? e.attention : null;
+    const m = L.circleMarker(z.map, { radius: 9, className: `zone-dot ${zBucket(att ? att.z : null)}`, weight: 2 }).addTo(map);
+    m.bindTooltip(h("span", null, `${z.name}${att ? `: z ${att.z}` : ""}`));
+    m.on("click", () => { location.hash = `#/zone/${z.id}?day=${day}`; });
+  }
+  layer.bringToBack();
+  if (zoneSel) {
+    try {
+      const v = await get(`/violent?day=${day}&zone=${encodeURIComponent(zoneSel)}`);
+      for (const ev of v.events) {
+        const u = safeUrl(ev.url);
+        const pt = L.circleMarker([ev.lat, ev.lon], { radius: 4, className: "event-dot", weight: 1 }).addTo(map);
+        pt.bindPopup(() => h("div", null,
+          h("strong", null, ev.place || "Unknown place"),
+          h("div", null, `${ev.a1 || "?"} → ${ev.a2 || "?"} (CAMEO ${ev.code})`),
+          h("div", { class: "muted small" }, `${ev.sources ?? "?"} source(s), ${ev.articles ?? "?"} article(s) when first seen`),
+          u ? h("a", { href: u, target: "_blank", rel: "noopener noreferrer nofollow" }, "First report") : null));
+      }
+      info.textContent = `${v.events.length} violent events shown for ${zoneSel === "all" ? "all zones" : (ents.zones.find((z) => z.id === zoneSel) || {}).name}. GDELT codes events automatically and often wrongly; check the report.`;
+    } catch (e) {
+      info.textContent = `Violent events unavailable: ${e.message}`;
+    }
+  }
 }
 
 // ---------- One zone ----------
@@ -268,7 +476,10 @@ async function viewSources() {
   show(h("h1", null, "Sources"),
     h("div", { class: "prose" },
       h("p", null, h("strong", null, "The GDELT Project. "), "GDELT's datasets are free for any academic, commercial or governmental use, with a citation and a link: ",
-        h("a", { href: "https://www.gdeltproject.org/" }, "gdeltproject.org"), ". Watchfloor uses GDELT's 15-minute Global Knowledge Graph files."),
+        h("a", { href: "https://www.gdeltproject.org/" }, "gdeltproject.org"), ". Watchfloor uses GDELT's 15-minute Global Knowledge Graph and Event files."),
+      h("p", null, h("strong", null, "Map. "), "Drawn with ", h("a", { href: "https://leafletjs.com/" }, "Leaflet"),
+        " (BSD 2-Clause licence) over country outlines from ", h("a", { href: "https://www.naturalearthdata.com/" }, "Natural Earth"),
+        " (public domain), both served from this site."),
       h("p", null, h("strong", null, "News feeds and public channels. "), "Headlines, short excerpts and links belong to their publishers, under each publisher's terms. Watchfloor shows a headline and links to the original; read the full article at the source."),
       h("p", null, h("strong", null, "Story codings. "), "Generated by Google Gemini on Vertex AI from headlines only. Machine-generated and sometimes wrong.")),
     h("h2", null, `Catalogue (${cat.sources.length} sources)`),
@@ -300,6 +511,8 @@ async function render() {
   try {
     if (path.startsWith("/zone/")) await viewZone(decodeURIComponent(path.slice(6)), params);
     else if (path === "/status") await viewStatus();
+    else if (path === "/rising") await viewRising(params);
+    else if (path === "/map") await viewMap(params);
     else if (path === "/about") viewAbout();
     else if (path === "/sources") await viewSources();
     else if (path === "/terms") viewTerms();
