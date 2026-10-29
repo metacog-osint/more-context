@@ -145,15 +145,22 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
         summary["written"] = {"key": key, "rows": len(rows)}
         state.setdefault("first_data_day", f"{now:%Y-%m-%d}")
 
-    # Save ingest progress first: a build that dies (28 Oct 2026: out of memory) must not make the next run
-    # repeat this ingest.
-    state["last_run"] = summary
-    sink.write_json(STATE_KEY, state)
-
+    days = []
     if build_stories:
-        sstate = state.setdefault("stories", {})
         first = state.get("first_data_day")
-        for day in daily.days_to_build(sstate.get("last_day"), now, date.fromisoformat(first) if first else None):
+        days = daily.days_to_build((state.get("stories") or {}).get("last_day"), now,
+                                   date.fromisoformat(first) if first else None)
+    ai_on = ondemand.ai_enabled() if ai_on is None else ai_on
+    # Save ingest progress first when slow work follows: a build or a Vertex call that dies (28 Oct 2026: out of
+    # memory) must not make the next run repeat this ingest. Most runs have neither and write state once, at the end:
+    # every write leaves a copy the bucket keeps for a week (soft delete).
+    if days or (ai_on and (state.get("ai") or {}).get("pending")):
+        state["last_run"] = summary
+        sink.write_json(STATE_KEY, state)
+
+    if days:
+        sstate = state.setdefault("stories", {})
+        for day in days:
             try:
                 summary.setdefault("stories_built", []).append(daily.build_day(sink, day))
                 sstate["last_day"] = day.isoformat()
@@ -166,7 +173,7 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
             except Exception as e:
                 summary["countries_error"] = f"{day}: {e}"[:200]
 
-    run_alarms(sink, state, summary, ondemand.ai_enabled() if ai_on is None else ai_on, code_alarm)
+    run_alarms(sink, state, summary, ai_on, code_alarm)
     state["last_run"] = summary
     sink.write_json(STATE_KEY, state)
     return summary

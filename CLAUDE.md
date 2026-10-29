@@ -37,6 +37,36 @@ Serves warning (did something change?) and awareness (what is the picture, how i
 - Same GCP project as v4.3: `context-484804`. Keep MORE CONTEXT's tables/collections separate (prefix `mc_`).
 - No secrets in files. Keys live in Secret Manager or GitHub secrets; Tom sets them.
 - One scheduler per job, defined in this repo. v4.3 once ran a duplicate Scheduler job for months.
+
+## Cost audit (29 Oct 2026; Tom: no paid usage, lose nothing, keep a historical record)
+- Free tiers are per **billing account** (019D1C-D7ADF2-989261: context-484804, geo-context, listening-post-app,
+  morning-brief-tic), not per project: Cloud Storage 5 GB-months in us-central1/us-east1/us-west1, 5,000 Class A
+  (writes, lists) and 50,000 Class B (reads) a month, 100 GB egress; BigQuery 1 TiB scanned a month; Scheduler
+  3 jobs (paused jobs still count, $0.10/job/month after); Cloud Run 2M requests, 180,000 vCPU-s, 360,000 GiB-s,
+  1 GB egress. Verified on Google's pages 28 Oct 2026. Soft-deleted objects are billed like live ones.
+- Bucket `more-context-484804` (soft delete 7 days): 1,002 MiB live + 840 MiB soft-deleted. 633 MiB of that was
+  the history re-uploads (expires by ~4 Nov). `state/state.json` (99% per-feed "seen" link lists, capped at 1,000
+  links a feed, most not yet full) is written twice a run, 8 copies an hour kept a week: 1.9 GB held at today's
+  1.45 MB, ~15 GB once the lists fill (~11 MB). Biggest risk to the free tier.
+- **State fix (29 Oct 2026, `pipeline/health.py`, `cycle.py`):** feeds remember 8-character fingerprints
+  (`seen_fp`), not links, in the order items were last listed, sized per feed (3 x the most items it has returned,
+  200-2,000; `max_items`). Last-listed order matters: feeds keep sticky items for months (tribune_pk one 238 days
+  old, jpost 49), and trimming by first sighting would have dropped 30 of 4,100 listed items on the first run.
+  Old `seen` lists are converted untrimmed (`upgrade_seen`); each feed's next fetch trims its own. State is written
+  once a run, twice only when a day build or pending Vertex alarms follow. Checked on the 29 Oct state copy with a
+  live poll of all feeds: 0 listed items forgotten; 1.98 MB -> 173 KB (~276 KB once every list is full); a week of
+  old copies 2.66 GB -> ~0.12 GB (~0.19 GB full). A forgotten link seen again costs one cycle row, never a double
+  count: the build keeps one copy per source and link and skips rows dated before its day, and none of ~98,000
+  feed rows read 26-29 Oct lacked a date.
+- Writes counted from code: ~4 Class A a run (cycle, events, state x2) x 2,880 runs = ~11,500 a month, over the
+  5,000 free (~$0.03/month). After the state fix, 3 a run (~8,600 a month): still over; merging the cycle and
+  events files and a longer interval are the next levers. The API lists all of `stories/` for its day lists
+  (grows with history; cached 5 min).
+- Every build read is bounded (one day of files + 28 or 90 daily summaries); no BigQuery anywhere in Watchfloor.
+- Same account: old GEO CONTEXT v4.0 in project `geo-context` (job `generate-watchcon-data`, 3 runs a day, deployed
+  16 Jan 2026) still scans ~350 GiB of BigQuery a month and nothing reads its output; October was at 962 of 1,024
+  free GiB on 29 Oct. Paused 29 Oct 2026 14:39 UTC on Tom's yes (a paused job still counts as one of the 3 free
+  Scheduler jobs; deleting it is Tom's). Scheduler has 6 jobs on the account (3 free).
 - Windows: use `python`, not `python3`; run downloaded-data tooling with `python -I`.
 - Current-situation research (charters, briefs): MORE CONTEXT's own stories first (`mc-api` `/zone`), then
   extended web searches with month, year, outlets and conflict trackers in the query; a date and source on every
