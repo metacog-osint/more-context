@@ -55,9 +55,20 @@ def load_day_rows(sink, day: date) -> tuple[list[dict], list[str]]:
     keys = sink.list(f"cycles/{day:%Y/%m/%d}/")
     keys += [k for k in sink.list(f"cycles/{nxt:%Y/%m/%d}/") if k.rsplit("/", 1)[-1] < "040000"]
     want = day.isoformat()
-    rows = []
+    rows, seen = [], set()
     for k in keys:
-        rows += [{f: r[f] for f in BUILD_FIELDS if f in r} for r in sink.read_lines(k) if _row_day(r) == want]
+        for r in sink.read_lines(k):
+            if _row_day(r) != want:
+                continue
+            # The same row can sit in several cycle files: on 28 Oct 2026 runs that died re-read the same slots
+            # for 16 hours (266,950 rows for 41,208 distinct; loading all of them peaked at 518 MiB, over the
+            # function's 512). Keep the first copy. The link is part of the key because GDELT reused 89
+            # translation record ids for other articles that day.
+            key = (r.get("record_id"), r.get("kind"), r.get("source"), r.get("url"))
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append({f: r[f] for f in BUILD_FIELDS if f in r})
     return rows, keys
 
 
