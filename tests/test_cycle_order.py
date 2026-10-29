@@ -27,5 +27,47 @@ class SaveBeforeBuildTests(unittest.TestCase):
             self.assertEqual(sink.read_json(cycle.STATE_KEY)["stories"]["last_day"], "2026-10-26")  # retried next run
 
 
+class CountingSink(LocalSink):
+    def __init__(self, root):
+        super().__init__(root)
+        self.state_writes = 0
+
+    def write_json(self, key, obj):
+        self.state_writes += key == cycle.STATE_KEY
+        super().write_json(key, obj)
+
+
+class StateWritesTests(unittest.TestCase):
+    # Every state write leaves a copy the bucket keeps for a week (soft delete): write once unless slow work follows.
+    def test_a_plain_run_writes_state_once(self):
+        with tempfile.TemporaryDirectory() as d:
+            sink = CountingSink(d)
+            now = datetime(2026, 10, 28, 15, 0, tzinfo=timezone.utc)  # 28 Oct is not built until 29 Oct 03:15
+            sink.write_json(cycle.STATE_KEY, {"first_data_day": "2026-10-26", "stories": {"last_day": "2026-10-27"}})
+            sink.state_writes = 0
+            cycle.run_cycle(sink, now=now, streams=(), poll_rss=False, ai_on=False)
+            self.assertEqual(sink.state_writes, 1)
+            self.assertEqual(sink.read_json(cycle.STATE_KEY)["last_run"]["run_at"], "2026-10-28T15:00:00Z")
+
+    def test_pending_ai_work_saves_state_first(self):
+        with tempfile.TemporaryDirectory() as d:
+            sink = CountingSink(d)
+            now = datetime(2026, 10, 28, 15, 0, tzinfo=timezone.utc)
+            sink.write_json(cycle.STATE_KEY, {"first_data_day": "2026-10-26", "stories": {"last_day": "2026-10-27"},
+                                              "ai": {"pending": [{"entity": "15_Cuba", "day": "2026-10-27",
+                                                                  "reasons": ["attention z 3.2"], "tries": 0}],
+                                                     "done": []}})
+            sink.state_writes = 0
+            writes_at_call = []
+
+            def code(s, entity, day, why):
+                writes_at_call.append(s.state_writes)
+                return {"entity": entity, "day": day.isoformat(), "coded": 1, "already_coded": 0, "cost_usd": 0.001}
+
+            cycle.run_cycle(sink, now=now, streams=(), poll_rss=False, ai_on=True, code_alarm=code)
+            self.assertEqual(writes_at_call, [1])
+            self.assertEqual(sink.state_writes, 2)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,7 @@
 """Where a cycle writes: a local folder (testing) or a Cloud Storage bucket (production).
 
-Each cycle writes two objects: its data rows (JSON lines) and the state file. Keeping writes to two per
-run keeps Cloud Storage operations near its free allowance.
+A run writes its data rows (JSON lines), its Events record and the state file, each once (state twice on the run
+that builds a day). Writes are the Cloud Storage operations a 15-minute schedule uses up: 5,000 a month are free.
 """
 from __future__ import annotations
 

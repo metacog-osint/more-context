@@ -80,6 +80,8 @@ def poll(state: dict, now: datetime, include_candidates: bool = False, workers: 
     """Returns (new item rows, per-source probe rows). Mutates state["rss"] (health, ETags, seen URLs)."""
     all_sources = load_sources(include_candidates)
     feeds = state.setdefault("rss", {})
+    for entry in feeds.values():  # every feed, fetched this run or not
+        health.upgrade_seen(entry)
     sources = [s for s in all_sources if is_due(s, feeds.get(s["id"]), now)]
     results, held = [], set()
     searches = [s for s in sources if s.get("group") == SEARCH_GROUP]
@@ -113,7 +115,10 @@ def poll(state: dict, now: datetime, include_candidates: bool = False, workers: 
             newest = max((i["published"] for i in items if i["published"]), default=None)
             health.record_success(entry, now, len(items), newest, res.etag, res.last_modified)
             new_urls = set(health.remember(entry, [i["url"] for i in items]))
-            new = [i for i in items if i["url"] in new_urls]
+            for i in items:  # a link listed twice in one fetch is kept once
+                if i["url"] in new_urls:
+                    new_urls.discard(i["url"])
+                    new.append(i)
             for i in new:
                 new_rows.append({"source": src["id"], "group": src["group"], "owner": src["owner"],
                                  "lang": src["lang"], "title": i["title"], "url": i["url"],
