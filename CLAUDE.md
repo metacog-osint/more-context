@@ -147,6 +147,11 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   the build, every run from 03:20 UTC repeated the same ingest and died. Fixes: the MinHash token cache is compact
   and cleared per call (full-day peak 475 -> 200 MiB, nothing kept between runs), `load_day_rows` keeps only
   `BUILD_FIELDS`, and `run_cycle` saves state before building.
+- Its leftovers: from 03:35 to 19:50 UTC 28 Oct each cycle file re-wrote up to 17 slots (0.4 -> 6-7 MB per file;
+  that day's cycles are 360 MiB against ~50 MiB normal). Loading them all for the 28 Oct build held 266,950 rows
+  for 41,208 distinct and peaked at 518 MiB locally, over the 512 MiB function. `load_day_rows` now keeps one
+  copy of each (record id, kind, source, link): peak 295 MiB, same 34,509 articles. The link is in the key
+  because GDELT reused 89 translation record ids for other articles that day.
 
 ## Rising, map and zone violence (28 Oct 2026, Tom: "start the rising list, then the map, violent events...")
 - Source: GDELT Events 2.0 export files, not GKG: ~100 KB per stream per 15 minutes against ~20 MB, so every

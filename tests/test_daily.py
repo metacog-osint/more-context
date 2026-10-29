@@ -63,6 +63,25 @@ class BuildDayTests(unittest.TestCase):
             self.assertEqual(sum(1 for r in rows if r["kind"] == "rss"), 1)
             self.assertTrue(all(len(r["story_id"]) == 16 for r in rows))
 
+    def test_rows_repeated_across_cycle_files_load_once(self):
+        # 28 Oct 2026: runs that died re-read the same slots, so one record sat in many cycle files.
+        with tempfile.TemporaryDirectory() as d:
+            sink = LocalSink(d)
+            a = {**g("https://a.com/1", "Strike on Kharkiv", "2026-10-26T11:00:00Z", group="western_wire"),
+                 "record_id": "20261026110000-1"}
+            item = {"kind": "rss", "url": "https://r.com/1", "title": "Talks resume", "published": "2026-10-26T09:00:00Z",
+                    "source": "bbc_world"}
+            search = {**item, "source": "gn_01_ukraine_conflict"}  # same link from a saved search: kept
+            reused = {**a, "url": "https://b.com/2", "group": None}  # GDELT reused the record id: kept
+            sink.write_lines("cycles/2026/10/26/120500.jsonl", [a, a, item])
+            sink.write_lines("cycles/2026/10/26/122000.jsonl", [a, item, search, reused])
+            rows, _ = daily.load_day_rows(sink, date(2026, 10, 26))
+            self.assertEqual(len(rows), 4)
+            summary = daily.build_day(sink, date(2026, 10, 26))
+            self.assertEqual(summary["gdelt_articles"], 2)
+            ukr = sink.read_json("stories/2026/10/26/summary.json")["entities"]["01_Ukraine_Conflict"]
+            self.assertEqual(ukr["by_group"], {"western_wire": 1})
+
 
 if __name__ == "__main__":
     unittest.main()
