@@ -1,7 +1,8 @@
 """Where a cycle writes: a local folder (testing) or a Cloud Storage bucket (production).
 
-A run writes its data rows (JSON lines), its Events record and the state file, each once (state twice on the run
-that builds a day). Writes are the Cloud Storage operations a 15-minute schedule uses up: 5,000 a month are free.
+A run writes two objects: its cycle file (article rows and Events records, JSON lines) and the state file (twice
+on the run that builds a day). Writes and lists are Class A operations, the ones a 15-minute schedule uses up:
+5,000 a month are free.
 """
 from __future__ import annotations
 
@@ -12,6 +13,12 @@ from pathlib import Path
 
 def _lines(rows: list[dict]) -> str:
     return "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows)
+
+
+def _parse(text: str, prefix: str = "") -> list[dict]:
+    """JSON lines; with `prefix`, only the lines that start with it (the rest are never parsed). Split on "\\n"
+    only: splitlines() also breaks at U+2028 inside JSON strings."""
+    return [json.loads(line) for line in text.split("\n") if line.strip() and line.startswith(prefix)]
 
 
 class LocalSink:
@@ -40,9 +47,8 @@ class LocalSink:
             return []
         return sorted(str(p.relative_to(self.root)).replace("\\", "/") for p in base.rglob("*") if p.is_file())
 
-    def read_lines(self, key: str) -> list[dict]:
-        p = self.root / key
-        return [json.loads(line) for line in p.read_text(encoding="utf-8").split("\n") if line.strip()]
+    def read_lines(self, key: str, prefix: str = "") -> list[dict]:
+        return _parse((self.root / key).read_text(encoding="utf-8"), prefix)
 
     def exists(self, key: str) -> bool:
         return (self.root / key).exists()
@@ -83,9 +89,8 @@ class GCSSink:
     def list(self, prefix: str) -> list[str]:
         return sorted(b.name for b in self.bucket.client.list_blobs(self.bucket, prefix=prefix))
 
-    def read_lines(self, key: str) -> list[dict]:
-        text = self.bucket.blob(key).download_as_text()
-        return [json.loads(line) for line in text.split("\n") if line.strip()]
+    def read_lines(self, key: str, prefix: str = "") -> list[dict]:
+        return _parse(self.bucket.blob(key).download_as_text(), prefix)
 
     def exists(self, key: str) -> bool:
         return self.bucket.blob(key).exists()

@@ -31,10 +31,16 @@ class CountingSink(LocalSink):
     def __init__(self, root):
         super().__init__(root)
         self.state_writes = 0
+        self.keys_written = []
 
     def write_json(self, key, obj):
         self.state_writes += key == cycle.STATE_KEY
+        self.keys_written.append(key)
         super().write_json(key, obj)
+
+    def write_lines(self, key, rows):
+        self.keys_written.append(key)
+        super().write_lines(key, rows)
 
 
 class StateWritesTests(unittest.TestCase):
@@ -67,6 +73,26 @@ class StateWritesTests(unittest.TestCase):
             cycle.run_cycle(sink, now=now, streams=(), poll_rss=False, ai_on=True, code_alarm=code)
             self.assertEqual(writes_at_call, [1])
             self.assertEqual(sink.state_writes, 2)
+
+    def test_a_full_run_writes_two_objects(self):
+        # GKG, Events and feeds in one run: one cycle file (articles and Events records) and the state, nothing else.
+        # Writes are Class A operations; 5,000 a month are free (cost audit in CLAUDE.md).
+        from tests.test_events import row, zipped
+
+        with tempfile.TemporaryDirectory() as d:
+            sink = CountingSink(d)
+            now = datetime(2026, 10, 28, 15, 5, tzinfo=timezone.utc)
+            sink.write_json(cycle.STATE_KEY, {"first_data_day": "2026-10-26", "stories": {"last_day": "2026-10-27"},
+                                              "gdelt": {"english": {"last_stamp": "20261028143000"}}})
+            sink.keys_written = []
+            feed_row = {"url": "https://a/feed-1", "title": "t", "fetched": "2026-10-28T15:05:00Z", "source": "x"}
+            summary = cycle.run_cycle(
+                sink, now=now, streams=("english",), ai_on=False, latest=lambda s: "20261028150000",
+                download=lambda st, s: zipped([]), download_events=lambda st, s: zipped([row("1", "ET", "https://a/1")]),
+                poll=lambda state, now: ([dict(feed_row)], []))
+            self.assertEqual(sink.keys_written, ["cycles/2026/10/28/150500.jsonl", cycle.STATE_KEY])
+            self.assertEqual(summary["written"]["rows"], 1)
+            self.assertEqual(summary["written"]["events_files"], 2)  # 14:45 and 15:00
 
 
 if __name__ == "__main__":

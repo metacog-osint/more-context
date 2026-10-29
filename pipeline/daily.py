@@ -58,7 +58,7 @@ def load_day_rows(sink, day: date) -> tuple[list[dict], list[str]]:
     rows, seen = [], set()
     for k in keys:
         for r in sink.read_lines(k):
-            if _row_day(r) != want:
+            if r.get("kind") == "events" or _row_day(r) != want:  # Events records are for countries.py
                 continue
             # The same row can sit in several cycle files: on 28 Oct 2026 runs that died re-read the same slots
             # for 16 hours (266,950 rows for 41,208 distinct; loading all of them peaked at 518 MiB, over the

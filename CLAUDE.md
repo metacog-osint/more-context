@@ -59,9 +59,19 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   count: the build keeps one copy per source and link and skips rows dated before its day, and none of ~98,000
   feed rows read 26-29 Oct lacked a date.
 - Writes counted from code: ~4 Class A a run (cycle, events, state x2) x 2,880 runs = ~11,500 a month, over the
-  5,000 free (~$0.03/month). After the state fix, 3 a run (~8,600 a month): still over; merging the cycle and
-  events files and a longer interval are the next levers. The API lists all of `stories/` for its day lists
-  (grows with history; cached 5 min).
+  5,000 free (~$0.03/month). After the state fix, 3 a run (~8,600 a month).
+- **Events merged into the cycle file (30 Oct 2026):** the Events records are `"kind": "events"` rows in the run's
+  cycle file (`events.as_row`, `kind` first so `read_lines(key, events.ROW_PREFIX)` skips article lines unparsed);
+  `countries.day_records` reads them there and in old `events/` files (backfills still write there), once per
+  stamp and stream; the story build skips them. 2 writes a run: ~5,850 a month, plus the daily build (~15 a day)
+  and the API's lists of `stories/` (`/days`, `/countries`; 5-minute cache; 216 requests 26-29 Oct, ~10-30 lists
+  a day): ~6,600-7,200 a month, still over. Levers left: a 30-minute interval (~4,000), 20 minutes (~5,400), or
+  the state in Firestore at 15 minutes (~4,000; `(default)` is Native, nam5; free 20,000 writes a day; a
+  document holds 1 MiB, state is 170 KB; needs `mc-ingest@` and `mc-api@` roles from Tom).
+- **Feed rates (27 and 29 Oct, each feed's first poll and post-outage runs left out):** busiest 15 minutes used at
+  most 37 of TASS-ru's 100 listed items; busiest 30 minutes would have used 16 of 20 for `tg_kpszsu` (Air Force
+  Telegram, 27 Oct) and 72 of 100 for `tass_ru`. A 30-minute poll risks dropping items on heavy strike nights;
+  15 minutes has 2.5x headroom. Batch publishers (Taipei Times, CGTN) post a whole list at once at any interval.
 - Every build read is bounded (one day of files + 28 or 90 daily summaries); no BigQuery anywhere in Watchfloor.
 - Same account: old GEO CONTEXT v4.0 in project `geo-context` (job `generate-watchcon-data`, 3 runs a day, deployed
   16 Jan 2026) still scans ~350 GiB of BigQuery a month and nothing reads its output; October was at 962 of 1,024
@@ -191,8 +201,9 @@ Serves warning (did something change?) and awareness (what is the picture, how i
 ## Rising, map and zone violence (28 Oct 2026, Tom: "start the rising list, then the map, violent events...")
 - Source: GDELT Events 2.0 export files, not GKG: ~100 KB per stream per 15 minutes against ~20 MB, so every
   country is counted live and 90 days back for free (`scripts/backfill_events.py`: 8,832 slots, 29 Jul-28 Oct,
-  ~20 minutes, ~550 MB local). Each ingest run fetches the Events files for the GKG slots it read and writes
-  `events/YYYY/MM/DD/HHMMSS.json`; the daily build writes `stories/.../countries.json` and `violent.jsonl`.
+  ~20 minutes, ~550 MB local). Each ingest run fetches the Events files for the GKG slots it read and keeps
+  one record per file as a `kind: events` row in its cycle file (`events/YYYY/MM/DD/HHMMSS.json` before 30 Oct
+  2026); the daily build writes `stories/.../countries.json` and `violent.jsonl`.
 - Counts per country-day: distinct articles with an event located there (`urls`, attention) and with an assault,
   fight or mass-violence event there (`violent`, CAMEO 18-20). Scored against the country's own last 28 complete
   days (log z, weekday-adjusted) and its 90-day median. Rising: z >= 2.5, >= 1.5x expected, >= 40 articles

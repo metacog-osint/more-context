@@ -1,7 +1,8 @@
 """Per-country daily counts from GDELT Events records, each country against its own normal, and the Rising list.
 
 So new crises surface without a catalog edit (Tom, 27 Oct 2026, after Ethiopia's renewed war was lost inside the
-Horn of Africa zone). Every country is counted, not just the zones, from the per-file records `events.py` writes.
+Horn of Africa zone). Every country is counted, not just the zones, from the per-file records `events.py` makes
+(rows in each run's cycle file; `events/` files before 30 Oct 2026).
 
 Two counts per country-day, both distinct articles with at least one event located in the country:
 - attention (`urls`): any event;
@@ -30,7 +31,7 @@ from pathlib import Path
 from statistics import median
 
 from . import measures
-from .events import METRICS
+from .events import METRICS, ROW_PREFIX
 from .relevance import TermMatcher
 from .stories import title_from_url
 
@@ -95,18 +96,32 @@ def zone_violence(recs: list[dict], matcher: TermMatcher | None = None) -> dict[
 
 
 def _keys_for(sink, day: date) -> list[str]:
+    """Where `day`'s Events records can be: `events/` files (before 30 Oct 2026, and backfills) and cycle files."""
     nxt = day + timedelta(days=1)
-    keys = sink.list(f"events/{day:%Y/%m/%d}/")
-    # A day's last files can be fetched by the next day's first runs (cloud files are named by run time).
-    keys += [k for k in sink.list(f"events/{nxt:%Y/%m/%d}/") if Path(k).stem[-6:] < "040000"]
+    keys = []
+    for prefix in ("events", "cycles"):
+        keys += sink.list(f"{prefix}/{day:%Y/%m/%d}/")
+        # A day's last files can be fetched by the next day's first runs (cloud files are named by run time).
+        keys += [k for k in sink.list(f"{prefix}/{nxt:%Y/%m/%d}/") if _clock(k) < "040000"]
     return keys
+
+
+def _clock(key: str) -> str:
+    """HHMMSS of a file name: live runs write HHMMSS, Events backfills the full stamp, GKG backfills HHMMSSt."""
+    return "".join(c for c in Path(key).stem if c.isdigit())[-6:]
+
+
+def _records_in(sink, key: str) -> list[dict]:
+    if key.startswith("cycles/"):
+        return [r for r in sink.read_lines(key, ROW_PREFIX) if r.get("kind") == "events"]
+    return (sink.read_json(key) or {}).get("files", [])
 
 
 def day_records(sink, day: date) -> list[dict]:
     want = f"{day:%Y%m%d}"
     recs, seen = [], set()
     for k in _keys_for(sink, day):
-        for r in (sink.read_json(k) or {}).get("files", []):
+        for r in _records_in(sink, k):
             key = (r["stamp"], r["stream"])
             if r["stamp"][:8] == want and key not in seen:
                 seen.add(key)
