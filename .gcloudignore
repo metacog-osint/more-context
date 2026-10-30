@@ -14,3 +14,4 @@ __pycache__/
 .gcloudignore
 firebase.json
 .firebaserc
+doctrine/kit/geo/

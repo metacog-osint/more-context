@@ -25,6 +25,19 @@ the repo `more-context`, functions `mc-ingest` / `mc-api`, bucket `more-context-
 - Footer pattern (shared with Tom's noisefloor): "A project of The Intelligence Company. Updated <date>." + terms
   link + data credits (GDELT requires a citation and link) + a Sources page.
 
+## Doctrine kit (30 Oct 2026)
+- `doctrine/kit/` is a vendored copy of The Intelligence Company's shared kit (`[local path]`): never edit
+  it here; change the kit and run `python [local path] [local path]`. CI runs
+  `doctrine/kit/tic.py kitcheck` and `registers doctrine`.
+- `doctrine/` holds Watchfloor's registers: requirements (SQ1 "Is a zone escalating?", PIRs, EEIs), one warning problem
+  per zone and topic (`WF-WP-Z01` ... `WF-WP-T5`, three hypotheses each, the measured indicators `WF-IND-1`..`6`),
+  assumptions, the function map for topics, source grades (proposed; Tom to confirm) and a method summary. Each
+  warning problem's charter indicators and watch condition wait on Tom's charters in `catalog/indicators/`.
+- `GET /feed?day=` on mc-api serves the day in feed contract v2 (`tic-feed/2`, GeoJSON) from the same files as
+  `/summary` and `/countries` (`pipeline/feed_v2.py`; no new storage writes). Every item is an observation; an item
+  that fails the kit's linter is left out and listed in `dropped`. Countries are ISO alpha-2 through
+  `catalog/fips_iso.json` (GDELT's FIPS codes; built by `scripts/build_fips_iso.py` from Natural Earth 1:50m).
+
 ## What it does
 Turns GDELT articles into stories (reprints grouped), codes each story with Gemini, tracks warning
 indicators per zone, and measures attention, escalation and framing divergence.

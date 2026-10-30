@@ -1,0 +1,64 @@
+{
+  "program": "watchfloor",
+  "assumptions": [
+    {
+      "id": "WF-AS-1",
+      "text": "News attention to a zone rises when something changes there, not only when the news cycle turns to it.",
+      "test": {
+        "type": "manual",
+        "rule": "Alarms checked against events: scripts/eval_rising.py (63 scored days, 26 Aug-27 Oct 2026) and the 12-26 Oct alarm review in CLAUDE.md"
+      },
+      "status": "strained",
+      "note": "Attention is noisier than violence: name matches (Ilhan Omar under Somalia), routine Finnish and Norwegian news, Vietnamese weather headlines naming Bien Dong.",
+      "reviewed": "2026-10-30",
+      "linked": ["WF-IND-1", "WF-IND-5"]
+    },
+    {
+      "id": "WF-AS-2",
+      "text": "A headline that names the zone means the story is about the zone.",
+      "test": {
+        "type": "manual",
+        "rule": "catalog/eval/relevance_v1.jsonl (278 stories): headline terms 82% precision, 78% retention"
+      },
+      "status": "holds",
+      "note": "Likely flattered: the same reviewer wrote the terms and the labels. Gemini's relevance call agreed with the labels on 243 of 253.",
+      "reviewed": "2026-10-30",
+      "linked": ["WF-IND-1", "WF-IND-2"]
+    },
+    {
+      "id": "WF-AS-3",
+      "text": "GDELT places violent events in the right country.",
+      "test": {
+        "type": "manual",
+        "rule": "Spot checks of violent.jsonl on the map; known misplacements recorded in CLAUDE.md"
+      },
+      "status": "strained",
+      "note": "GDELT geocodes names: 'Guadalupe' became Guadeloupe. Country-level counts only; never read a single event's place as fact.",
+      "reviewed": "2026-10-30",
+      "linked": ["WF-IND-2", "WF-IND-3", "WF-IND-4"]
+    },
+    {
+      "id": "WF-AS-4",
+      "text": "The previous 28 days describe normal for a zone.",
+      "test": {
+        "type": "auto",
+        "rule": "Every score carries the 90-day median beside the 28-day z; WF-IND-3 flags weeks-long rises the 28-day z absorbs"
+      },
+      "status": "strained",
+      "note": "On 27 Oct 2026 Ethiopia's violence read normal against 28 days while running 5.6x its 90-day median. JP 2-01.3 warns that a steady signal can come to look normal.",
+      "reviewed": "2026-10-30",
+      "linked": ["WF-IND-2", "WF-IND-3"]
+    },
+    {
+      "id": "WF-AS-5",
+      "text": "Feeds that refuse Google Cloud addresses (France 24, RFI Afrique, Times of Israel, ReliefWeb, Suspilne) are still covered through GDELT by domain.",
+      "test": {
+        "type": "auto",
+        "rule": "Feed health in state; GDELT rows by domain for the same outlets"
+      },
+      "status": "untested",
+      "reviewed": "2026-10-30",
+      "linked": ["WF-IND-6"]
+    }
+  ]
+}

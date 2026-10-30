@@ -1,0 +1,1186 @@
+{
+ "program": "watchfloor",
+ "indicator_rule": "Indicators meet Gentry's test. Lists stay flat, not tiered by time (Grabo). Readouts count changed indicators per hypothesis; there is no weighted threat score. An indicator hit from the charters counts once two independent sources report it (two-source rule); a single-source hit is shown as claimed and moves nothing.",
+ "emerging_concerns": "A country on a Rising list outside every zone goes to the review queue (the Rising list on the site). It is proposed as a new zone after it recurs in 3 separate weeks (precedent: the Ethiopia & Eritrea split of 27 Oct 2026) and dropped from the queue after 60 quiet days.",
+ "indicators": [
+  {
+   "id": "WF-IND-1",
+   "text": "News attention to the zone or topic is well above its own normal",
+   "series": "attention z (summary.json entities.attention; alarms)",
+   "rule": "headline-filtered stories, log-scale z >= 2 against the entity's previous 28 complete days, weekday-adjusted, and >= 5 stories; never on a partial day",
+   "baseline": "previous 28 complete days (rolling)",
+   "gentry": {
+    "predictive": false,
+    "diagnostic": false,
+    "unambiguous": true,
+    "collectable": true
+   }
+  },
+  {
+   "id": "WF-IND-2",
+   "text": "Violent events placed in the zone are well above the zone's normal",
+   "series": "zone violence (countries.json zones.named_score)",
+   "rule": "articles with an assault, fight or mass-violence event (CAMEO 18-20) placed in the zone and a headline naming the zone; z >= 2 against the previous 28 complete days and >= 5 articles",
+   "baseline": "previous 28 complete days (rolling); 90-day median shown beside it",
+   "gentry": {
+    "predictive": true,
+    "diagnostic": true,
+    "unambiguous": true,
+    "collectable": true
+   }
+  },
+  {
+   "id": "WF-IND-3",
+   "text": "Violence in a zone country has stayed well above its 90-day normal",
+   "series": "Elevated list, violence (countries.json lists.violent.elevated)",
+   "rule": "country's violent-event articles >= 2x its 90-day median",
+   "baseline": "90-day median (rolling)",
+   "gentry": {
+    "predictive": false,
+    "diagnostic": true,
+    "unambiguous": true,
+    "collectable": true
+   }
+  },
+  {
+   "id": "WF-IND-4",
+   "text": "A zone country is rising on violence",
+   "series": "Rising list, violence (countries.json lists.violent.rising)",
+   "rule": "country z >= 2.5 against its previous 28 complete days, >= 1.5x expected, >= 15 articles",
+   "baseline": "previous 28 complete days (rolling)",
+   "gentry": {
+    "predictive": true,
+    "diagnostic": true,
+    "unambiguous": true,
+    "collectable": true
+   }
+  },
+  {
+   "id": "WF-IND-5",
+   "text": "A zone country is rising on news attention",
+   "series": "Rising list, attention (countries.json lists.urls.rising)",
+   "rule": "country z >= 2.5 against its previous 28 complete days, >= 1.5x expected, >= 40 articles",
+   "baseline": "previous 28 complete days (rolling)",
+   "gentry": {
+    "predictive": false,
+    "diagnostic": false,
+    "unambiguous": true,
+    "collectable": true
+   }
+  },
+  {
+   "id": "WF-IND-6",
+   "text": "The day's data is incomplete",
+   "series": "countries.json files and partial; feed health",
+   "rule": "partial day, or fewer than 90% of the day's 192 GDELT Events files (96 per stream)",
+   "baseline": "192 files a day",
+   "gentry": {
+    "predictive": false,
+    "diagnostic": true,
+    "unambiguous": true,
+    "collectable": true
+   }
+  }
+ ],
+ "warning_problems": [
+  {
+   "id": "WF-WP-Z01",
+   "entity": "01_Ukraine_Conflict",
+   "title": "Ukraine Conflict (zone)",
+   "scope": "Russia's war against Ukraine: fighting along the front, missile and drone strikes by both sides, Ukraine's defence and foreign military aid, and talks on a ceasefire or settlement.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z01-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z01-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z01-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z07",
+   "entity": "07_Russia_NATO",
+   "title": "Russia-NATO Border (zone)",
+   "scope": "Military competition between Russia and NATO on the alliance's eastern flank (Nordic and Baltic states, Poland, Kaliningrad, the Arctic): deployments, exercises, airspace and drone incursions, sabotage, and nuclear posture.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z07-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z07-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z07-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z02",
+   "entity": "02_Taiwan_Strait",
+   "title": "Taiwan Strait (zone)",
+   "scope": "Military and political pressure across the Taiwan Strait: People's Liberation Army activity around Taiwan, Taiwan's defence and US support, and relations between Beijing and Taipei.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z02-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z02-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z02-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z08",
+   "entity": "08_South_China_Sea",
+   "title": "South China Sea (zone)",
+   "scope": "Territorial disputes and maritime confrontation in the South China Sea between China and the Philippines, Vietnam, Malaysia and others: coast guard and militia incidents, island building, and US and allied presence.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z08-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z08-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z08-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z03",
+   "entity": "03_Korea_Peninsula",
+   "title": "Korea Peninsula (zone)",
+   "scope": "Security on the Korean Peninsula: North Korea's missile and nuclear programmes, tension along the DMZ, North Korea's ties with China and Russia, and the US-South Korea alliance.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z03-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z03-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z03-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z10",
+   "entity": "10_Israel_Gaza_Lebanon",
+   "title": "Israel, Gaza & Lebanon (zone)",
+   "scope": "Israel's wars with Hamas in Gaza and Hezbollah in Lebanon: fighting and strikes, ceasefire terms, hostages and prisoners, the humanitarian crisis, the West Bank, and Israeli politics where it shapes the war.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z10-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z10-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z10-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z11",
+   "entity": "11_Iran_Red_Sea",
+   "title": "Iran & Red Sea (zone)",
+   "scope": "Confrontation between Iran and Israel, the United States and Gulf states: strikes and threats, the nuclear programme and talks, Iran-aligned armed groups, and Houthi attacks on Red Sea and Gulf shipping.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z11-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z11-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z11-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z06",
+   "entity": "06_India_Pakistan",
+   "title": "India-Pakistan (zone)",
+   "scope": "Military and political confrontation between India and Pakistan: the Line of Control and Kashmir, militant attacks and cross-border strikes, nuclear signalling, and crisis diplomacy.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z06-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z06-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z06-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z13",
+   "entity": "13_Sudan",
+   "title": "Sudan (zone)",
+   "scope": "Sudan's civil war between the Sudanese Armed Forces and the Rapid Support Forces: fighting in Darfur, Kordofan and around Khartoum, drone strikes, atrocities, famine and displacement, and peace efforts.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z13-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z13-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z13-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z18",
+   "entity": "18_Ethiopia_Eritrea",
+   "title": "Ethiopia & Eritrea (zone)",
+   "scope": "Ethiopia's renewed civil war and its neighbours: fighting in Tigray, Amhara and Afar between federal forces and the TPLF-Fano alliance, Eritrea's role and the Ethiopia-Eritrea confrontation, violence in Oromia, and talks or mediation.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z18-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z18-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z18-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z19",
+   "entity": "19_Somalia",
+   "title": "Somalia (zone)",
+   "scope": "Somalia and Djibouti: al-Shabaab's insurgency and counter-terrorism operations including US strikes, the African Union mission, disputes between Mogadishu and the federal states, elections, Somaliland, and piracy in the Gulf of Aden.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z19-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z19-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z19-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z12",
+   "entity": "12_Sahel_West_Africa",
+   "title": "Sahel & West Africa (zone)",
+   "scope": "Jihadist insurgency and military rule in Mali, Burkina Faso and Niger, and its spread toward coastal West Africa: attacks, army and Russian Africa Corps operations, junta politics, and neighbours' interventions.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z12-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z12-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z12-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z14",
+   "entity": "14_DRC_Rwanda",
+   "title": "DRC-Rwanda (M23) (zone)",
+   "scope": "Conflict in eastern Democratic Republic of the Congo: the Rwanda-backed M23 and other armed groups, fighting in North and South Kivu, Rwanda-DRC tension, and peace talks.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z14-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z14-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z14-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z16",
+   "entity": "16_Myanmar",
+   "title": "Myanmar (zone)",
+   "scope": "Myanmar's civil war between the military government and resistance forces and ethnic armed groups: fighting and airstrikes, junta politics, the Rohingya crisis, and the role of China and neighbours.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z16-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z16-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z16-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z05",
+   "entity": "05_Venezuela",
+   "title": "Venezuela (zone)",
+   "scope": "Venezuela's political and security crisis: the struggle between government and opposition, US pressure (military, legal and sanctions), oil, migration, and tension with neighbours.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z05-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z05-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z05-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-Z15",
+   "entity": "15_Cuba",
+   "title": "Cuba (zone)",
+   "scope": "Pressure on Cuba's government: the US embargo and sanctions, economic collapse and blackouts, protest and repression, migration, and Cuba's ties with Russia and China.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 and WF-IND-2 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-Z15-H1",
+     "statement": "Escalation on the ground: more fighting, strikes or confrontation in the zone",
+     "emerging": [
+      "WF-IND-2",
+      "WF-IND-3",
+      "WF-IND-4",
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-Z15-H2",
+     "statement": "A news cycle without change on the ground (a summit, a statement, an anniversary, or a name in the headlines)",
+     "emerging": [
+      "WF-IND-1",
+      "WF-IND-5"
+     ],
+     "not_emerging": [
+      "WF-IND-2",
+      "WF-IND-4"
+     ]
+    },
+    {
+     "id": "WF-WP-Z15-H3",
+     "statement": "Artefact or data failure (GDELT geocoding, an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-T1",
+   "entity": "T1_Critical_Minerals",
+   "title": "Critical Minerals & Rare Earths (topic)",
+   "scope": "Supply security for critical minerals and rare earths: export controls, stockpiling and industrial policy, and state-backed deals for lithium, cobalt, gallium, germanium, antimony, tungsten and similar materials.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-T1-H1",
+     "statement": "A real development in the topic (new measures, incidents or disruptions)",
+     "emerging": [
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-T1-H2",
+     "statement": "Coverage of an old development, or unrelated stories that share the topic's words",
+     "emerging": [
+      "WF-IND-1"
+     ],
+     "not_emerging": []
+    },
+    {
+     "id": "WF-WP-T1-H3",
+     "statement": "Artefact or data failure (an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-T2",
+   "entity": "T2_Semiconductors",
+   "title": "Chips & Export Controls (topic)",
+   "scope": "The strategic contest over semiconductors: export controls on chips and chipmaking tools, national fab and subsidy programmes, and supply-chain risk involving Taiwan, China, the United States, Europe, Japan and Korea.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-T2-H1",
+     "statement": "A real development in the topic (new measures, incidents or disruptions)",
+     "emerging": [
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-T2-H2",
+     "statement": "Coverage of an old development, or unrelated stories that share the topic's words",
+     "emerging": [
+      "WF-IND-1"
+     ],
+     "not_emerging": []
+    },
+    {
+     "id": "WF-WP-T2-H3",
+     "statement": "Artefact or data failure (an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-T3",
+   "entity": "T3_Undersea_Infrastructure",
+   "title": "Undersea Cables & Infrastructure (topic)",
+   "scope": "Security of undersea cables, pipelines and other seabed infrastructure: damage and suspected sabotage, suspicious vessels, protection and monitoring, and the resulting investigations and trials.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-T3-H1",
+     "statement": "A real development in the topic (new measures, incidents or disruptions)",
+     "emerging": [
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-T3-H2",
+     "statement": "Coverage of an old development, or unrelated stories that share the topic's words",
+     "emerging": [
+      "WF-IND-1"
+     ],
+     "not_emerging": []
+    },
+    {
+     "id": "WF-WP-T3-H3",
+     "statement": "Artefact or data failure (an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-T4",
+   "entity": "T4_GNSS_Counterspace",
+   "title": "GPS Jamming & Counterspace (topic)",
+   "scope": "Interference with satellite navigation and space systems: GPS/GNSS jamming and spoofing affecting aviation and shipping, and counterspace weapons such as anti-satellite tests and satellite jamming.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-T4-H1",
+     "statement": "A real development in the topic (new measures, incidents or disruptions)",
+     "emerging": [
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-T4-H2",
+     "statement": "Coverage of an old development, or unrelated stories that share the topic's words",
+     "emerging": [
+      "WF-IND-1"
+     ],
+     "not_emerging": []
+    },
+    {
+     "id": "WF-WP-T4-H3",
+     "statement": "Artefact or data failure (an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  },
+  {
+   "id": "WF-WP-T5",
+   "entity": "T5_Sanctions_Shadow_Fleet",
+   "title": "Sanctions & Shadow Fleet (topic)",
+   "scope": "Sanctions as a tool of statecraft and their evasion: new measures and enforcement, the shadow fleet of tankers moving sanctioned oil, price caps, and evasion schemes.",
+   "frozen": "2026-10-30",
+   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "watch_condition": {
+    "current": "not set until the charter is final",
+    "levels": [
+     "normal",
+     "watch",
+     "warning",
+     "crisis"
+    ]
+   },
+   "issue_on_change": "Issue a notice only when the watch condition changes; stay silent while it holds. Until the charter is final, measured anomalies are published as observations and never move the condition.",
+   "deactivation": "Back to normal after 14 days with WF-IND-1 absent on complete days",
+   "hypotheses": [
+    {
+     "id": "WF-WP-T5-H1",
+     "statement": "A real development in the topic (new measures, incidents or disruptions)",
+     "emerging": [
+      "WF-IND-1"
+     ],
+     "not_emerging": [
+      "WF-IND-6"
+     ]
+    },
+    {
+     "id": "WF-WP-T5-H2",
+     "statement": "Coverage of an old development, or unrelated stories that share the topic's words",
+     "emerging": [
+      "WF-IND-1"
+     ],
+     "not_emerging": []
+    },
+    {
+     "id": "WF-WP-T5-H3",
+     "statement": "Artefact or data failure (an ingest gap, a partial day)",
+     "emerging": [
+      "WF-IND-6"
+     ],
+     "not_emerging": []
+    }
+   ]
+  }
+ ]
+}

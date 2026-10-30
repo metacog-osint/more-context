@@ -12,6 +12,8 @@
                                          Rising and Elevated lists and sample headlines (GDELT Events)
     GET  /violent?day=<date>&zone=<id>|cc=<FIPS>
                                          violent events placed in a zone's countries (or one country), for the map
+    GET  /feed?day=<date>                one built day in feed contract v2 (tic-feed/2, GeoJSON) for COP and other
+                                         programs, from the same data as /summary and /countries (pipeline/feed_v2.py)
 
 Anyone may call it (Tom, 26 Oct 2026). Spending is bounded by the ledger (pipeline/budget.py): $5 a month,
 on-view work at most $0.50 a day and never the last $1 (kept for alarms). A request codes at most 25 stories
@@ -280,6 +282,20 @@ def handle(method: str, path: str, params: dict, body: dict | None, sink, *, ai_
             key = f"violent:{d}:{','.join(zones or sorted(ccs))}"
             return 200, {"day": d.isoformat(), "countries": sorted(ccs),
                          "events": _cached(key, 3600, lambda: _violent(sink, d, ccs, zones))}
+        if method == "GET" and path == "/feed":
+            from . import feed_v2  # imported here so a doctrine-kit problem can only affect this route
+            days = _cached("days", 300, lambda: built_days(sink))
+            d = params.get("day") or (days[0] if days else None)
+            if not d:
+                return 404, {"error": "no day built yet"}
+            d = _day(d, today).isoformat()
+            summary = _cached(f"summary:{d}", 3600, lambda: _summary(sink, d, catalog))
+            if not summary:
+                return 404, {"error": f"no summary for {d}"}
+            if not any(e.get("violence") for e in summary["entities"].values()):
+                _CACHE.pop(f"summary:{d}", None)  # country counts land seconds after the stories
+            ctry = _cached(f"countries:{d}", 3600, lambda: _countries(sink, d))
+            return 200, feed_v2.build(summary, ctry, catalog=catalog)
         return 404, {"error": "not found"}
     except BadRequest as e:
         return 400, {"error": str(e)}

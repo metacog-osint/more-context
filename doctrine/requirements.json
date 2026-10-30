@@ -1,0 +1,133 @@
+{
+  "program": "watchfloor",
+  "customer": "Public readers, analysts, and COP. Written by the program owner.",
+  "reviewed": "2026-10-30",
+  "review_by": "2027-01-31",
+  "note": "Zone charters (key questions and escalation ladders) are Tom's to write in catalog/indicators/; their questions join this file as each charter is final.",
+  "requirements": [
+    {
+      "id": "WF-SQ-1",
+      "type": "standing",
+      "standing_question": "SQ1",
+      "question": "Is a zone escalating?"
+    },
+    {
+      "id": "WF-PIR-1",
+      "type": "pir",
+      "parent": "WF-SQ-1",
+      "question": "Is any watched zone or topic drawing unusual news attention today, against its own normal?",
+      "series": [
+        "attention z per zone and topic (headline-filtered stories, stories/YYYY/MM/DD/summary.json)",
+        "attention alarms"
+      ],
+      "warning_problems": [
+        "WF-WP-Z01",
+        "WF-WP-Z07",
+        "WF-WP-Z02",
+        "WF-WP-Z08",
+        "WF-WP-Z03",
+        "WF-WP-Z10",
+        "WF-WP-Z11",
+        "WF-WP-Z06",
+        "WF-WP-Z13",
+        "WF-WP-Z18",
+        "WF-WP-Z19",
+        "WF-WP-Z12",
+        "WF-WP-Z14",
+        "WF-WP-Z16",
+        "WF-WP-Z05",
+        "WF-WP-Z15",
+        "WF-WP-T1",
+        "WF-WP-T2",
+        "WF-WP-T3",
+        "WF-WP-T4",
+        "WF-WP-T5"
+      ]
+    },
+    {
+      "id": "WF-PIR-2",
+      "type": "pir",
+      "parent": "WF-SQ-1",
+      "question": "Is violence rising inside a watched zone, and for how long has it been above normal?",
+      "series": [
+        "zone violence (countries.json zones: named_score z and 90-day ratio)",
+        "violent events on the map (violent.jsonl)"
+      ],
+      "warning_problems": [
+        "WF-WP-Z01",
+        "WF-WP-Z07",
+        "WF-WP-Z02",
+        "WF-WP-Z08",
+        "WF-WP-Z03",
+        "WF-WP-Z10",
+        "WF-WP-Z11",
+        "WF-WP-Z06",
+        "WF-WP-Z13",
+        "WF-WP-Z18",
+        "WF-WP-Z19",
+        "WF-WP-Z12",
+        "WF-WP-Z14",
+        "WF-WP-Z16",
+        "WF-WP-Z05",
+        "WF-WP-Z15"
+      ]
+    },
+    {
+      "id": "WF-PIR-3",
+      "type": "pir",
+      "parent": "WF-SQ-1",
+      "question": "Which countries outside the watched zones are rising, and should any become a zone?",
+      "series": [
+        "Rising and Elevated lists (countries.json lists)"
+      ],
+      "review_queue": "emerging_concerns in indicators.json"
+    },
+    {
+      "id": "WF-PIR-4",
+      "type": "pir",
+      "parent": "WF-SQ-1",
+      "question": "How is each side telling the story of a zone, and where do their accounts diverge?",
+      "series": [
+        "articles by source group (summary.json by_group)",
+        "story coding: frame, direction, actors (codings/, on demand)"
+      ],
+      "warning_problems": [
+        "WF-WP-Z01",
+        "WF-WP-Z07",
+        "WF-WP-Z02",
+        "WF-WP-Z08",
+        "WF-WP-Z03",
+        "WF-WP-Z10",
+        "WF-WP-Z11",
+        "WF-WP-Z06",
+        "WF-WP-Z13",
+        "WF-WP-Z18",
+        "WF-WP-Z19",
+        "WF-WP-Z12",
+        "WF-WP-Z14",
+        "WF-WP-Z16",
+        "WF-WP-Z05",
+        "WF-WP-Z15"
+      ]
+    },
+    {
+      "id": "WF-EEI-1",
+      "type": "eei",
+      "parent": "WF-PIR-1",
+      "question": "Did the day's data arrive in full (GDELT files received, partial days, failing feeds)?",
+      "series": [
+        "countries.json files and partial",
+        "feed health (state feed_health)"
+      ]
+    },
+    {
+      "id": "WF-EEI-2",
+      "type": "eei",
+      "parent": "WF-PIR-2",
+      "question": "Do two independent sources report an indicator hit (two-source rule), or is it a single-government claim?",
+      "series": [
+        "story coding indicator_ids with source owner and group (planned with the charters)"
+      ]
+    }
+  ]
+}

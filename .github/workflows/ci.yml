@@ -12,3 +12,5 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m unittest discover -s tests -t . -v
+      - name: Doctrine kit copy and registers (tic-doctrine)
+        run: python doctrine/kit/tic.py kitcheck && python doctrine/kit/tic.py registers doctrine
