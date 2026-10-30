@@ -77,6 +77,9 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   `mc_state/roundtrip-test` (left in place): identical in one document and in three, under 1 s each way. The
   service account (`mc-ingest@`, which both functions run as) needs `roles/datastore.user`, which also reaches
   v4.3's collections. Bucket Class A after the switch: ~2,900 a run-month + ~450 build + API lists.
+  Live 30 Oct 2026 15:00 UTC (`mc-ingest-00016-lit`, `mc-api-00008-vix`, role granted by Tom the same morning):
+  the 15:05 run read the bucket copy, wrote `mc_state/ingest` (one part, 104,536 gzip bytes) and only its cycle
+  file to the bucket; `state/state.json` stayed at the 14:50 version until the next build run.
   Back to the bucket: redeploy without `MC_STATE` (the state then restarts from the last daily backup: one
   two-hour GDELT re-read and a day of repeat feed rows, which the build drops).
 - **Feed rates (27 and 29 Oct, each feed's first poll and post-outage runs left out):** busiest 15 minutes used at
