@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime, timezone
 from unittest import mock
 
-from pipeline import cycle, daily
+from pipeline import cycle, daily, health, statestore
 from pipeline.sinks import LocalSink
 
 
@@ -93,6 +93,31 @@ class StateWritesTests(unittest.TestCase):
             self.assertEqual(sink.keys_written, ["cycles/2026/10/28/150500.jsonl", cycle.STATE_KEY])
             self.assertEqual(summary["written"]["rows"], 1)
             self.assertEqual(summary["written"]["events_files"], 2)  # 14:45 and 15:00
+
+    def test_firestore_state_leaves_one_bucket_write_a_run(self):
+        # MC_STATE=firestore (30 Oct 2026): the state moves out of the bucket, which keeps the cycle file; the run
+        # that builds a day also refreshes the bucket copy (the fallback).
+        from tests.test_statestore import FakeFirestore
+
+        with tempfile.TemporaryDirectory() as d:
+            sink = CountingSink(d)
+            sink.write_json(cycle.STATE_KEY, {"first_data_day": "2026-10-26", "stories": {"last_day": "2026-10-27"}})
+            fs = FakeFirestore()
+            store = statestore.FirestoreState("p", fs, statestore.SinkState(sink))
+            sink.keys_written = []
+            feed = lambda state, now: ([{"url": f"https://a/{now:%H%M}", "title": "t", "fetched": health.iso(now)}], [])
+            plain = datetime(2026, 10, 28, 15, 5, tzinfo=timezone.utc)  # 28 Oct is built after 29 Oct 03:15
+            cycle.run_cycle(sink, now=plain, streams=(), ai_on=False, poll=feed, store=store)
+            self.assertEqual(sink.keys_written, ["cycles/2026/10/28/150500.jsonl"])  # state read from the bucket copy
+            self.assertEqual(store.read()["last_run"]["run_at"], "2026-10-28T15:05:00Z")
+            sink.keys_written = []
+            build = datetime(2026, 10, 29, 3, 20, tzinfo=timezone.utc)
+            with mock.patch.object(daily, "build_day", lambda s, day: {"day": day.isoformat(), "alarms": {}}), \
+                    mock.patch("pipeline.countries.build_day", lambda s, day: {"day": day.isoformat()}):
+                cycle.run_cycle(sink, now=build, streams=(), ai_on=False, poll=feed, store=store)
+            self.assertEqual(sink.keys_written, ["cycles/2026/10/29/032000.jsonl", cycle.STATE_KEY])
+            self.assertEqual(sink.read_json(cycle.STATE_KEY)["stories"]["last_day"], "2026-10-28")
+            self.assertEqual(store.read()["stories"]["last_day"], "2026-10-28")
 
 
 if __name__ == "__main__":

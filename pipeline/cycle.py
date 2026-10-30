@@ -1,7 +1,8 @@
 """One ingest cycle, run every 15 minutes: new GDELT files since the last run, plus one RSS poll.
 
 Writes one data object per run (`cycles/YYYY/MM/DD/HHMMSS.jsonl`, rows tagged kind=gdelt|rss|events) and the
-state object (`state/state.json`: last GDELT stamp per stream, feed health, the last run's summary).
+state (last GDELT stamp per stream, feed health, the last run's summary): `state/state.json` in the sink, or a
+Firestore document with that object as fallback and daily backup (statestore.py, MC_STATE=firestore).
 For each GKG slot read, the matching GDELT Events files are read too (events.py; ~100 KB each) and kept as one
 compact record per file, a kind=events row in the same cycle file (in `events/YYYY/MM/DD/HHMMSS.json` before
 30 Oct 2026: one write a run saved); the daily build turns them into country counts.
@@ -12,7 +13,7 @@ from __future__ import annotations
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 
-from . import countries, daily, events, feeds, gdelt, health, ondemand
+from . import countries, daily, events, feeds, gdelt, health, ondemand, statestore
 from .budget import BudgetExceeded
 from .match import Matcher
 from .sources import lookup_domain
@@ -22,7 +23,7 @@ MAX_FILES_PER_STREAM = 8  # catch up at most two hours in one run
 # GDELT's index can list a file 30-45 minutes before it is downloadable (seen on the translation stream,
 # 26 Oct 2026). A not-found file younger than this is "not published yet": stop and retry next run.
 NOT_YET_PUBLISHED = timedelta(hours=3)
-STATE_KEY = "state/state.json"
+STATE_KEY = statestore.STATE_KEY
 MAX_ALARMS_PER_RUN = 2  # each is one Vertex request (~10 s); the rest wait for the next run
 MAX_PENDING_ALARMS = 50
 _FMT = "%Y%m%d%H%M%S"
@@ -71,13 +72,14 @@ def gdelt_rows(stamp: str, stream: str, data: bytes, matcher: Matcher) -> list[d
 def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool = True,
               latest=gdelt.latest_stamp, download=gdelt.download, poll=feeds.poll,
               build_stories: bool = True, ai_on: bool | None = None, code_alarm=ondemand.code_entity_day,
-              download_events=None) -> dict:
+              download_events=None, store=None) -> dict:
     now = now or datetime.now(timezone.utc)
+    store = store or statestore.SinkState(sink)
     # Events follow the live GKG downloader; a test that fakes GKG files gets no Events unless it passes a fake.
     if download_events is None and download is gdelt.download:
         download_events = events.download
     done: dict[str, list[str]] = {}
-    state = sink.read_json(STATE_KEY) or {}
+    state = store.read() or {}
     gstate = state.setdefault("gdelt", {})
     matcher = Matcher()
     rows: list[dict] = []
@@ -153,10 +155,10 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
     ai_on = ondemand.ai_enabled() if ai_on is None else ai_on
     # Save ingest progress first when slow work follows: a build or a Vertex call that dies (28 Oct 2026: out of
     # memory) must not make the next run repeat this ingest. Most runs have neither and write state once, at the end:
-    # every write leaves a copy the bucket keeps for a week (soft delete).
+    # in the bucket every write is a Class A operation and leaves a copy kept for a week (soft delete).
     if days or (ai_on and (state.get("ai") or {}).get("pending")):
         state["last_run"] = summary
-        sink.write_json(STATE_KEY, state)
+        store.write(state)
 
     if days:
         sstate = state.setdefault("stories", {})
@@ -175,7 +177,7 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
 
     run_alarms(sink, state, summary, ai_on, code_alarm)
     state["last_run"] = summary
-    sink.write_json(STATE_KEY, state)
+    store.write(state, backup=bool(days))  # Firestore state: the run that builds a day refreshes the bucket copy
     return summary
 
 

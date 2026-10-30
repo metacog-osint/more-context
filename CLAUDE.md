@@ -65,9 +65,20 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   `countries.day_records` reads them there and in old `events/` files (backfills still write there), once per
   stamp and stream; the story build skips them. 2 writes a run: ~5,850 a month, plus the daily build (~15 a day)
   and the API's lists of `stories/` (`/days`, `/countries`; 5-minute cache; 216 requests 26-29 Oct, ~10-30 lists
-  a day): ~6,600-7,200 a month, still over. Levers left: a 30-minute interval (~4,000), 20 minutes (~5,400), or
-  the state in Firestore at 15 minutes (~4,000; `(default)` is Native, nam5; free 20,000 writes a day; a
-  document holds 1 MiB, state is 170 KB; needs `mc-ingest@` and `mc-api@` roles from Tom).
+  a day): ~6,600-7,200 a month, still over. Levers were a 30-minute interval (~4,000), 20 minutes (~5,400), or
+  the state in Firestore at 15 minutes (~4,000). Tom chose Firestore (30 Oct 2026).
+- **State in Firestore (`pipeline/statestore.py`, `MC_STATE=firestore` on both functions):** document
+  `mc_state/ingest` in the `(default)` database (Native, nam5, shared with v4.3; free 20,000 writes and 50,000
+  reads a day), gzip JSON in a bytes field over the REST API (no new library; `google-auth` and `requests` come
+  with the storage client). 95 KB compressed on 29 Oct, ~140 KB when every list is full, against 1 MiB a
+  document; bigger states split across `mc_state/ingest.1`, ... in one atomic commit. A missing document falls
+  back to the bucket's `state/state.json` (the switch), which the build run rewrites once a day as a backup; any
+  other Firestore error stops the run. Live round trip as Tom's gcloud user, 30 Oct 2026, on
+  `mc_state/roundtrip-test` (left in place): identical in one document and in three, under 1 s each way. The
+  service account (`mc-ingest@`, which both functions run as) needs `roles/datastore.user`, which also reaches
+  v4.3's collections. Bucket Class A after the switch: ~2,900 a run-month + ~450 build + API lists.
+  Back to the bucket: redeploy without `MC_STATE` (the state then restarts from the last daily backup: one
+  two-hour GDELT re-read and a day of repeat feed rows, which the build drops).
 - **Feed rates (27 and 29 Oct, each feed's first poll and post-outage runs left out):** busiest 15 minutes used at
   most 37 of TASS-ru's 100 listed items; busiest 30 minutes would have used 16 of 20 for `tg_kpszsu` (Air Force
   Telegram, 27 Oct) and 72 of 100 for `tass_ru`. A 30-minute poll risks dropping items on heavy strike nights;
@@ -137,12 +148,12 @@ Serves warning (did something change?) and awareness (what is the picture, how i
 - `main.py`, `requirements.txt`, `.gcloudignore` - Cloud Run function wrapper (`mc-ingest`).
   `scripts/deploy_ingest.sh` creates bucket, service accounts, private function, one Scheduler job.
   Local dry run: `python -I run.py cycle`. Redeploy after code changes with the `gcloud functions deploy`
-  line from that script (needs Tom's yes, like any deploy). **In PowerShell, single-quote the env-var argument:**
-  `'--set-env-vars=MC_BUCKET=more-context-484804,MC_AI=on'`. PowerShell runs `gcloud.ps1`, which turns an
+  line from `scripts/deploy_ai.sh` (needs Tom's yes, like any deploy). **In PowerShell, single-quote the env-var
+  argument:** `'--set-env-vars=MC_BUCKET=more-context-484804,MC_AI=on,MC_STATE=firestore'`. PowerShell runs `gcloud.ps1`, which turns an
   unquoted `a,b` into a list and rejoins it with a space: on 29 Oct 2026 that deployed `MC_BUCKET` as
   `more-context-484804 MC_AI=on` and every run failed with "Invalid bucket name" until redeployed. After any
   deploy, check `gcloud functions describe mc-ingest --gen2 --region=us-central1 --project=context-484804
-  --format="json(serviceConfig.environmentVariables)"` shows the two variables separately.
+  --format="json(serviceConfig.environmentVariables)"` shows each variable separately.
 
 ## Changing the watchlist
 - Zones and topics live in `catalog/entities.json` (order matters: first zone match wins). A retired id goes in
