@@ -1,0 +1,60 @@
+{
+  "program": "watchfloor",
+  "register": "catalog/sources.json",
+  "note": "The register of record is catalog/sources.json (116 feeds and searches, each with group, owner, language and polling interval) plus GDELT, the main source. The rows here add what the doctrine kit needs: Admiralty grades, independence, ease of faking, cadence and health probes.",
+  "grading": {
+    "status": "proposed 30 Oct 2026; Tom to confirm",
+    "reliability_by_group": {
+      "western_wire": "B",
+      "western_public": "B",
+      "western_press": "B",
+      "specialist": "B",
+      "official": "B",
+      "russian_independent": "C",
+      "ukrainian": "C",
+      "israeli": "C",
+      "gulf_arab": "C",
+      "south_asian": "C",
+      "east_asian": "C",
+      "southeast_asian": "C",
+      "african": "C",
+      "latin_american": "C",
+      "russian_state": "D",
+      "iranian_state": "D",
+      "chinese_state": "D",
+      "russian_milblog": "E",
+      "search": "F"
+    },
+    "reliability_basis": "Admiralty reliability (A-F) of the outlet group, not of any one report. State media of a party to the conflict start at D; pro-war military bloggers at E; saved searches at F because the publisher behind each result varies (grade the publisher instead when it is known).",
+    "credibility_rule": "Credibility (1-6) is set per report: 3 for a single report, 2 once a second independent source confirms it (the two-source rule), 6 when it cannot be judged. Official claims stay 'claimed' (status_class) until an outlet outside that government reports them."
+  },
+  "independence": "Two sources are independent when they are different outlets and not owned by the same government (catalog/sources.json owner and group). Reprints of one story count once (stories are grouped before counting).",
+  "extra": {
+    "gdelt-gkg": {
+      "grade": "C3",
+      "independence_group": "gdelt",
+      "ease_of_faking": "medium",
+      "cadence_s": 900,
+      "descriptor": "The GDELT Project's Global Knowledge Graph 2.1: machine-read world news (English and translated streams) every 15 minutes; articles grouped into stories by Watchfloor before counting.",
+      "licence": "GDELT terms: free for any use with a citation and a link to gdeltproject.org",
+      "probe": {"url": "http://data.gdeltproject.org/gdeltv2/lastupdate.txt", "expect": "any"}
+    },
+    "gdelt-events": {
+      "grade": "C3",
+      "independence_group": "gdelt",
+      "ease_of_faking": "medium",
+      "cadence_s": 900,
+      "descriptor": "The GDELT Project's Events 2.0 export: machine-coded CAMEO events with a geocoded place, every 15 minutes. Country-level counts only; single events can be misplaced.",
+      "licence": "GDELT terms: free for any use with a citation and a link to gdeltproject.org",
+      "probe": {"url": "http://data.gdeltproject.org/gdeltv2/lastupdate.txt", "expect": "any"}
+    },
+    "watchfloor-api": {
+      "grade": "B2",
+      "independence_group": "watchfloor",
+      "ease_of_faking": "low",
+      "cadence_s": 86400,
+      "descriptor": "Watchfloor's own daily build (stories, zone measures, country lists), served by its public API.",
+      "probe": {"url": "https://mc-api-odg3xhcd4a-uc.a.run.app/days", "expect": "json"}
+    }
+  }
+}

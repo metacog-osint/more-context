@@ -1,0 +1,11 @@
+{
+  "program": "watchfloor",
+  "note": "Deterministic: the topic sets the functions. Zones carry no function tags (they are about conflict, not infrastructure). No AI calls.",
+  "rules": [
+    {"match": {"entity": "T1_Critical_Minerals"}, "ncf": ["maintain_supply_chains"]},
+    {"match": {"entity": "T2_Semiconductors"}, "ncf": ["manufacture_equipment", "maintain_supply_chains"]},
+    {"match": {"entity": "T3_Undersea_Infrastructure"}, "ncf": ["provide_cable_access_network", "provide_internet_routing"]},
+    {"match": {"entity": "T4_GNSS_Counterspace"}, "ncf": ["provide_pnt", "provide_satellite_access"]},
+    {"match": {"entity": "T5_Sanctions_Shadow_Fleet"}, "ncf": ["transport_by_vessel", "maintain_supply_chains"]}
+  ]
+}
