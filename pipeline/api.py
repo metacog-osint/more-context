@@ -23,7 +23,7 @@ import time
 from datetime import date, datetime, timedelta, timezone
 
 from . import countries as countries_mod
-from . import ondemand
+from . import ondemand, statestore
 from .budget import BudgetExceeded, Ledger
 from .match import load_catalog
 from .relevance import TermMatcher
@@ -183,8 +183,8 @@ def _violent(sink, d: date, ccs: set[str], zones: list[str] | None = None) -> li
     return [{k: r.get(k) for k in VIOLENT_FIELDS} for r in rows[:MAX_VIOLENT]]
 
 
-def _ingest_status(sink) -> dict:
-    st = sink.read_json("state/state.json") or {}
+def _ingest_status(read_state) -> dict:
+    st = read_state() or {}
     lr = st.get("last_run") or {}
     fh = st.get("feed_health") or {}
     counts: dict[str, int] = {}
@@ -198,9 +198,11 @@ def _ingest_status(sink) -> dict:
 
 def handle(method: str, path: str, params: dict, body: dict | None, sink, *, ai_on: bool | None = None,
            ledger: Ledger | None = None, code=ondemand.code_entity_day, catalog: dict | None = None,
-           today: date | None = None) -> tuple[int, dict]:
-    """(HTTP status, JSON body). Pure function of its inputs, so it is tested without a server."""
+           today: date | None = None, read_state=None) -> tuple[int, dict]:
+    """(HTTP status, JSON body). Pure function of its inputs, so it is tested without a server. `read_state`
+    returns the ingest state (statestore.py); by default the sink's `state/state.json`."""
     catalog = catalog or load_catalog()
+    read_state = read_state or (lambda: sink.read_json(statestore.STATE_KEY))
     ledger = ledger or Ledger(sink)
     ai_on = ondemand.ai_enabled() if ai_on is None else ai_on
     today = today or datetime.now(timezone.utc).date()
@@ -208,7 +210,7 @@ def handle(method: str, path: str, params: dict, body: dict | None, sink, *, ai_
     try:
         if method == "GET" and path == "/status":
             return 200, {"ai": "on" if ai_on else "off", "budget": ledger.status(),
-                         "ingest": _cached("ingest", 60, lambda: _ingest_status(sink))}
+                         "ingest": _cached("ingest", 60, lambda: _ingest_status(read_state))}
         if method == "GET" and path == "/entities":
             return 200, {k: [{"id": e["id"], "name": e["name"], "profile": e.get("profile", ""),
                               **({"map": e["map"]} if e.get("map") else {}),
