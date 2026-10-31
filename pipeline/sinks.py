@@ -3,16 +3,34 @@
 A run writes two objects: its cycle file (article rows and Events records, JSON lines) and the state file (twice
 on the run that builds a day). Writes and lists are Class A operations, the ones a 15-minute schedule uses up:
 5,000 a month are free.
+
+The bucket sink gzips every object it writes (added 30 Oct 2026) (stored with Content-Encoding: gzip). Cycle files
+shrink 4.6x, which keeps the record inside the free 5 GB for months instead of weeks. Reads take gzip or plain
+(older objects, backfill uploads), told apart by gzip's first two bytes; the keys and the text are unchanged.
+scripts/recompress.py converts plain objects already in the bucket. Local folders stay plain.
 """
 from __future__ import annotations
 
+import gzip
 import hashlib
 import json
 from pathlib import Path
 
+GZIP_MAGIC = b"\x1f\x8b"  # every gzip stream starts with these; JSON text never does
+
 
 def _lines(rows: list[dict]) -> str:
     return "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows)
+
+
+def gz(data: bytes) -> bytes:
+    """gzip with no timestamp in the header, so the same text always gives the same bytes."""
+    return gzip.compress(data, compresslevel=6, mtime=0)
+
+
+def _text(data: bytes) -> str:
+    """UTF-8 text from stored bytes, gzip or plain."""
+    return (gzip.decompress(data) if data[:2] == GZIP_MAGIC else data).decode("utf-8")
 
 
 def _parse(text: str, prefix: str = "") -> list[dict]:
@@ -25,9 +43,13 @@ class LocalSink:
     def __init__(self, root: Path):
         self.root = Path(root)
 
+    def _read(self, key: str) -> str:
+        # Plain or gzip (a raw copy of a bucket object); "\r\n" back to "\n" as read_text did for Windows files.
+        return _text((self.root / key).read_bytes()).replace("\r\n", "\n")
+
     def read_json(self, key: str) -> dict | None:
         p = self.root / key
-        return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+        return json.loads(self._read(key)) if p.exists() else None
 
     def write_json(self, key: str, obj: dict) -> None:
         p = self.root / key
@@ -48,7 +70,7 @@ class LocalSink:
         return sorted(str(p.relative_to(self.root)).replace("\\", "/") for p in base.rglob("*") if p.is_file())
 
     def read_lines(self, key: str, prefix: str = "") -> list[dict]:
-        return _parse((self.root / key).read_text(encoding="utf-8"), prefix)
+        return _parse(self._read(key), prefix)
 
     def exists(self, key: str) -> bool:
         return (self.root / key).exists()
@@ -75,22 +97,31 @@ class GCSSink:
 
         self.bucket = storage.Client().bucket(bucket)
 
+    def _put(self, key: str, text: str, content_type: str, **kw) -> None:
+        blob = self.bucket.blob(key)
+        blob.content_encoding = "gzip"
+        blob.upload_from_string(gz(text.encode("utf-8")), content_type=content_type, **kw)
+
+    @staticmethod
+    def _get(blob) -> str:
+        # raw_download: the stored bytes as they are (the checksum is on those); _text unzips gzip ones.
+        return _text(blob.download_as_bytes(raw_download=True))
+
     def read_json(self, key: str) -> dict | None:
         blob = self.bucket.blob(key)
-        return json.loads(blob.download_as_text()) if blob.exists() else None
+        return json.loads(self._get(blob)) if blob.exists() else None
 
     def write_json(self, key: str, obj: dict) -> None:
-        self.bucket.blob(key).upload_from_string(json.dumps(obj, ensure_ascii=False),
-                                                 content_type="application/json")
+        self._put(key, json.dumps(obj, ensure_ascii=False), "application/json")
 
     def write_lines(self, key: str, rows: list[dict]) -> None:
-        self.bucket.blob(key).upload_from_string(_lines(rows), content_type="application/x-ndjson")
+        self._put(key, _lines(rows), "application/x-ndjson")
 
     def list(self, prefix: str) -> list[str]:
         return sorted(b.name for b in self.bucket.client.list_blobs(self.bucket, prefix=prefix))
 
     def read_lines(self, key: str, prefix: str = "") -> list[dict]:
-        return _parse(self.bucket.blob(key).download_as_text(), prefix)
+        return _parse(self._get(self.bucket.blob(key)), prefix)
 
     def exists(self, key: str) -> bool:
         return self.bucket.blob(key).exists()
@@ -100,15 +131,14 @@ class GCSSink:
         blob = self.bucket.get_blob(key)
         if blob is None:
             return None, 0
-        return json.loads(blob.download_as_text()), blob.generation
+        return json.loads(self._get(blob)), blob.generation
 
     def write_json_if(self, key: str, obj: dict, version: int) -> bool:
         """Atomic compare-and-swap: Cloud Storage refuses the write if the generation moved on."""
         from google.api_core.exceptions import PreconditionFailed
 
         try:
-            self.bucket.blob(key).upload_from_string(json.dumps(obj, ensure_ascii=False),
-                                                     content_type="application/json", if_generation_match=version)
+            self._put(key, json.dumps(obj, ensure_ascii=False), "application/json", if_generation_match=version)
             return True
         except PreconditionFailed:
             return False

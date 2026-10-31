@@ -99,6 +99,19 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   most 37 of TASS-ru's 100 listed items; busiest 30 minutes would have used 16 of 20 for `tg_kpszsu` (Air Force
   Telegram, 27 Oct) and 72 of 100 for `tass_ru`. A 30-minute poll risks dropping items on heavy strike nights;
   15 minutes has 2.5x headroom. Batch publishers (Taipei Times, CGTN) post a whole list at once at any interval.
+- **Storage growth and gzip (30 Oct 2026):** measured that day: 1.1 GiB live (`cycles/` 576 MiB in 516 objects,
+  `stories/` 541 MiB in 250 back to July, `events/` 11 MiB, `state/` and `codings/` under 1 MiB), growing ~60 MiB
+  a day of cycle files + ~19 MiB of stories (~80 MiB a day): past the 5 GB free tier around mid-December. The bucket
+  sink now gzips every object it writes (`Content-Encoding: gzip`, `pipeline/sinks.py`); the 29 Oct cycle files
+  went 54.7 -> 11.9 MiB (4.6x), so ~17 MiB a day, into mid-2027 on 5 GB. Reads take gzip or plain (told apart by
+  gzip's first two bytes); keys and text are unchanged; local folders stay plain. `gcloud storage cp` unzips on
+  download, `gcloud storage cat` prints the raw gzip. Live check with google-cloud-storage 3.17.1 on
+  `_test/gzip-check.jsonl` (left in place). `scripts/recompress.py` converts plain objects in place (one Class A
+  write each, conditional on generation, checked lossless; dry run by default): 766 in `cycles/` and `stories/` on
+  30 Oct. Past 5 GB anyway, the free path is moving older files to Tom's own storage.
+- Class A measured in Cloud Monitoring (`storage.googleapis.com/api/request_count` by method, a free read): 2,545
+  in October to 30 Oct 20:27 UTC (backfill and analysis days 27-29 Oct included); 32 lists in the 24 hours to
+  30 Oct 20:00 UTC. Use hourly alignment: one window as long as the query mis-buckets (it reported 285 lists).
 - Every build read is bounded (one day of files + 28 or 90 daily summaries); no BigQuery anywhere in Watchfloor.
 - Same account: old GEO CONTEXT v4.0 in project `geo-context` (job `generate-watchcon-data`, 3 runs a day, deployed
   16 Jan 2026) still scans ~350 GiB of BigQuery a month and nothing reads its output; October was at 962 of 1,024
@@ -284,7 +297,9 @@ Most stories are never read by a person, so model work waits for a reason to spe
   duplicate; v4.3's own job is `trigger-context-update`.
 - Bucket `gs://more-context-484804` (us-central1, uniform access, public access prevented):
   `cycles/YYYY/MM/DD/HHMMSS.jsonl` (rows kind=gdelt|rss) and `state/state.json` (GDELT progress and
-  retry lists, feed health, last run summary). Read it with `gcloud storage cat gs://more-context-484804/state/state.json`.
+  retry lists, feed health, last run summary). Since 30 Oct 2026 the live state is the Firestore document
+  `mc_state/ingest` and `state/state.json` is its daily backup; objects are gzip, so download rather than cat:
+  `gcloud storage cp gs://more-context-484804/state/state.json .` (cp unzips).
 - First cloud run 26 Oct 17:10 UTC: 46 s for a 2-hour catch-up, 4,001 rows. From Google Cloud,
   france24_en, rfi_afrique and timesofisrael answer HTTP 403 (they block cloud addresses; fine from a home
   connection) and reliefweb returned an empty body. GDELT still carries all four by domain.
