@@ -11,6 +11,8 @@ first with the daily builder, so each day's attention baseline uses the days bef
 --every 4 keeps one file per hour (counts are then a quarter of full volume: fine for a separate run-up profile,
 never for the live baselines). Re-running skips files already written. Upload afterwards (needs Tom's yes):
     gcloud storage rsync data/backfill/baseline/stories gs://more-context-484804/stories --recursive
+rsync stores the files plain; compress them after (dry run first, each rewrite is one Class A write):
+    python -I scripts/recompress.py --bucket more-context-484804 --prefix stories/
 """
 from __future__ import annotations
 
