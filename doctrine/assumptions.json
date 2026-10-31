@@ -56,8 +56,9 @@
         "type": "auto",
         "rule": "Feed health in state; GDELT rows by domain for the same outlets"
       },
-      "status": "untested",
-      "reviewed": "2026-10-30",
+      "status": "broken",
+      "note": "Tested 31 Oct 2026 on the 29 and 30 Oct cycle files (~30,000 matched GDELT rows a day): france24.com 0, timesofisrael.com 0, reliefweb.int 0, suspilne.media 0, rfi.fr 2-3 a day, against jpost.com 95. GDELT does not carry these outlets either. Suspilne's feed works again from 31 Oct; the other four are read through Google News site: searches from catalog 2026-10-31.1.",
+      "reviewed": "2026-10-31",
       "linked": ["WF-IND-6"]
     }
   ]
