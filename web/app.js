@@ -414,7 +414,7 @@ async function viewZone(id, params) {
       : h("p", { class: "muted" }, filter === "terms" ? "No headline names this zone for that day. Untick the filter to see every match." : "No stories for that day."),
     h("p", { class: "muted small" }, `Showing up to 25 stories, largest first. ${z.coded} coded. Coding is capped at $5 a month for the whole site; this page has $${left.toFixed(2)} left today.`),
     h("h2", null, "From news feeds and searches"),
-    h("p", { class: "muted small" }, "A saved Google News search for this zone, plus items from Watchfloor's own feeds and Telegram channels whose headlines name it. Kept apart from the counts above."),
+    h("p", { class: "muted small" }, "A saved Google News search for this zone, plus items whose headlines name it from Watchfloor's own feeds, outlet searches and Telegram channels. Kept apart from the counts above, which use GDELT only."),
     (z.feeds || []).length
       ? h("ul", { class: "stories panel" }, z.feeds.map(feedItem))
       : h("p", { class: "muted" }, "No feed items for that day yet."),
@@ -450,10 +450,14 @@ function viewAbout() {
     h("p", { class: "lede" }, "Watchfloor turns publicly available news into a daily picture of 15 conflict zones and 5 strategic topics, built to answer two questions: did something change, and how is each side telling it?"),
     h("h2", null, "How it works"),
     h("ul", null,
-      li("Every 15 minutes it reads GDELT's article files (English and machine-translated) and more than 50 news feeds."),
+      li("Every 15 minutes it reads GDELT's article files (English and machine-translated), its main source."),
+      li("GDELT does not carry many major outlets, among them Reuters, AP, AFP, Bloomberg, CNN, NHK and several regional ones (measured October 2026). So Watchfloor also reads publishers' own feeds, public Telegram channels and Google News searches: one for each zone and topic, and others limited to one outlet's website, for outlets GDELT misses or whose feeds turn away automated readers. The ",
+        h("a", { href: "#/sources" }, "Sources"), " page lists every source and how it is read."),
+      li("Some websites are left out of GDELT's articles because they are not news or only copy it: a court-records database, press-release wires, a network of about 100 look-alike reprint sites, and radio-station copies. The list and the reasons are on the Sources page."),
       li("Articles become stories: reprints and near-identical headlines are merged, so one wire story is counted once."),
       li("A free headline filter keeps stories that name the zone. In a first test on 278 stories it raised the on-topic share from 42% (the matching rules alone) to about 82%; the test set will grow."),
-      li("Free measures run on everything: attention, the day's count of stories whose headline names the zone, against the zone's own last 28 days (adjusted for the day of the week). On a labelled test, 82% of those stories were on topic, against 42% of everything the matching rules catch."),
+      li("Free measures run on GDELT's stories: attention, the day's count of stories whose headline names the zone, against the zone's own last 28 days (adjusted for the day of the week). Counting one source keeps each day comparable with the zone's history. On a labelled test, 82% of those stories were on topic, against 42% of everything the matching rules catch."),
+      li("Stories from the feeds, searches and Telegram channels appear on each zone page, apart from those counts."),
       li("Google Gemini codes a story only when someone opens a zone or a free alarm fires: relevance, event type (PLOVER), direction, and a plain-English gist. Every coding is cached, and spending is capped at $5 a month."),
       li("Warning ladders (Watch, Warning, Crisis) with headline-observable indicators are being written for each zone and will be backtested against known onsets.")),
     h("h2", null, "Two-source rule"),
@@ -462,7 +466,8 @@ function viewAbout() {
     h("ul", null,
       li("Watchfloor sees headlines, languages, outlets and source groups, not full article text."),
       li("Codings are machine-generated and can be wrong; counts come from automated matching."),
-      li("Coverage reflects what outlets publish, not what happens. A spike in reporting is not a measured change on the ground.")),
+      li("Coverage reflects what outlets publish, not what happens. A spike in reporting is not a measured change on the ground."),
+      li("Attention counts follow GDELT's coverage, which leaves out several major outlets. Watchfloor's own feeds and searches fill part of that gap on the zone pages, but are not counted.")),
     h("p", null, h("a", { href: "#/sources" }, "Sources and their terms"), " · ", h("a", { href: "#/terms" }, "Terms of use")),
   ));
 }
@@ -470,22 +475,33 @@ function viewAbout() {
 async function viewSources() {
   setNav("about");
   const cat = await (await fetch("data/sources.json")).json();
-  const kind = (s) => (s.format === "telegram" ? "Telegram channel" : s.rss_status === "active" ? "News feed" : "GDELT only");
+  // `read` comes from scripts/build_web.py; the fallback serves a sources.json built before it.
+  const kind = (s) => s.read || (s.format === "telegram" ? "Telegram channel" : s.rss_status === "active" ? "News feed" : "GDELT only");
+  const count = (k) => cat.sources.filter((s) => kind(s) === k).length;
   const rows = cat.sources.map((s) => h("tr", null,
     h("td", null, s.name), h("td", { class: "hide-sm" }, cat.groups[s.group] || s.group), h("td", null, kind(s)), h("td", { class: "hide-sm" }, s.lang)));
+  const leftOut = (cat.left_out || []).map((b) => h("li", null, b.what ? h("strong", null, `${b.what}: `) : null, b.why));
   show(h("h1", null, "Sources"),
     h("div", { class: "prose" },
       h("p", null, h("strong", null, "The GDELT Project. "), "GDELT's datasets are free for any academic, commercial or governmental use, with a citation and a link: ",
-        h("a", { href: "https://www.gdeltproject.org/" }, "gdeltproject.org"), ". Watchfloor uses GDELT's 15-minute Global Knowledge Graph and Event files."),
+        h("a", { href: "https://www.gdeltproject.org/" }, "gdeltproject.org"), ". Watchfloor uses GDELT's 15-minute Global Knowledge Graph and Event files. They are its main source and the only one its attention counts and alarms use."),
+      h("p", null, h("strong", null, "What Watchfloor reads itself. "), "GDELT does not carry many major outlets, among them Reuters, AP, AFP, Bloomberg, CNN, NHK and several regional ones (measured October 2026). Watchfloor reads ",
+        `${count("News feed")} publishers' feeds, ${count("Telegram channel")} public Telegram channels, ${count("Google News search")} Google News searches (one for each zone and topic) and ${count("Google News site search")} Google News searches limited to one outlet's website, `,
+        "for outlets GDELT misses or whose own feeds turn away automated readers. These appear on the zone pages, apart from the counts."),
       h("p", null, h("strong", null, "Map. "), "Drawn with ", h("a", { href: "https://leafletjs.com/" }, "Leaflet"),
         " (BSD 2-Clause licence) over country outlines from ", h("a", { href: "https://www.naturalearthdata.com/" }, "Natural Earth"),
         " (public domain), both served from this site."),
       h("p", null, h("strong", null, "News feeds and public channels. "), "Headlines, short excerpts and links belong to their publishers, under each publisher's terms. Watchfloor shows a headline and links to the original; read the full article at the source."),
+      h("p", null, h("strong", null, "Google News. "), "Saved searches read through Google News's public search feed, hourly. Each result keeps its publisher's headline and links to the publisher; an outlet found this way is counted as that outlet, not as Google News."),
       h("p", null, h("strong", null, "Story codings. "), "Generated by Google Gemini on Vertex AI from headlines only. Machine-generated and sometimes wrong.")),
     h("h2", null, `Catalogue (${cat.sources.length} sources)`),
     h("div", { class: "panel" }, h("table", null,
       h("thead", null, h("tr", null, h("th", null, "Source"), h("th", { class: "hide-sm" }, "Perspective"), h("th", null, "How it is read"), h("th", { class: "hide-sm" }, "Language"))),
-      h("tbody", null, rows))));
+      h("tbody", null, rows))),
+    leftOut.length ? h("div", { class: "prose" },
+      h("h2", null, "Left out"),
+      h("p", null, "These are dropped from GDELT's articles (and the last ones from Google News results) because they are not news or only copy other outlets. Removing them changed the attention counts by 3% or less when measured, but keeps story cards and outlet counts honest."),
+      h("ul", null, leftOut)) : null);
 }
 
 function viewTerms() {
@@ -497,7 +513,7 @@ function viewTerms() {
     h("ul", null,
       li("Watchfloor is provided as is, for information and research. It is not advice, and nothing on it is guaranteed accurate, complete or current."),
       li("It is built only from publicly available information. It is a private project of The Intelligence Company and is not affiliated with any government."),
-      li("Headlines, excerpts and links belong to their publishers. Follow the link to read an article at its source."),
+      li("Headlines, excerpts and links belong to their publishers. Follow the link to read an article at its source. Some headlines are found through Google News search results; they too belong to their publishers."),
       li("Story codings are machine-generated and can be wrong. Counts and alarms come from automated matching and describe coverage, not events."),
       li("Do not use Watchfloor to identify, track, harass or target individuals."),
       li("News data from The GDELT Project (gdeltproject.org), used under its terms, which require this citation.")),

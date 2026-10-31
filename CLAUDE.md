@@ -137,9 +137,15 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   plus 12 front-line sources Tom approved on 27 Oct 2026: Suspilne, RBC-Ukraine, Meduza (ru, en), ISW (dropped:
   HTTP 403 to automated requests), and 7 Telegram channels (`format: telegram`): Ukrainian Air Force (nightly
   tallies), General Staff, Russian MoD, DeepState, Rybar, Two Majors, WarGonzo. New groups: russian_independent,
-  russian_milblog. Now (31 Oct 2026, catalog 2026-10-31.1): 116 sources in 19 groups; 83 polled (51 news feeds,
-  21 Google News searches by zone or topic, 4 outlets read through Google News `site:` searches, 7 Telegram
-  channels), 2 to retry, 18 dropped, 13 GDELT-only.
+  russian_milblog. Now (31 Oct 2026, catalog 2026-10-31.2): 120 sources in 20 groups; 96 polled (51 news feeds,
+  21 Google News searches by zone or topic, 17 outlets read through Google News `site:` searches, 7 Telegram
+  channels), 1 to retry (Granma), 9 dropped (not read at all), 14 GDELT-only. New group `iranian_exile` (Iran
+  International; doctrine grade proposed C). `rss_status` now means how a source is read: `dropped` = not read,
+  `none` = read only through GDELT (checked against measured GDELT counts, see Feeds and saved searches).
+- `catalog/blocklist.json` + `pipeline/blocklist.py` - sites left out (Tom, 31 Oct 2026), each with its reason:
+  GDELT rows by domain or URL pattern at ingest (`cycle.gdelt_rows`) and again at day build (`daily.build_day`);
+  Google News items by publisher tail at ingest (`feeds.poll`) and at build. GDELT Events (country counts) are
+  not filtered.
 - **Two-source rule (Tom, 27 Oct 2026):** an indicator hit counts once two independent sources report it
   (different outlets, not both from the same government); an official claim counts once an outlet outside that
   government reports it. Single-source hits are shown as "claimed" and do not move the ladder. Use `owner` + `group`.
@@ -240,6 +246,26 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   names the outlet after the catalog entry. Searches drop items with no headline ("- ReliefWeb") at ingest.
   Not yet seen working from the cloud: check these four in feed health after the deploy.
 - suspilne returned 403 from 28 Oct 03:05 UTC and was fresh again by 31 Oct, so it comes in by RSS.
+- **GDELT coverage audit (31 Oct 2026; scratch scripts, not in the repo).** In 52,618 raw GKG articles (30 Oct
+  15:00-18:00 UTC, before any matching) and 2 days of matched rows: zero from Reuters, AP, AFP, Bloomberg, CNN, NYT,
+  Washington Post, WSJ, NHK, Kyodo, Yonhap, SCMP, Japan Times, Dawn, TASS, Kyiv Independent, Suspilne, Iran
+  International, Press TV, Tasnim, Fars, Al Arabiya, Hiiraan, Addis Standard, Sudan Tribune, Mizzima, ISW, Lloyd's
+  List, CiberCuba. Present: BBC, Guardian, Al Jazeera, Jerusalem Post, Hindustan Times, RIA, Xinhua. So the
+  attention counts (GDELT only) never see the wires.
+- Catalog 2026-10-31.2 added 13 Google News site searches, measured from Tom's machine (usable items in 24 h):
+  AP 80, Bloomberg 76, AFP 55, CiberCuba 48, Reuters /world 38, Al Arabiya 36, Hiiraan 28, Addis Standard 22,
+  NHK World 19, Efecto Cocuyo 10, Iran International 9, Garowe 5, ISW 4. No usable site search: Tasnim, Fars,
+  Mizzima, Myanmar Now, Caracas Chronicles, Novaya Gazeta Europe (0 items); Sudan Tribune and Sudans Post (old
+  archive pages); Diario de Cuba and Kyodo (mostly no headline); Lloyd's List (paywalled, ~2). Telegram previews
+  `presstv` and `farsna` (Fars, Persian) were live; ownership unconfirmed, not added. Myanmar and Sudan remain thin.
+- Statuses fixed the same day: xinhua_en, ria_ru, arabnews, peoplesdaily_en, chinadaily_world, focustaiwan,
+  mining_com were `dropped` but GDELT carries them (6-82 matched articles a day) -> `none`; farsnews and ifp were
+  `none` but GDELT carries none -> `dropped`.
+- **Blocklist measurement lesson:** counting distinct headlines said 72% of Cuba's filtered stories were junk; the
+  real story build (`build_stories` + headline filter, as `daily.build_day`) said 3%. iHeart's station-suffixed
+  copies group back into one story. Measure filters at story level. Removing all blocked sites changed attention
+  counts 0-3% (T1 critical minerals 9%, 3 stories); the blocklist is for story cards, outlet counts and storage
+  (~2,600 of ~30,000 matched rows a day).
 - Weekends: on Saturday 31 Oct 2026, 13 feeds were late and 4 stale with no fetch errors (Defense News, Breaking
   Defense, Splash247, Irrawaddy quiet 24-34 h). Before calling a feed broken, check `consecutive_failures` and
   the HTTP code, not the fresh count.

@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 
-from . import countries, daily, events, feeds, gdelt, health, ondemand, statestore
+from . import blocklist, countries, daily, events, feeds, gdelt, health, ondemand, statestore
 from .budget import BudgetExceeded
 from .match import Matcher
 from .sources import lookup_domain
@@ -55,6 +55,8 @@ def stamps_after(last: str | None, latest: str, cap: int = MAX_FILES_PER_STREAM)
 def gdelt_rows(stamp: str, stream: str, data: bytes, matcher: Matcher) -> list[dict]:
     rows = []
     for art in gdelt.parse_zip(data, stream):
+        if blocklist.gdelt_reason(art.domain, art.url):  # catalog/blocklist.json: non-news, press releases, copies
+            continue
         labels = matcher.labels(art)
         if not labels:
             continue

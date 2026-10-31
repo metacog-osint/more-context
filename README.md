@@ -1,7 +1,10 @@
 # MORE CONTEXT
 
 A warning-and-awareness monitor for 15 conflict zones and 5 strategic Watch Topics, built from
-publicly available news data (GDELT). It groups reprinted articles into stories, codes each story with
+publicly available news: GDELT's article and event files (the main source, and the only one the attention counts
+use), plus publishers' own feeds, Google News searches and public Telegram channels for outlets GDELT does not
+carry, such as Reuters, AP and AFP (`catalog/sources.json`). Sites that are not news or only copy it are left out
+(`catalog/blocklist.json`). It groups reprinted articles into stories, codes each story with
 Gemini on Vertex AI, and tracks indicators, attention, escalation and how different source groups frame
 the same events. Every signal is backtested before it drives a status.
 

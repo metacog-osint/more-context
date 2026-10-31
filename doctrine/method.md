@@ -3,6 +3,19 @@
 The full method is in `CLAUDE.md` (measures, tests and incidents) and the build plan. This page states it in the terms
 of The Intelligence Company's doctrine kit (`doctrine/kit/`).
 
+## How sources are gathered
+- **GDELT** (GKG 2.1 and Events 2.0, every 15 minutes) is the main source and the only one the measures below count.
+  It does not carry many major outlets (none of Reuters, AP, AFP, Bloomberg, CNN, NHK, Kyodo, Iran International,
+  Hiiraan, Addis Standard, ISW and others in 52,618 raw articles on 30 Oct 2026; WF-AS-5).
+- **Read by Watchfloor itself** (`catalog/sources.json`): publishers' feeds, public Telegram channels, a Google News
+  search per zone and topic, and Google News `site:` searches for outlets GDELT misses or whose feeds turn away
+  automated readers. Their stories appear on the zone pages, kept out of the counts so each day stays comparable with
+  the zone's history.
+- **Left out** (`catalog/blocklist.json`): sites that are not news or only copy it (a court-records database,
+  press-release wires, the Big News Network's ~100 reprint sites, radio-station copies, two aggregators). Removing
+  them changed attention counts by 0-3% on 29-30 Oct 2026; they are dropped so story cards and outlet counts stay
+  honest.
+
 ## What it measures
 - **Attention:** GDELT articles about each zone and topic, grouped into stories so reprints count once, kept only when
   the headline names the zone (82% precision, 78% retention on the labelled set; likely flattered, see WF-AS-2).
