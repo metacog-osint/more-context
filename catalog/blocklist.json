@@ -1,0 +1,28 @@
+{
+ "version": "2026-10-31.1",
+ "note": "Sites left out of Watchfloor's data (Tom's yes, 31 Oct 2026). Measured on the 29 and 30 Oct 2026 cycle files (~30,000 matched GDELT articles a day): removing all of these changed any zone's attention count by 0-3% (critical minerals 9%, 3 stories), because story grouping and the headline filter already absorb most of them. They are left out so story cards, outlet counts and stored rows are not padded with non-news, press releases and copies. GDELT rows are checked at ingest (pipeline/cycle.py) and again when a day is built (pipeline/daily.py); Google News items by their ' - Publisher' tail at ingest (pipeline/feeds.py). Articles a day are GDELT articles matched to a zone or topic.",
+ "gdelt_domains": [
+  {"domain": "indiankanoon.org", "reason": "Indian court-records database, not news (~100 articles a day, all labelled India-Pakistan)"},
+  {"domain": "finanznachrichten.de", "reason": "company press releases and finance-wire copies (~170 articles a day; press releases labelled Iran by place names in their boilerplate)"},
+  {"domain": "prnewswire.com", "reason": "press releases"},
+  {"domain": "globenewswire.com", "reason": "press releases"},
+  {"domain": "businesswire.com", "reason": "press releases"},
+  {"domain": "einpresswire.com", "reason": "press releases"},
+  {"domain": "accessnewswire.com", "reason": "press releases"},
+  {"domain": "iheart.com", "reason": "radio-station pages that copy one national story to dozens of stations (~300 articles a day; 69 copies of one story in the Ukraine zone on 30 Oct)"},
+  {"domain": "zazoom.it", "reason": "Italian aggregator reposting other outlets' headlines (~140 articles a day)"},
+  {"domain": "inewsgr.com", "reason": "Greek aggregator reposting other outlets (~100 articles a day, 60% copies)"},
+  {"domain": "webindia123.com", "reason": "reposts Indian wire copy (~55 articles a day, 90% copies)"},
+  {"domain": "prokerala.com", "reason": "reposts Indian wire copy (~65 articles a day, 53% copies)"}
+ ],
+ "gdelt_url_patterns": [
+  {"pattern": "^https?://[^/]+/news/\\d{9}/", "reason": "Big News Network: about 100 look-alike sites (India Gazette, Iran Herald, Kenya Star, Texas Guardian...) reprinting wire copy, each counted as a separate outlet (~1,060 articles a day); every one of their articles has this path and no other site's does"},
+  {"pattern": "globenewswire|prnewswire|businesswire|accesswire|einpresswire|newsfilecorp|/tmt-newswire/", "ignore_case": true, "reason": "press-release pages hosted on news sites (83% of the Manila Times' matched articles, under /tmt-newswire/, labelled South China Sea)"}
+ ],
+ "search_publishers": [
+  {"publisher": "Facebook", "reason": "social posts repeating outlets already read (~15 a day in the zone searches)"},
+  {"publisher": "Modern Ghana", "reason": "reposts other outlets' items, such as Al Jazeera clips (~28 a day)"},
+  {"publisher": "NewsCord", "reason": "automated pages comparing other outlets' coverage (~10 a day)"},
+  {"publisher": "BigGo Finance", "reason": "machine-translated finance aggregator (~7 a day)"}
+ ]
+}

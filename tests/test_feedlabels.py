@@ -171,6 +171,15 @@ class SiteSearchTests(unittest.TestCase):
         self.assertEqual(probe["toi"]["items"], 1)
         self.assertEqual([r["title"] for r in rows if r["source"] == "bbc"], ["- odd but kept"])
 
+    def test_blocked_publishers_are_dropped_from_searches(self):
+        now = datetime(2026, 10, 31, 21, 0, tzinfo=timezone.utc)
+        items = [{"url": "https://news.google.com/a", "title": "Russian drone strikes kill two - Modern Ghana", "summary": "",
+                  "published": now},
+                 {"url": "https://news.google.com/b", "title": "Russian drone strikes kill two - Reuters", "summary": "",
+                  "published": now}]
+        _, rows, _, _ = self.poll(lambda src, n: 200, items_for={"toi": items}, sources=[SITE, PLAIN])
+        self.assertEqual([r["title"] for r in rows if r["source"] == "toi"], ["Russian drone strikes kill two - Reuters"])
+
     def test_has_headline(self):
         self.assertFalse(feeds.has_headline("- ReliefWeb"))
         self.assertFalse(feeds.has_headline("  "))

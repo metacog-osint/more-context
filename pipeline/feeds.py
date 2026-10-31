@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
-from . import health, rss, telegram
+from . import blocklist, health, rss, telegram
 
 SOURCES = Path(__file__).resolve().parent.parent / "catalog" / "sources.json"
 
@@ -127,7 +127,7 @@ def poll(state: dict, now: datetime, include_candidates: bool = False, workers: 
         entry = feeds.setdefault(src["id"], {})
         new: list[dict] = []
         if items is not None and is_search(src):
-            items = [i for i in items if has_headline(i.get("title"))]
+            items = [i for i in items if has_headline(i.get("title")) and not blocklist.blocked_publisher(i.get("title"))]
         if res.not_modified:
             health.record_success(entry, now, entry.get("last_items", 0), None, None, None)
         elif items is not None:

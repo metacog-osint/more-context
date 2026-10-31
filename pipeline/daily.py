@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta, timezone
 
-from . import feedlabels, measures
+from . import blocklist, feedlabels, measures
 from .relevance import TermMatcher
 from .stories import build_stories
 
@@ -91,8 +91,10 @@ def build_day(sink, day: date) -> dict:
     rows, keys = load_day_rows(sink, day)
     story_hist = history(sink, day)
     matcher = TermMatcher()
-    gdelt = [r for r in rows if r.get("kind") == "gdelt"]
-    rss = [r for r in rows if r.get("kind") == "rss"]
+    # Rows written before the blocklist (31 Oct 2026), or by a backfill, are checked again here.
+    gdelt = [r for r in rows if r.get("kind") == "gdelt" and not blocklist.blocked_row(r)]
+    rss = [r for r in rows if r.get("kind") == "rss"
+           and not ((r.get("url") or "").startswith("https://news.google.com/") and blocklist.blocked_publisher(r.get("title")))]
 
     by_entity: dict[str, list[dict]] = defaultdict(list)
     for r in gdelt:

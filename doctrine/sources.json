@@ -1,9 +1,9 @@
 {
   "program": "watchfloor",
   "register": "catalog/sources.json",
-  "note": "The register of record is catalog/sources.json (116 feeds and searches, each with group, owner, language and polling interval) plus GDELT, the main source. The rows here add what the doctrine kit needs: Admiralty grades, independence, ease of faking, cadence and health probes.",
+  "note": "The register of record is catalog/sources.json (120 sources, each with group, owner, language and how it is read: a publisher's feed, a Google News search by zone or topic, a Google News site: search for one outlet, a public Telegram channel, or GDELT alone) plus GDELT, the main source and the only one the attention counts use. catalog/blocklist.json lists the sites left out. The rows here add what the doctrine kit needs: Admiralty grades, independence, ease of faking, cadence and health probes.",
   "grading": {
-    "status": "proposed 30 Oct 2026; Tom to confirm",
+    "status": "proposed 30 Oct 2026; Tom to confirm (iranian_exile added 31 Oct 2026, proposed C like russian_independent)",
     "reliability_by_group": {
       "western_wire": "B",
       "western_public": "B",
@@ -11,6 +11,7 @@
       "specialist": "B",
       "official": "B",
       "russian_independent": "C",
+      "iranian_exile": "C",
       "ukrainian": "C",
       "israeli": "C",
       "gulf_arab": "C",
