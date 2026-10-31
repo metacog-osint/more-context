@@ -109,6 +109,13 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   `_test/gzip-check.jsonl` (left in place). `scripts/recompress.py` converts plain objects in place (one Class A
   write each, conditional on generation, checked lossless; dry run by default): 766 in `cycles/` and `stories/` on
   30 Oct. Past 5 GB anyway, the free path is moving older files to Tom's own storage.
+  Live 31 Oct 2026 18:24 UTC (`mc-ingest-00017-wuc`, `mc-api-00009-now`): the first gzip cycle file, 18:35
+  (`183519.jsonl`), was 98,497 bytes for 293 rows against ~560-600 KB for the plain ones before it. The same day
+  `recompress.py` converted 858 plain objects, 1,175.8 -> 254.8 MiB, none skipped (October's account-wide Class
+  A: 2,690 before, ~3,560 after); the 85 converted 29 Oct cycle files unzip byte-identical to plain copies taken
+  on 29 Oct. Bucket 266 MiB live after (the plain copies sit in soft delete until ~7 Nov). That deploy was built
+  from af29a90 plus the new `pipeline/sinks.py`, not from main, so `/feed` (93a87bf) is still undeployed: the
+  next deploy from main ships it.
 - Class A measured in Cloud Monitoring (`storage.googleapis.com/api/request_count` by method, a free read): 2,545
   in October to 30 Oct 20:27 UTC (backfill and analysis days 27-29 Oct included); 32 lists in the 24 hours to
   30 Oct 20:00 UTC. Use hourly alignment: one window as long as the query mis-buckets (it reported 285 lists).
