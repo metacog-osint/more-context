@@ -11,7 +11,7 @@ import json
 from collections import defaultdict
 from functools import lru_cache
 
-from .feeds import SEARCH_GROUP, SOURCES
+from .feeds import SEARCH_GROUP, SOURCES, is_search
 from .match import load_catalog
 from .relevance import TermMatcher
 
@@ -49,7 +49,8 @@ def labels(row: dict, matcher: TermMatcher, ids: list[str], sources: dict[str, d
 def prepared(rows: list[dict], catalog: dict | None = None, matcher: TermMatcher | None = None,
              sources: dict[str, dict] | None = None) -> dict[str, list[dict]]:
     """Feed rows grouped by entity, ready for build_stories. Search headlines lose their " - Publisher" tail, which
-    becomes the outlet; other feeds count each source as one outlet."""
+    becomes the outlet; other feeds count each source as one outlet. An outlet read through a site: search loses the
+    tail too (it would put "Israel" in every Times of Israel headline) and keeps its own name as the outlet."""
     sources = _sources() if sources is None else sources
     ids = entity_ids(catalog)
     matcher = matcher or TermMatcher()
@@ -61,6 +62,9 @@ def prepared(rows: list[dict], catalog: dict | None = None, matcher: TermMatcher
             head, pub = split_publisher(item.get("title") or "")
             item["title"] = head
             item["domain"] = pub or "news.google.com"
+        elif is_search(src):
+            item["title"] = split_publisher(item.get("title") or "")[0]
+            item["domain"] = src.get("name") or item.get("source") or ""
         else:
             item["domain"] = src.get("name") or item.get("source") or ""
         for eid in labels(item, matcher, ids, sources):

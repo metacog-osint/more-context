@@ -1,5 +1,5 @@
 {
- "catalog_version": "2026-10-27.1",
+ "catalog_version": "2026-10-31.1",
  "notes": "Draft list for Tom's approval. group = the perspective a source speaks from (used for framing divergence); owner = state | public | private | intergovernmental | ngo. domains tag GDELT articles with the same groups, so outlets without a usable feed still count. rss_status: active (polled) | candidate (retry) | dropped (reason in rss_note) | none (GDELT only). expected_minutes = normal gap between new items, calibrated from the 26 Oct probe. clock_skew_hours = hours to subtract from a feed that labels local time as UTC. format: telegram = a public channel's web preview (t.me/s/<channel>), parsed by pipeline/telegram.py. Front-line sources added 27 Oct 2026 (Tom); two-source rule: an indicator hit counts once two independent sources report it (different outlets, not both from the same government).",
  "groups": {
   "western_public": "Western public broadcasters",
@@ -59,7 +59,9 @@
   {
    "id": "france24_en",
    "name": "France 24 (English)",
-   "url": "https://www.france24.com/en/rss",
+   "url": "https://news.google.com/rss/search?q=site%3Afrance24.com%2Fen%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "feed_url": "https://www.france24.com/en/rss",
+   "query": "site:france24.com/en",
    "group": "western_public",
    "owner": "public",
    "lang": "eng",
@@ -67,10 +69,12 @@
     "global"
    ],
    "expected_minutes": 60,
+   "poll_minutes": 60,
    "domains": [
     "france24.com"
    ],
-   "rss_status": "active"
+   "rss_status": "active",
+   "rss_note": "Read through a Google News site: search since 31 Oct 2026. Its own feed (feed_url) gives Google Cloud addresses HTTP 403 every run 26-31 Oct 2026 (it works from a home connection), and GDELT carries almost none of it (0 matched articles a day on 29-30 Oct 2026)."
   },
   {
    "id": "npr_world",
@@ -193,7 +197,9 @@
   {
    "id": "timesofisrael",
    "name": "The Times of Israel",
-   "url": "https://www.timesofisrael.com/feed/",
+   "url": "https://news.google.com/rss/search?q=site%3Atimesofisrael.com%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "feed_url": "https://www.timesofisrael.com/feed/",
+   "query": "site:timesofisrael.com",
    "group": "israeli",
    "owner": "private",
    "lang": "eng",
@@ -201,11 +207,13 @@
     "10_Israel_Gaza_Lebanon",
     "11_Iran_Red_Sea"
    ],
-   "expected_minutes": 30,
+   "expected_minutes": 60,
+   "poll_minutes": 60,
    "domains": [
     "timesofisrael.com"
    ],
-   "rss_status": "active"
+   "rss_status": "active",
+   "rss_note": "Read through a Google News site: search since 31 Oct 2026. Its own feed (feed_url) gives Google Cloud addresses HTTP 403 every run 26-31 Oct 2026 (it works from a home connection), and GDELT carries almost none of it (0 matched articles a day on 29-30 Oct 2026). Includes blogs.timesofisrael.com: leaving it out brought in empty items and another publisher."
   },
   {
    "id": "jpost",
@@ -851,7 +859,9 @@
   {
    "id": "rfi_afrique",
    "name": "RFI - Afrique",
-   "url": "https://www.rfi.fr/fr/afrique/rss",
+   "url": "https://news.google.com/rss/search?q=site%3Arfi.fr%2Ffr%2Fafrique%20when%3A1d&hl=fr&gl=FR&ceid=FR:fr",
+   "feed_url": "https://www.rfi.fr/fr/afrique/rss",
+   "query": "site:rfi.fr/fr/afrique",
    "group": "western_public",
    "owner": "public",
    "lang": "fra",
@@ -862,11 +872,13 @@
     "18_Ethiopia_Eritrea",
     "19_Somalia"
    ],
-   "expected_minutes": 60,
+   "expected_minutes": 180,
+   "poll_minutes": 60,
    "domains": [
     "rfi.fr"
    ],
-   "rss_status": "active"
+   "rss_status": "active",
+   "rss_note": "Read through a Google News site: search since 31 Oct 2026. Its own feed (feed_url) gives Google Cloud addresses HTTP 403 every run 26-31 Oct 2026 (it works from a home connection), and GDELT carries almost none of it (2-3 matched articles a day on 29-30 Oct 2026). The Afrique section only, French edition (13 items in the 24 h to 31 Oct 2026 20:00 UTC)."
   },
   {
    "id": "premiumtimes_ng",
@@ -1004,7 +1016,9 @@
   {
    "id": "reliefweb",
    "name": "ReliefWeb - Updates",
-   "url": "https://reliefweb.int/updates/rss.xml",
+   "url": "https://news.google.com/rss/search?q=site%3Areliefweb.int%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "feed_url": "https://reliefweb.int/updates/rss.xml",
+   "query": "site:reliefweb.int",
    "group": "official",
    "owner": "intergovernmental",
    "lang": "eng",
@@ -1016,11 +1030,13 @@
     "12_Sahel_West_Africa",
     "16_Myanmar"
    ],
-   "expected_minutes": 60,
+   "expected_minutes": 120,
+   "poll_minutes": 60,
    "domains": [
     "reliefweb.int"
    ],
-   "rss_status": "active"
+   "rss_status": "active",
+   "rss_note": "Read through a Google News site: search since 31 Oct 2026. Its own feed (feed_url) gives Google Cloud addresses an empty page every run 26-31 Oct 2026 (it works from a home connection), and GDELT carries almost none of it (0 matched articles a day on 29-30 Oct 2026). About 2 in 5 items come with no headline (\"- ReliefWeb\") and are dropped at ingest."
   },
   {
    "id": "crisisgroup",

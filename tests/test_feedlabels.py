@@ -11,6 +11,9 @@ SOURCES = {
     "gn_19_somalia": {"id": "gn_19_somalia", "name": "Google News search: Somalia", "group": "search", "entity": "19_Somalia"},
     "kyiv": {"id": "kyiv", "name": "Kyiv Independent", "group": "ukrainian", "focus": ["01_Ukraine_Conflict"]},
     "bbc": {"id": "bbc", "name": "BBC News - World", "group": "western_public", "focus": ["global"]},
+    "toi": {"id": "toi", "name": "The Times of Israel", "group": "israeli",
+            "url": "https://news.google.com/rss/search?q=site%3Atimesofisrael.com%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+            "focus": ["10_Israel_Gaza_Lebanon", "11_Iran_Red_Sea"]},
 }
 
 
@@ -44,6 +47,15 @@ class FeedLabelTests(unittest.TestCase):
         out = feedlabels.prepared(rows, sources=SOURCES)
         self.assertEqual([r["title"] for r in out["19_Somalia"]], ["Al-Shabaab attack kills 12"] * 2)
         self.assertEqual([r["domain"] for r in out["19_Somalia"]], ["Reuters", "BBC"])
+
+    def test_site_search_loses_the_outlet_tail_before_matching(self):
+        # The tail " - The Times of Israel" alone would label every headline for the Israel zone.
+        tail_only = {"source": "toi", "group": "israeli", "title": "Poland suspends chief justice, sparking protests - The Times of Israel"}
+        self.assertIn("10_Israel_Gaza_Lebanon", feedlabels.labels(tail_only, self.m, self.ids, SOURCES))
+        about = {"source": "toi", "group": "israeli", "title": "Israel says Hezbollah fired rockets at Galilee - The Times of Israel"}
+        out = feedlabels.prepared([tail_only, about], sources=SOURCES)
+        self.assertEqual([r["title"] for r in out["10_Israel_Gaza_Lebanon"]], ["Israel says Hezbollah fired rockets at Galilee"])
+        self.assertEqual(out["10_Israel_Gaza_Lebanon"][0]["domain"], "The Times of Israel")
 
 
 class PollTimingTests(unittest.TestCase):
@@ -105,6 +117,65 @@ class SearchProbeTests(unittest.TestCase):
         self.assertEqual(sorted(tried), ["bbc", "gn_0", "gn_1", "gn_2"])
         self.assertEqual(tried[0], "gn_0")
         self.assertFalse(any(p.get("held") for p in probe.values()))
+
+
+SITE = {"id": "toi", "group": "israeli", "owner": "private", "lang": "eng", "expected_minutes": 60, "poll_minutes": 60,
+        "url": "https://news.google.com/rss/search?q=site%3Atimesofisrael.com%20when%3A1d&hl=en-US&gl=US&ceid=US:en"}
+
+
+class SiteSearchTests(unittest.TestCase):
+    """An outlet read through a Google News site: search keeps its own group but is handled as a search."""
+
+    def poll(self, status_for, items_for=None, sources=None):
+        now = datetime(2026, 10, 31, 21, 0, tzinfo=timezone.utc)
+        state, tried = {"rss": {}}, []
+
+        def fetch_one(src, entry):
+            tried.append(src["id"])
+            status = status_for(src, len(tried))
+            if status != 200:
+                return _Res(status), None, f"HTTP {status}"
+            items = (items_for or {}).get(src["id"]) or [{"url": f"https://x/{src['id']}", "title": "t - Pub",
+                                                           "summary": "", "published": now}]
+            return _Res(200), items, None
+
+        with mock.patch.object(feeds, "load_sources", lambda include_candidates=False: sources or SEARCHES + [SITE, PLAIN]):
+            rows, probe = feeds.poll(state, now, fetch_one=fetch_one)
+        return tried, rows, {p["id"]: p for p in probe}, state
+
+    def test_is_search_by_group_or_address(self):
+        self.assertTrue(feeds.is_search(SEARCHES[0]) and feeds.is_search(SITE))
+        self.assertFalse(feeds.is_search(PLAIN))
+
+    def test_site_search_is_held_when_the_probe_is_refused(self):
+        tried, rows, probe, state = self.poll(lambda src, n: 503 if n == 1 else 200)
+        self.assertEqual(tried, ["gn_0", "bbc"])
+        self.assertTrue(probe["toi"].get("held") and probe["toi"].get("search"))
+        self.assertNotIn("toi", state["rss"])  # not tried, so no failure recorded
+        self.assertTrue(feeds.searches_refused(list(probe.values())))
+
+    def test_refused_site_search_alone_counts_as_refused(self):
+        tried, _, probe, _ = self.poll(lambda src, n: 503, sources=[SITE, PLAIN])
+        self.assertEqual(sorted(tried), ["bbc", "toi"])
+        self.assertTrue(feeds.searches_refused(list(probe.values())))
+        self.assertNotIn("search", probe["bbc"])
+
+    def test_items_without_a_headline_are_dropped_from_searches_only(self):
+        now = datetime(2026, 10, 31, 21, 0, tzinfo=timezone.utc)
+        bare = [{"url": "https://news.google.com/a", "title": "- ReliefWeb", "summary": "", "published": now},
+                {"url": "https://news.google.com/b", "title": "Sudan: floods displace 20,000 - ReliefWeb", "summary": "",
+                 "published": now}]
+        plain = [{"url": "https://bbc/a", "title": "- odd but kept", "summary": "", "published": now}]
+        _, rows, probe, _ = self.poll(lambda src, n: 200, items_for={"toi": bare, "bbc": plain}, sources=[SITE, PLAIN])
+        self.assertEqual([r["title"] for r in rows if r["source"] == "toi"], ["Sudan: floods displace 20,000 - ReliefWeb"])
+        self.assertEqual(probe["toi"]["items"], 1)
+        self.assertEqual([r["title"] for r in rows if r["source"] == "bbc"], ["- odd but kept"])
+
+    def test_has_headline(self):
+        self.assertFalse(feeds.has_headline("- ReliefWeb"))
+        self.assertFalse(feeds.has_headline("  "))
+        self.assertFalse(feeds.has_headline(None))
+        self.assertTrue(feeds.has_headline("Gaza - Israel - live updates - BBC"))
 
 
 class BuildDayFeedTests(unittest.TestCase):

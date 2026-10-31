@@ -137,7 +137,9 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   plus 12 front-line sources Tom approved on 27 Oct 2026: Suspilne, RBC-Ukraine, Meduza (ru, en), ISW (dropped:
   HTTP 403 to automated requests), and 7 Telegram channels (`format: telegram`): Ukrainian Air Force (nightly
   tallies), General Staff, Russian MoD, DeepState, Rybar, Two Majors, WarGonzo. New groups: russian_independent,
-  russian_milblog.
+  russian_milblog. Now (31 Oct 2026, catalog 2026-10-31.1): 116 sources in 19 groups; 83 polled (51 news feeds,
+  21 Google News searches by zone or topic, 4 outlets read through Google News `site:` searches, 7 Telegram
+  channels), 2 to retry, 18 dropped, 13 GDELT-only.
 - **Two-source rule (Tom, 27 Oct 2026):** an indicator hit counts once two independent sources report it
   (different outlets, not both from the same government); an official claim counts once an outlet outside that
   government reports it. Single-source hits are shown as "claimed" and do not move the ladder. Use `owner` + `group`.
@@ -223,8 +225,24 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   response, and the next run starts on a new instance (`restart_instance: true` in the run log). Only when
   `K_SERVICE` is set (Cloud Run). If Google ever refuses every address, this restarts every run: harmless (free
   cold starts), but then switch to another search source.
-- Also failing from the cloud (139 failures in a row by 28 Oct 2026): france24_en, rfi_afrique, timesofisrael
-  (HTTP 403) and reliefweb (empty body). suspilne has returned 403 since 28 Oct 03:05 UTC.
+- **Outlets that turn away cloud addresses** (31 Oct 2026): the feeds of france24_en, rfi_afrique, timesofisrael
+  (HTTP 403) and reliefweb (empty body) failed every run from 26 to 31 Oct (423 in a row) and answered HTTP 200 from
+  Tom's home connection. GDELT does not cover them either (29 and 30 Oct cycle files, ~30,000 matched GDELT rows a
+  day): france24.com 0, timesofisrael.com 0, reliefweb.int 0, suspilne.media 0, rfi.fr 2-3 a day, against
+  jpost.com 95 and aljazeera 95. So they were effectively missing.
+- Since catalog 2026-10-31.1 the four are read through **Google News `site:` searches**: same ids, groups and
+  focus; `url` is the search, `feed_url` the old feed, `query` the readable search, polled hourly. Measured from
+  Tom's machine on 31 Oct: timesofisrael 100 items (a new one every ~7 min; includes blogs, since
+  `-site:blogs...` brought in empty items and another publisher), france24.com/en 77, rfi.fr/fr/afrique 13
+  (French edition), reliefweb 47, of which 19 had no headline. `feeds.is_search` treats any
+  `news.google.com/rss/search` address as a search: probe-first, holds and `searches_refused` cover it, and
+  `feedlabels` cuts its " - Publisher" tail (otherwise "The Times of Israel" puts "Israel" in every headline) and
+  names the outlet after the catalog entry. Searches drop items with no headline ("- ReliefWeb") at ingest.
+  Not yet seen working from the cloud: check these four in feed health after the deploy.
+- suspilne returned 403 from 28 Oct 03:05 UTC and was fresh again by 31 Oct, so it comes in by RSS.
+- Weekends: on Saturday 31 Oct 2026, 13 feeds were late and 4 stale with no fetch errors (Defense News, Breaking
+  Defense, Splash247, Irrawaddy quiet 24-34 h). Before calling a feed broken, check `consecutive_failures` and
+  the HTTP code, not the fresh count.
 - A partial day (ingest started or stopped mid-day) gets no attention z and no alarm.
 
 ## Relevance and attention (28 Oct 2026)
@@ -309,7 +327,8 @@ Most stories are never read by a person, so model work waits for a reason to spe
   `gcloud storage cp gs://more-context-484804/state/state.json .` (cp unzips).
 - First cloud run 26 Oct 17:10 UTC: 46 s for a 2-hour catch-up, 4,001 rows. From Google Cloud,
   france24_en, rfi_afrique and timesofisrael answer HTTP 403 (they block cloud addresses; fine from a home
-  connection) and reliefweb returned an empty body. GDELT still carries all four by domain.
+  connection) and reliefweb returned an empty body. GDELT carries almost none of their articles; since 31 Oct 2026
+  they are read through Google News site: searches (see Feeds and saved searches).
 - `tests/` - `python -m unittest discover -s tests -t .` (CI runs this on every push).
 - `data/` - downloads and reports, git-ignored.
 

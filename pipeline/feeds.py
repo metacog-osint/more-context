@@ -17,6 +17,21 @@ SOURCES = Path(__file__).resolve().parent.parent / "catalog" / "sources.json"
 SEARCH_GROUP = "search"
 RETRY_MINUTES = 15
 REFUSED = (403, 429, 503)
+# Since 31 Oct 2026 four outlets that turn away Google Cloud addresses (Times of Israel, France 24, RFI Afrique,
+# ReliefWeb) are read through Google News `site:` searches. They keep their own group, so a source counts as a
+# search by its address as well: Google's refusals and holds apply to it, and its " - Publisher" tails are cut.
+NEWS_SEARCH = "https://news.google.com/rss/search"
+
+
+def is_search(src: dict) -> bool:
+    return src.get("group") == SEARCH_GROUP or (src.get("url") or "").startswith(NEWS_SEARCH)
+
+
+def has_headline(title: str | None) -> bool:
+    """False for Google News items that carry only the publisher ("- ReliefWeb": 19 of 47 items in a
+    site:reliefweb.int search on 31 Oct 2026). A row with no headline cannot be labelled or grouped."""
+    t = (title or "").strip()
+    return bool(t) and t != "-" and not t.startswith("- ")
 
 
 def load_sources(include_candidates: bool = False) -> list[dict]:
@@ -42,7 +57,7 @@ def is_due(src: dict, entry: dict | None, now: datetime) -> bool:
 
 def searches_refused(probe: list[dict]) -> bool:
     """True when every saved search fetched this run was refused (REFUSED): this run's egress address is turned away."""
-    tried = [p for p in probe if p.get("group") == SEARCH_GROUP and not p.get("skipped")]
+    tried = [p for p in probe if (p.get("search") or p.get("group") == SEARCH_GROUP) and not p.get("skipped")]
     return bool(tried) and all(p.get("http") in REFUSED for p in tried)
 
 
@@ -84,7 +99,7 @@ def poll(state: dict, now: datetime, include_candidates: bool = False, workers: 
         health.upgrade_seen(entry)
     sources = [s for s in all_sources if is_due(s, feeds.get(s["id"]), now)]
     results, held = [], set()
-    searches = [s for s in sources if s.get("group") == SEARCH_GROUP]
+    searches = [s for s in sources if is_search(s)]
     if len(searches) > 1:
         first = _probe_first(searches, feeds)
         results.append((first, *fetch_one(first, feeds.get(first["id"], {}))))
@@ -105,10 +120,14 @@ def poll(state: dict, now: datetime, include_candidates: bool = False, workers: 
                "error": entry.get("last_error", ""), "skipped": True}
         if src["id"] in held:
             row["held"] = "the first saved search was refused this run"
+        if is_search(src):
+            row["search"] = True
         probe.append(row)
     for src, res, items, err in results:
         entry = feeds.setdefault(src["id"], {})
         new: list[dict] = []
+        if items is not None and is_search(src):
+            items = [i for i in items if has_headline(i.get("title"))]
         if res.not_modified:
             health.record_success(entry, now, entry.get("last_items", 0), None, None, None)
         elif items is not None:
@@ -135,5 +154,6 @@ def poll(state: dict, now: datetime, include_candidates: bool = False, workers: 
             "median_gap_min": median_gap_minutes(items) if items else None,
             "error": entry.get("last_error", "")
             or (f"items dated {future_h}h in the future: check clock_skew_hours" if future_h else ""),
+            **({"search": True} if is_search(src) else {}),
         })
     return new_rows, probe
