@@ -32,6 +32,8 @@ class InterestsTests(unittest.TestCase):
         self.assertEqual(set(doc["areas"]), {f"WF-WP-Z{z['id'][:2]}" for z in zones if z.get("countries")})
         self.assertLessEqual(set(doc["areas"]), wps)
         self.assertEqual(doc["areas"]["WF-WP-Z01"], ["UA"])  # FIPS UP -> ISO UA
+        named = {w for i in doc["interests"] for w in i.get("warning_problems", [])}
+        self.assertLessEqual(named, wps)  # topics an interest serves are real warning problems
 
     def test_matches_a_live_shaped_bus(self):
         items = [

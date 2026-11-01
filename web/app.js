@@ -370,6 +370,35 @@ function feedItem(s) {
       s.first_seen ? ` · ${when(s.first_seen)}` : ""));
 }
 
+// "From the suite": what The Intelligence Company's other programs report now (GET /suite; pipeline/suite.py).
+function suiteItem(t) {
+  const url = safeUrl(t.link);
+  const site = safeUrl(t.site);
+  const flagged = t.tier === "anomaly" || t.tier === "warning";
+  return h("li", { class: t.stale ? "story stale" : "story", title: t.why || null },
+    url ? h("a", { class: "story-title", href: url, target: "_blank", rel: "noopener noreferrer" }, t.title) : h("span", { class: "story-title" }, t.title),
+    h("div", { class: "meta" },
+      site ? h("a", { href: site, target: "_blank", rel: "noopener noreferrer" }, t.program_name) : t.program_name,
+      flagged ? [" ", h("span", { class: "badge warm" }, t.tier === "warning" ? "warning" : "anomaly")] : "",
+      // with the year: standing notices can be months or years old
+      t.data_as_of || t.published_at ? ` · ${window.TicTime.format(t.data_as_of || t.published_at, { year: true })}` : "",
+      t.stale ? ` · ${t.program_name}'s feed is behind; shown in grey` : ""));
+}
+
+function suitePanel(s, pastDay) {
+  const more = Object.entries(s.more || {}).map(([p, n]) => `${n} more from ${p.charAt(0).toUpperCase()}${p.slice(1)}`);
+  return [
+    pastDay ? h("p", { class: "muted small" }, "These are current reports, not the chosen day's.") : null,
+    (s.missing || []).length
+      ? h("p", { class: "note" }, `Could not read ${s.missing.join(", ")} just now. Its reports are missing here, not absent.`)
+      : null,
+    (s.tips || []).length
+      ? h("ul", { class: "stories panel" }, s.tips.map(suiteItem))
+      : h("p", { class: "muted" }, (s.missing || []).length ? "No reports could be read." : "Nothing from the other programs for this right now."),
+    more.length ? h("p", { class: "muted small" }, `Also: ${more.join(", ")}.`) : null,
+  ];
+}
+
 async function viewZone(id, params) {
   setNav("home");
   const ents = await entities();
@@ -398,6 +427,8 @@ async function viewZone(id, params) {
       }
     },
   }, uncoded ? `Code ${uncoded} stor${uncoded === 1 ? "y" : "ies"} with Gemini (about $${Math.max(uncoded * COST_PER_STORY, 0.001).toFixed(3)})` : "All shown stories are coded");
+  // Loaded after the page so a slow program feed never holds up the stories.
+  const suiteBox = h("div", null, h("p", { class: "muted small" }, "Loading reports from the other programs…"));
   show(
     h("p", { class: "small" }, h("a", { href: `#/?day=${days.days.includes(day) ? day : days.days[0] || ""}` }, "← All zones")),
     h("h1", null, ent.name),
@@ -418,7 +449,19 @@ async function viewZone(id, params) {
     (z.feeds || []).length
       ? h("ul", { class: "stories panel" }, z.feeds.map(feedItem))
       : h("p", { class: "muted" }, "No feed items for that day yet."),
+    h("h2", null, "From the suite"),
+    h("p", { class: "muted small" }, "What The Intelligence Company's other programs report now for this zone's countries or this topic: travel advisories, embassy posture, airspace and navigational warnings (",
+      h("a", { href: "https://cordon.theintelligence.company/", target: "_blank", rel: "noopener noreferrer" }, "Cordon"), "), GPS interference (",
+      h("a", { href: "https://noisefloor.theintelligence.company", target: "_blank", rel: "noopener noreferrer" }, "Noisefloor"), "), fire detections and natural hazards (",
+      h("a", { href: "https://elements.theintelligence.company/", target: "_blank", rel: "noopener noreferrer" }, "Elements"), "), cyber activity (",
+      h("a", { href: "https://vigil.theintelligence.company", target: "_blank", rel: "noopener noreferrer" }, "Vigil"), ") and dated events (",
+      h("a", { href: "https://metacog-osint.github.io/verdict/", target: "_blank", rel: "noopener noreferrer" }, "Verdict"),
+      "). Each program collects its own data; Watchfloor links to it and does not count it above."),
+    suiteBox,
   );
+  get(`/suite?entity=${encodeURIComponent(id)}`)
+    .then((s) => suiteBox.replaceChildren(...suitePanel(s, day !== days.today).filter(Boolean)))
+    .catch(() => suiteBox.replaceChildren(h("p", { class: "note" }, "The other programs could not be reached just now. Their reports are missing here, not absent.")));
 }
 
 // ---------- Status ----------
@@ -458,6 +501,7 @@ function viewAbout() {
       li("A free headline filter keeps stories that name the zone. In a first test on 278 stories it raised the on-topic share from 42% (the matching rules alone) to about 82%; the test set will grow."),
       li("Free measures run on GDELT's stories: attention, the day's count of stories whose headline names the zone, against the zone's own last 28 days (adjusted for the day of the week). Counting one source keeps each day comparable with the zone's history. On a labelled test, 82% of those stories were on topic, against 42% of everything the matching rules catch."),
       li("Stories from the feeds, searches and Telegram channels appear on each zone page, apart from those counts."),
+      li("Each zone and topic page also shows what The Intelligence Company's other programs report there now: travel advisories, embassy posture, airspace and navigational warnings (Cordon), GPS interference (Noisefloor), fire detections and natural hazards (Elements), cyber activity (Vigil) and dated events (Verdict). Each program collects its own data; Watchfloor links to it and does not count it."),
       li("Google Gemini codes a story only when someone opens a zone or a free alarm fires: relevance, event type (PLOVER), direction, and a plain-English gist. Every coding is cached, and spending is capped at $5 a month."),
       li("Warning ladders (Watch, Warning, Crisis) with headline-observable indicators are being written for each zone and will be backtested against known onsets.")),
     h("h2", null, "Two-source rule"),
