@@ -1,0 +1,212 @@
+{
+ "program": "watchfloor",
+ "note": "Written by scripts/build_interests.py; edit the script, not this file. What Watchfloor reads from the suite's other programs instead of collecting it again (doctrine kit tips.py). Areas are the zones' countries in ISO alpha-2, keyed by each zone's warning problem.",
+ "areas": {
+  "WF-WP-Z01": [
+   "UA"
+  ],
+  "WF-WP-Z02": [
+   "TW"
+  ],
+  "WF-WP-Z03": [
+   "KP",
+   "KR"
+  ],
+  "WF-WP-Z05": [
+   "VE"
+  ],
+  "WF-WP-Z06": [
+   "IN",
+   "PK"
+  ],
+  "WF-WP-Z07": [
+   "BY",
+   "DK",
+   "EE",
+   "FI",
+   "LT",
+   "LV",
+   "NO",
+   "PL",
+   "RU",
+   "SE"
+  ],
+  "WF-WP-Z08": [
+   "PH",
+   "VN"
+  ],
+  "WF-WP-Z10": [
+   "IL",
+   "LB",
+   "PS"
+  ],
+  "WF-WP-Z11": [
+   "IR",
+   "YE"
+  ],
+  "WF-WP-Z12": [
+   "BF",
+   "ML",
+   "NE"
+  ],
+  "WF-WP-Z13": [
+   "SD"
+  ],
+  "WF-WP-Z14": [
+   "CD",
+   "RW"
+  ],
+  "WF-WP-Z15": [
+   "CU"
+  ],
+  "WF-WP-Z16": [
+   "MM"
+  ],
+  "WF-WP-Z18": [
+   "ER",
+   "ET"
+  ],
+  "WF-WP-Z19": [
+   "DJ",
+   "SO"
+  ]
+ },
+ "interests": [
+  {
+   "id": "WF-INT-1",
+   "programs": [
+    "cordon"
+   ],
+   "about": "US embassy posture in a zone country (authorized or ordered departure, suspended operations): a diplomatic warning step that news counts do not show",
+   "response_stage_prefix": [
+    "state_post_posture:"
+   ],
+   "fingerprint": [
+    "measures.posture"
+   ]
+  },
+  {
+   "id": "WF-INT-2",
+   "programs": [
+    "cordon"
+   ],
+   "about": "State Department travel advisory at level 3 or 4 for a zone country; a level change is a change",
+   "response_stage_prefix": [
+    "state_travel_advisory:"
+   ],
+   "where": [
+    {
+     "path": "measures.level",
+     "op": "gte",
+     "value": 3
+    }
+   ],
+   "fingerprint": [
+    "measures.level"
+   ]
+  },
+  {
+   "id": "WF-INT-3",
+   "programs": [
+    "cordon"
+   ],
+   "about": "EASA conflict-zone bulletin in force over a zone country's airspace",
+   "response_stage_prefix": [
+    "easa_czib:"
+   ]
+  },
+  {
+   "id": "WF-INT-4",
+   "programs": [
+    "cordon"
+   ],
+   "anywhere": true,
+   "about": "NGA navigational warnings on military activity, mines, launches, restricted areas or GNSS trouble. They carry geometry, not countries, so they are taken worldwide until the kit matches by area",
+   "where": [
+    {
+     "path": "measures.category",
+     "op": "in",
+     "value": [
+      "military",
+      "mines",
+      "launch",
+      "restricted_area",
+      "gnss"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "WF-INT-5",
+   "programs": [
+    "cordon"
+   ],
+   "anywhere": true,
+   "about": "NGA navigational warnings on cables, pipelines and underwater operations (Undersea Cables topic)",
+   "where": [
+    {
+     "path": "measures.category",
+     "op": "in",
+     "value": [
+      "cable_pipeline",
+      "underwater_ops"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "WF-INT-6",
+   "programs": [
+    "noisefloor"
+   ],
+   "anywhere": true,
+   "tiers": [
+    "anomaly"
+   ],
+   "about": "GPS interference areas Noisefloor flags as anomalies: worldwide for the GNSS topic, labelled with the zone when inside one"
+  },
+  {
+   "id": "WF-INT-7",
+   "programs": [
+    "elements"
+   ],
+   "about": "NASA FIRMS fire and heat detections in a zone country (strikes on energy sites, burning villages). Daily counts only, until Elements marks anomalies against its own baseline",
+   "where": [
+    {
+     "path": "measures.detections",
+     "op": "gte",
+     "value": 1
+    }
+   ]
+  },
+  {
+   "id": "WF-INT-8",
+   "programs": [
+    "elements"
+   ],
+   "tiers": [
+    "anomaly",
+    "warning"
+   ],
+   "about": "Natural-hazard anomalies in a zone country (GDACS, USGS, Copernicus EMS), which change the conflict's conditions and its coverage"
+  },
+  {
+   "id": "WF-INT-9",
+   "programs": [
+    "vigil"
+   ],
+   "tiers": [
+    "anomaly",
+    "warning"
+   ],
+   "about": "Cyber anomalies placed in a zone country"
+  },
+  {
+   "id": "WF-INT-10",
+   "programs": [
+    "verdict"
+   ],
+   "about": "Scheduled, resolvable events for a zone country (bulletin expiries, rule dates) from Verdict's calendar"
+  }
+ ]
+}
