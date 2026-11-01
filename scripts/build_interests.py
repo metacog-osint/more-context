@@ -1,0 +1,90 @@
+"""Write doctrine/interests.json: what Watchfloor reads from the suite's other programs instead of collecting it again
+(doctrine kit 0.4.0 tips; Tom, 1 Nov 2026). Run after changing a zone's countries or an interest below.
+
+    python -I scripts/build_interests.py            # write
+    python -I scripts/build_interests.py --check    # exit 1 if the file is out of date (tests run this)
+
+Areas are the zones' countries from catalog/entities.json, in ISO alpha-2 (the feed contract's codes) through
+catalog/fips_iso.json; each area is the zone's warning problem id (WF-WP-Z01 ...). Topics have no countries: their
+interests are worldwide ("anywhere").
+"""
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "doctrine" / "interests.json"
+
+INTERESTS = [
+    {"id": "WF-INT-1", "programs": ["cordon"],
+     "about": "US embassy posture in a zone country (authorized or ordered departure, suspended operations): a "
+              "diplomatic warning step that news counts do not show",
+     "response_stage_prefix": ["state_post_posture:"], "fingerprint": ["measures.posture"]},
+    {"id": "WF-INT-2", "programs": ["cordon"],
+     "about": "State Department travel advisory at level 3 or 4 for a zone country; a level change is a change",
+     "response_stage_prefix": ["state_travel_advisory:"],
+     "where": [{"path": "measures.level", "op": "gte", "value": 3}], "fingerprint": ["measures.level"]},
+    {"id": "WF-INT-3", "programs": ["cordon"],
+     "about": "EASA conflict-zone bulletin in force over a zone country's airspace",
+     "response_stage_prefix": ["easa_czib:"]},
+    {"id": "WF-INT-4", "programs": ["cordon"], "anywhere": True,
+     "about": "NGA navigational warnings on military activity, mines, launches, restricted areas or GNSS trouble. "
+              "They carry geometry, not countries, so they are taken worldwide until the kit matches by area",
+     "where": [{"path": "measures.category", "op": "in",
+                "value": ["military", "mines", "launch", "restricted_area", "gnss"]}]},
+    {"id": "WF-INT-5", "programs": ["cordon"], "anywhere": True,
+     "about": "NGA navigational warnings on cables, pipelines and underwater operations (Undersea Cables topic)",
+     "where": [{"path": "measures.category", "op": "in", "value": ["cable_pipeline", "underwater_ops"]}]},
+    {"id": "WF-INT-6", "programs": ["noisefloor"], "anywhere": True, "tiers": ["anomaly"],
+     "about": "GPS interference areas Noisefloor flags as anomalies: worldwide for the GNSS topic, labelled with the "
+              "zone when inside one"},
+    {"id": "WF-INT-7", "programs": ["elements"],
+     "about": "NASA FIRMS fire and heat detections in a zone country (strikes on energy sites, burning villages). "
+              "Daily counts only, until Elements marks anomalies against its own baseline",
+     "where": [{"path": "measures.detections", "op": "gte", "value": 1}]},
+    {"id": "WF-INT-8", "programs": ["elements"], "tiers": ["anomaly", "warning"],
+     "about": "Natural-hazard anomalies in a zone country (GDACS, USGS, Copernicus EMS), which change the conflict's "
+              "conditions and its coverage"},
+    {"id": "WF-INT-9", "programs": ["vigil"], "tiers": ["anomaly", "warning"],
+     "about": "Cyber anomalies placed in a zone country"},
+    {"id": "WF-INT-10", "programs": ["verdict"],
+     "about": "Scheduled, resolvable events for a zone country (bulletin expiries, rule dates) from Verdict's calendar"},
+]
+
+
+def areas() -> dict[str, list[str]]:
+    zones = json.loads((ROOT / "catalog" / "entities.json").read_text(encoding="utf-8"))["zones"]
+    codes = json.loads((ROOT / "catalog" / "fips_iso.json").read_text(encoding="utf-8"))["codes"]
+    out = {}
+    for z in zones:
+        iso = sorted({codes[c]["iso"] for c in z.get("countries", []) if codes.get(c, {}).get("iso")})
+        if iso:
+            out[f"WF-WP-Z{z['id'][:2]}"] = iso
+    return dict(sorted(out.items()))
+
+
+def build() -> str:
+    doc = {"program": "watchfloor",
+           "note": "Written by scripts/build_interests.py; edit the script, not this file. What Watchfloor reads from "
+                   "the suite's other programs instead of collecting it again (doctrine kit tips.py). Areas are the "
+                   "zones' countries in ISO alpha-2, keyed by each zone's warning problem.",
+           "areas": areas(), "interests": INTERESTS}
+    return json.dumps(doc, ensure_ascii=False, indent=1) + "\n"
+
+
+def main() -> int:
+    text = build()
+    if "--check" in sys.argv:
+        current = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
+        if current.replace("\r\n", "\n") != text:
+            print("doctrine/interests.json is out of date: run python -I scripts/build_interests.py")
+            return 1
+        print("doctrine/interests.json is current")
+        return 0
+    OUT.write_text(text, encoding="utf-8", newline="\n")
+    print(f"wrote {OUT.relative_to(ROOT)}: {len(json.loads(text)['areas'])} areas, {len(INTERESTS)} interests")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

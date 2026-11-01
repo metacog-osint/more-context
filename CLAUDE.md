@@ -37,6 +37,17 @@ the repo `more-context`, functions `mc-ingest` / `mc-api`, bucket `more-context-
   `/summary` and `/countries` (`pipeline/feed_v2.py`; no new storage writes). Every item is an observation; an item
   that fails the kit's linter is left out and listed in `dropped`. Countries are ISO alpha-2 through
   `catalog/fips_iso.json` (GDELT's FIPS codes; built by `scripts/build_fips_iso.py` from Natural Earth 1:50m).
+- **Tips from the other programs (kit 0.4.0, 1 Nov 2026; Tom: "don't recreate these datasets when you can leverage
+  them from the other programs").** Before adding a collector, check `doctrine/kit/vocab/programs.json` (the suite
+  registry: who owns which dataset). Travel advisories, embassy posture, EASA bulletins and NGA warnings belong to
+  Cordon; fires (FIRMS), quakes and GDACS to Elements; GPS interference to Noisefloor; cyber to Vigil; dated events to
+  Verdict; outages, ships, flights, launches, statements, attention and sanctions to planned programs. Watchfloor
+  owns the news layer (GDELT raw files, feeds, Google News searches, Telegram).
+  `doctrine/interests.json` (written by `scripts/build_interests.py`; edit the script) lists what Watchfloor wants:
+  areas are the zones' countries in ISO, keyed by warning problem; 10 interests (WF-INT-1..10).
+  `python doctrine/kit/tic.py tips doctrine` runs them against COP's bus plus Verdict's calendar: 121 tips from 880
+  items on 1 Nov 2026. Not yet used by the pipeline or the site (next: a "From the suite" panel and indicators).
+  NGA warnings have geometry, not countries, so they are taken worldwide until the kit matches by area.
 
 ## What it does
 Turns GDELT articles into stories (reprints grouped), codes each story with Gemini, tracks warning
