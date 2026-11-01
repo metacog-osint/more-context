@@ -1,6 +1,6 @@
 {
  "program": "watchfloor",
- "note": "Written by scripts/build_interests.py; edit the script, not this file. What Watchfloor reads from the suite's other programs instead of collecting it again (doctrine kit tips.py). Areas are the zones' countries in ISO alpha-2, keyed by each zone's warning problem.",
+ "note": "Written by scripts/build_interests.py; edit the script, not this file. What Watchfloor reads from the suite's other programs instead of collecting it again (doctrine kit tips.py). Areas are the zones' countries in ISO alpha-2, keyed by each zone's warning problem; warning_problems names the topics an interest serves, since topics have no countries.",
  "areas": {
   "WF-WP-Z01": [
    "UA"
@@ -121,7 +121,7 @@
     "cordon"
    ],
    "anywhere": true,
-   "about": "NGA navigational warnings on military activity, mines, launches, restricted areas or GNSS trouble. They carry geometry, not countries, so they are taken worldwide until the kit matches by area",
+   "about": "NGA navigational warnings on military activity, mines, launches or restricted areas. They carry geometry, not countries, so they are not placed in a zone until the kit matches by area",
    "where": [
     {
      "path": "measures.category",
@@ -130,8 +130,7 @@
       "military",
       "mines",
       "launch",
-      "restricted_area",
-      "gnss"
+      "restricted_area"
      ]
     }
    ]
@@ -142,7 +141,10 @@
     "cordon"
    ],
    "anywhere": true,
-   "about": "NGA navigational warnings on cables, pipelines and underwater operations (Undersea Cables topic)",
+   "warning_problems": [
+    "WF-WP-T3"
+   ],
+   "about": "NGA navigational warnings on cables, pipelines and underwater operations",
    "where": [
     {
      "path": "measures.category",
@@ -163,7 +165,10 @@
    "tiers": [
     "anomaly"
    ],
-   "about": "GPS interference areas Noisefloor flags as anomalies: worldwide for the GNSS topic, labelled with the zone when inside one"
+   "warning_problems": [
+    "WF-WP-T4"
+   ],
+   "about": "GPS interference areas Noisefloor flags as anomalies, worldwide; shown on a zone too when inside it"
   },
   {
    "id": "WF-INT-7",
@@ -207,6 +212,24 @@
     "verdict"
    ],
    "about": "Scheduled, resolvable events for a zone country (bulletin expiries, rule dates) from Verdict's calendar"
+  },
+  {
+   "id": "WF-INT-11",
+   "programs": [
+    "cordon"
+   ],
+   "anywhere": true,
+   "warning_problems": [
+    "WF-WP-T4"
+   ],
+   "about": "NGA navigational warnings about GNSS trouble, worldwide",
+   "where": [
+    {
+     "path": "measures.category",
+     "op": "eq",
+     "value": "gnss"
+    }
+   ]
   }
  ]
 }

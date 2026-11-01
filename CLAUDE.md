@@ -46,8 +46,15 @@ the repo `more-context`, functions `mc-ingest` / `mc-api`, bucket `more-context-
   `doctrine/interests.json` (written by `scripts/build_interests.py`; edit the script) lists what Watchfloor wants:
   areas are the zones' countries in ISO, keyed by warning problem; 10 interests (WF-INT-1..10).
   `python doctrine/kit/tic.py tips doctrine` runs them against COP's bus plus Verdict's calendar: 121 tips from 880
-  items on 1 Nov 2026. Not yet used by the pipeline or the site (next: a "From the suite" panel and indicators).
-  NGA warnings have geometry, not countries, so they are taken worldwide until the kit matches by area.
+  items on 1 Nov 2026. NGA warnings have geometry, not countries, so they are taken worldwide until the kit matches
+  by area; WF-INT-4 (military, mines, launches) is not placed anywhere until then.
+- **"From the suite" panel** (1 Nov 2026): `GET /suite?entity=<id>` (`pipeline/suite.py`) gathers and matches the
+  interests at most every 30 minutes per instance (5 after a failed source), then picks a zone's tips by area and a
+  topic's by `warning_problems` (topics have no countries). Anomalies first, then standing items newest first, at most
+  12 per program. Sources that could not be read are named in `missing` and shown as missing, never quiet; a stale
+  producer's items draw grey. The zone page loads the panel after the stories, so a slow feed never holds them up.
+  Nothing from the panel is counted in Watchfloor's measures. Live on 1 Nov: 921 items, 122 tips; Sudan 5 (5,947
+  FIRMS detections in 24 h, EASA bulletin, Level 4, embassy suspended), Myanmar 2, Russia-NATO 10, T3 37, T4 12.
 
 ## What it does
 Turns GDELT articles into stories (reprints grouped), codes each story with Gemini, tracks warning

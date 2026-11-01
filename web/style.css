@@ -58,6 +58,7 @@ tr.alarm td { background: var(--alarm-soft); }
 .stories { list-style: none; margin: 0; padding: 0; }
 .story { padding: 14px 16px; border-bottom: 1px solid var(--line); }
 .story:last-child { border-bottom: 0; }
+.story.stale { opacity: .55; }
 .story-title { font-weight: 600; text-decoration: none; }
 .story-title:hover { text-decoration: underline; }
 .meta { color: var(--muted); font-size: 13px; margin-top: 3px; }

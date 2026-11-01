@@ -14,6 +14,9 @@
                                          violent events placed in a zone's countries (or one country), for the map
     GET  /feed?day=<date>                one built day in feed contract v2 (tic-feed/2, GeoJSON) for COP and other
                                          programs, from the same data as /summary and /countries (pipeline/feed_v2.py)
+    GET  /suite?entity=<id>              what the suite's other programs report now for a zone or topic (Cordon,
+                                         Noisefloor, Elements, Vigil, Verdict), linked to them, never counted here
+                                         (pipeline/suite.py; doctrine kit tips)
 
 Anyone may call it (Tom, 26 Oct 2026). Spending is bounded by the ledger (pipeline/budget.py): $5 a month,
 on-view work at most $0.50 a day and never the last $1 (kept for alarms). A request codes at most 25 stories
@@ -296,6 +299,10 @@ def handle(method: str, path: str, params: dict, body: dict | None, sink, *, ai_
                 _CACHE.pop(f"summary:{d}", None)  # country counts land seconds after the stories
             ctry = _cached(f"countries:{d}", 3600, lambda: _countries(sink, d))
             return 200, feed_v2.build(summary, ctry, catalog=catalog)
+        if method == "GET" and path == "/suite":
+            from . import suite  # imported here so a doctrine-kit or network problem can only affect this route
+            eid = _entity(params.get("entity"), catalog)
+            return 200, suite.for_entity(eid, suite.snapshot())
         return 404, {"error": "not found"}
     except BadRequest as e:
         return 400, {"error": str(e)}

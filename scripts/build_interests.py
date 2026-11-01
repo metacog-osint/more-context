@@ -6,7 +6,8 @@
 
 Areas are the zones' countries from catalog/entities.json, in ISO alpha-2 (the feed contract's codes) through
 catalog/fips_iso.json; each area is the zone's warning problem id (WF-WP-Z01 ...). Topics have no countries: their
-interests are worldwide ("anywhere").
+interests are worldwide ("anywhere") and name the topic in `warning_problems`, which the zone page's "From the suite"
+panel reads (pipeline/suite.py).
 """
 import json
 import sys
@@ -28,16 +29,15 @@ INTERESTS = [
      "about": "EASA conflict-zone bulletin in force over a zone country's airspace",
      "response_stage_prefix": ["easa_czib:"]},
     {"id": "WF-INT-4", "programs": ["cordon"], "anywhere": True,
-     "about": "NGA navigational warnings on military activity, mines, launches, restricted areas or GNSS trouble. "
-              "They carry geometry, not countries, so they are taken worldwide until the kit matches by area",
-     "where": [{"path": "measures.category", "op": "in",
-                "value": ["military", "mines", "launch", "restricted_area", "gnss"]}]},
-    {"id": "WF-INT-5", "programs": ["cordon"], "anywhere": True,
-     "about": "NGA navigational warnings on cables, pipelines and underwater operations (Undersea Cables topic)",
+     "about": "NGA navigational warnings on military activity, mines, launches or restricted areas. They carry "
+              "geometry, not countries, so they are not placed in a zone until the kit matches by area",
+     "where": [{"path": "measures.category", "op": "in", "value": ["military", "mines", "launch", "restricted_area"]}]},
+    {"id": "WF-INT-5", "programs": ["cordon"], "anywhere": True, "warning_problems": ["WF-WP-T3"],
+     "about": "NGA navigational warnings on cables, pipelines and underwater operations",
      "where": [{"path": "measures.category", "op": "in", "value": ["cable_pipeline", "underwater_ops"]}]},
     {"id": "WF-INT-6", "programs": ["noisefloor"], "anywhere": True, "tiers": ["anomaly"],
-     "about": "GPS interference areas Noisefloor flags as anomalies: worldwide for the GNSS topic, labelled with the "
-              "zone when inside one"},
+     "warning_problems": ["WF-WP-T4"],
+     "about": "GPS interference areas Noisefloor flags as anomalies, worldwide; shown on a zone too when inside it"},
     {"id": "WF-INT-7", "programs": ["elements"],
      "about": "NASA FIRMS fire and heat detections in a zone country (strikes on energy sites, burning villages). "
               "Daily counts only, until Elements marks anomalies against its own baseline",
@@ -49,6 +49,9 @@ INTERESTS = [
      "about": "Cyber anomalies placed in a zone country"},
     {"id": "WF-INT-10", "programs": ["verdict"],
      "about": "Scheduled, resolvable events for a zone country (bulletin expiries, rule dates) from Verdict's calendar"},
+    {"id": "WF-INT-11", "programs": ["cordon"], "anywhere": True, "warning_problems": ["WF-WP-T4"],
+     "about": "NGA navigational warnings about GNSS trouble, worldwide",
+     "where": [{"path": "measures.category", "op": "eq", "value": "gnss"}]},
 ]
 
 
@@ -67,7 +70,8 @@ def build() -> str:
     doc = {"program": "watchfloor",
            "note": "Written by scripts/build_interests.py; edit the script, not this file. What Watchfloor reads from "
                    "the suite's other programs instead of collecting it again (doctrine kit tips.py). Areas are the "
-                   "zones' countries in ISO alpha-2, keyed by each zone's warning problem.",
+                   "zones' countries in ISO alpha-2, keyed by each zone's warning problem; warning_problems names the "
+                   "topics an interest serves, since topics have no countries.",
            "areas": areas(), "interests": INTERESTS}
     return json.dumps(doc, ensure_ascii=False, indent=1) + "\n"
 
