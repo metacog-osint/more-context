@@ -1,6 +1,6 @@
 {
  "program": "watchfloor",
- "note": "Written by scripts/build_interests.py; edit the script, not this file. What Watchfloor reads from the suite's other programs instead of collecting it again (doctrine kit tips.py). Areas are the zones' countries in ISO alpha-2, keyed by each zone's warning problem; warning_problems names the topics an interest serves, since topics have no countries.",
+ "note": "Written by scripts/build_interests.py; edit the script, not this file. What Watchfloor reads from the suite's other programs instead of collecting it again (doctrine kit tips.py). Areas are the zones' countries in ISO alpha-2, keyed by each zone's warning problem; boxes add adjacent sea areas [west, south, east, north] for items placed by geometry; warning_problems names the topics an interest serves, since topics have no countries.",
  "areas": {
   "WF-WP-Z01": [
    "UA"
@@ -71,6 +71,90 @@
    "SO"
   ]
  },
+ "boxes": {
+  "WF-WP-Z01": [
+   27.5,
+   43.0,
+   40.0,
+   47.5
+  ],
+  "WF-WP-Z02": [
+   117.0,
+   21.0,
+   123.5,
+   26.5
+  ],
+  "WF-WP-Z03": [
+   123.5,
+   33.0,
+   132.5,
+   43.0
+  ],
+  "WF-WP-Z05": [
+   -73.5,
+   8.5,
+   -58.0,
+   13.5
+  ],
+  "WF-WP-Z06": [
+   66.0,
+   22.0,
+   78.0,
+   36.0
+  ],
+  "WF-WP-Z07": [
+   [
+    10.0,
+    53.5,
+    30.5,
+    66.0
+   ],
+   [
+    15.0,
+    68.0,
+    45.0,
+    76.0
+   ]
+  ],
+  "WF-WP-Z08": [
+   105.0,
+   4.0,
+   121.0,
+   21.0
+  ],
+  "WF-WP-Z10": [
+   33.5,
+   31.0,
+   36.0,
+   34.7
+  ],
+  "WF-WP-Z11": [
+   [
+    32.0,
+    11.0,
+    51.5,
+    30.0
+   ],
+   [
+    47.5,
+    23.5,
+    60.0,
+    30.5
+   ]
+  ],
+  "WF-WP-Z15": [
+   -85.5,
+   19.5,
+   -74.0,
+   24.5
+  ],
+  "WF-WP-Z19": [
+   41.0,
+   -2.0,
+   54.0,
+   13.5
+  ]
+ },
  "interests": [
   {
    "id": "WF-INT-1",
@@ -121,7 +205,7 @@
     "cordon"
    ],
    "anywhere": true,
-   "about": "NGA navigational warnings on military activity, mines, launches or restricted areas. They carry geometry, not countries, so they are not placed in a zone until the kit matches by area",
+   "about": "NGA navigational warnings on military activity, mines, launches or restricted areas, placed in a zone when their geometry falls inside a zone country or maritime theatre box",
    "where": [
     {
      "path": "measures.category",

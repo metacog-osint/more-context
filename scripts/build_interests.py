@@ -1,13 +1,14 @@
 """Write doctrine/interests.json: what Watchfloor reads from the suite's other programs instead of collecting it again
-(doctrine kit 0.4.0 tips; Tom, 1 Nov 2026). Run after changing a zone's countries or an interest below.
+(doctrine kit 0.4.1 tips; Tom, 1 Nov 2026). Run after changing a zone's countries, boxes or an interest below.
 
     python -I scripts/build_interests.py            # write
     python -I scripts/build_interests.py --check    # exit 1 if the file is out of date (tests run this)
 
 Areas are the zones' countries from catalog/entities.json, in ISO alpha-2 (the feed contract's codes) through
-catalog/fips_iso.json; each area is the zone's warning problem id (WF-WP-Z01 ...). Topics have no countries: their
-interests are worldwide ("anywhere") and name the topic in `warning_problems`, which the zone page's "From the suite"
-panel reads (pipeline/suite.py).
+catalog/fips_iso.json; each area is the zone's warning problem id (WF-WP-Z01 ...). Boxes add adjacent sea areas
+[west, south, east, north] for items placed by geometry (such as NGA navigational warnings). Topics have no countries:
+their interests are worldwide ("anywhere") and name the topic in `warning_problems`, which the zone page's
+"From the suite" panel reads (pipeline/suite.py).
 """
 import json
 import sys
@@ -29,8 +30,8 @@ INTERESTS = [
      "about": "EASA conflict-zone bulletin in force over a zone country's airspace",
      "response_stage_prefix": ["easa_czib:"]},
     {"id": "WF-INT-4", "programs": ["cordon"], "anywhere": True,
-     "about": "NGA navigational warnings on military activity, mines, launches or restricted areas. They carry "
-              "geometry, not countries, so they are not placed in a zone until the kit matches by area",
+     "about": "NGA navigational warnings on military activity, mines, launches or restricted areas, placed in a zone "
+              "when their geometry falls inside a zone country or maritime theatre box",
      "where": [{"path": "measures.category", "op": "in", "value": ["military", "mines", "launch", "restricted_area"]}]},
     {"id": "WF-INT-5", "programs": ["cordon"], "anywhere": True, "warning_problems": ["WF-WP-T3"],
      "about": "NGA navigational warnings on cables, pipelines and underwater operations",
@@ -54,6 +55,22 @@ INTERESTS = [
      "where": [{"path": "measures.category", "op": "eq", "value": "gnss"}]},
 ]
 
+# Maritime and adjacent-water boxes [west, south, east, north] for zones where navigational warnings, jamming or
+# offshore events happen at sea outside any land polygon.
+BOXES = {
+    "WF-WP-Z01": [27.5, 43.0, 40.0, 47.5],                                       # Black Sea and Sea of Azov
+    "WF-WP-Z02": [117.0, 21.0, 123.5, 26.5],                                     # Taiwan Strait and approaches
+    "WF-WP-Z03": [123.5, 33.0, 132.5, 43.0],                                     # Yellow Sea and East Sea around Korea
+    "WF-WP-Z05": [-73.5, 8.5, -58.0, 13.5],                                      # Venezuelan Caribbean and Essequibo coast
+    "WF-WP-Z06": [66.0, 22.0, 78.0, 36.0],                                       # Northern Arabian Sea and Kashmir/LoC
+    "WF-WP-Z07": [[10.0, 53.5, 30.5, 66.0], [15.0, 68.0, 45.0, 76.0]],           # Baltic Sea and Barents Sea
+    "WF-WP-Z08": [105.0, 4.0, 121.0, 21.0],                                      # South China Sea
+    "WF-WP-Z10": [33.5, 31.0, 36.0, 34.7],                                       # Eastern Mediterranean Levant coast
+    "WF-WP-Z11": [[32.0, 11.0, 51.5, 30.0], [47.5, 23.5, 60.0, 30.5]],           # Red Sea, Gulf of Aden, Persian Gulf, Hormuz
+    "WF-WP-Z15": [-85.5, 19.5, -74.0, 24.5],                                     # Cuban waters and Florida Straits
+    "WF-WP-Z19": [41.0, -2.0, 54.0, 13.5],                                       # Gulf of Aden and Somali coast
+}
+
 
 def areas() -> dict[str, list[str]]:
     zones = json.loads((ROOT / "catalog" / "entities.json").read_text(encoding="utf-8"))["zones"]
@@ -67,12 +84,14 @@ def areas() -> dict[str, list[str]]:
 
 
 def build() -> str:
+    a = areas()
     doc = {"program": "watchfloor",
            "note": "Written by scripts/build_interests.py; edit the script, not this file. What Watchfloor reads from "
                    "the suite's other programs instead of collecting it again (doctrine kit tips.py). Areas are the "
-                   "zones' countries in ISO alpha-2, keyed by each zone's warning problem; warning_problems names the "
+                   "zones' countries in ISO alpha-2, keyed by each zone's warning problem; boxes add adjacent sea "
+                   "areas [west, south, east, north] for items placed by geometry; warning_problems names the "
                    "topics an interest serves, since topics have no countries.",
-           "areas": areas(), "interests": INTERESTS}
+           "areas": a, "boxes": {k: v for k, v in sorted(BOXES.items()) if k in a}, "interests": INTERESTS}
     return json.dumps(doc, ensure_ascii=False, indent=1) + "\n"
 
 
