@@ -14,4 +14,4 @@ __pycache__/
 .gcloudignore
 firebase.json
 .firebaserc
-doctrine/kit/geo/
+# doctrine/kit/geo/ ships: since kit 0.4.1 (6f3a63d) the API's /suite places items by geometry with geo/countries.json.
