@@ -11,6 +11,13 @@ the repo `more-context`, functions `mc-ingest` / `mc-api`, bucket `more-context-
 
 **Plan (read first):** https://claude.ai/artifact/ShyAN6L2qhb6MBiq5284kk ("Watchfloor: Build Plan").
 
+**Current state (read next):** [`HANDOFF.md`](./HANDOFF.md), the 4 Nov 2026 handoff: live state, the parked
+`wip/2026-11-01-unreviewed` branch, decisions waiting on Tom and next steps.
+
+Dated measurements, incidents and test results (the 29-31 Oct cost audit, the feed and coverage audits, the 28 Oct
+memory incident, first runs and deploys) and the fuller notes on each mechanism are in [`HISTORY.md`](./HISTORY.md),
+moved there verbatim on 6 Nov 2026. It isn't auto-loaded; read the matching section before changing a mechanism.
+
 ## Website (deployed 27 Oct 2026, approved by Tom)
 - https://watchfloor.web.app: Firebase Hosting site `watchfloor` in project context-484804 (free tier: 10 GB stored,
   360 MB/day transfer). Static files in `web/` (no build tool, no dependencies; `web/app.js` inserts API text as
@@ -45,16 +52,17 @@ the repo `more-context`, functions `mc-ingest` / `mc-api`, bucket `more-context-
   owns the news layer (GDELT raw files, feeds, Google News searches, Telegram).
   `doctrine/interests.json` (written by `scripts/build_interests.py`; edit the script) lists what Watchfloor wants:
   areas are the zones' countries in ISO, keyed by warning problem; 10 interests (WF-INT-1..10).
-  `python doctrine/kit/tic.py tips doctrine` runs them against COP's bus plus Verdict's calendar: 121 tips from 880
-  items on 1 Nov 2026. NGA warnings have geometry, not countries, so they are taken worldwide until the kit matches
-  by area; WF-INT-4 (military, mines, launches) is not placed anywhere until then.
+  `python doctrine/kit/tic.py tips doctrine` runs them against COP's bus plus Verdict's calendar. Items placed only
+  by geometry, such as NGA navigational warnings, land in a zone through eleven sea-area `boxes` ([west, south, east,
+  north]: Black Sea and Azov, Taiwan Strait, Red Sea / Gulf of Aden / Hormuz and others) in `scripts/build_interests.py`
+  (kit 0.4.1, `6f3a63d`, 4 Nov 2026: 13 of 48 NGA warnings placed). Run the script after changing a zone's countries,
+  boxes or an interest. The live panel uses the boxes only after an mc-api deploy (Tom's yes; waiting as of 4 Nov).
 - **"From the suite" panel** (1 Nov 2026): `GET /suite?entity=<id>` (`pipeline/suite.py`) gathers and matches the
   interests at most every 30 minutes per instance (5 after a failed source), then picks a zone's tips by area and a
   topic's by `warning_problems` (topics have no countries). Anomalies first, then standing items newest first, at most
   12 per program. Sources that could not be read are named in `missing` and shown as missing, never quiet; a stale
   producer's items draw grey. The zone page loads the panel after the stories, so a slow feed never holds them up.
-  Nothing from the panel is counted in Watchfloor's measures. Live on 1 Nov: 921 items, 122 tips; Sudan 5 (5,947
-  FIRMS detections in 24 h, EASA bulletin, Level 4, embassy suspended), Myanmar 2, Russia-NATO 10, T3 37, T4 12.
+  Nothing from the panel is counted in Watchfloor's measures.
 
 ## What it does
 Turns GDELT articles into stories (reprints grouped), codes each story with Gemini, tracks warning
@@ -69,97 +77,52 @@ Serves warning (did something change?) and awareness (what is the picture, how i
 - No secrets in files. Keys live in Secret Manager or GitHub secrets; Tom sets them.
 - One scheduler per job, defined in this repo. v4.3 once ran a duplicate Scheduler job for months.
 
-## Cost audit (29 Oct 2026; Tom: no paid usage, lose nothing, keep a historical record)
+## Costs and storage (Tom, 29 Oct 2026: no paid usage, lose nothing, keep a historical record)
+Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
 - Free tiers are per **billing account** (019D1C-D7ADF2-989261: context-484804, geo-context, listening-post-app,
   morning-brief-tic), not per project: Cloud Storage 5 GB-months in us-central1/us-east1/us-west1, 5,000 Class A
   (writes, lists) and 50,000 Class B (reads) a month, 100 GB egress; BigQuery 1 TiB scanned a month; Scheduler
   3 jobs (paused jobs still count, $0.10/job/month after); Cloud Run 2M requests, 180,000 vCPU-s, 360,000 GiB-s,
   1 GB egress. Verified on Google's pages 28 Oct 2026. Soft-deleted objects are billed like live ones.
-- Bucket `more-context-484804` (soft delete 7 days): 1,002 MiB live + 840 MiB soft-deleted. 633 MiB of that was
-  the history re-uploads (expires by ~4 Nov). `state/state.json` (99% per-feed "seen" link lists, capped at 1,000
-  links a feed, most not yet full) is written twice a run, 8 copies an hour kept a week: 1.9 GB held at today's
-  1.45 MB, ~15 GB once the lists fill (~11 MB). Biggest risk to the free tier.
-- **State fix (29 Oct 2026, `pipeline/health.py`, `cycle.py`):** feeds remember 8-character fingerprints
-  (`seen_fp`), not links, in the order items were last listed, sized per feed (3 x the most items it has returned,
-  200-2,000; `max_items`). Last-listed order matters: feeds keep sticky items for months (tribune_pk one 238 days
-  old, jpost 49), and trimming by first sighting would have dropped 30 of 4,100 listed items on the first run.
-  Old `seen` lists are converted untrimmed (`upgrade_seen`); each feed's next fetch trims its own. State is written
-  once a run, twice only when a day build or pending Vertex alarms follow. Checked on the 29 Oct state copy with a
-  live poll of all feeds: 0 listed items forgotten; 1.98 MB -> 173 KB (~276 KB once every list is full); a week of
-  old copies 2.66 GB -> ~0.12 GB (~0.19 GB full). A forgotten link seen again costs one cycle row, never a double
-  count: the build keeps one copy per source and link and skips rows dated before its day, and none of ~98,000
-  feed rows read 26-29 Oct lacked a date.
-- Writes counted from code: ~4 Class A a run (cycle, events, state x2) x 2,880 runs = ~11,500 a month, over the
-  5,000 free (~$0.03/month). After the state fix, 3 a run (~8,600 a month).
-- **Events merged into the cycle file (30 Oct 2026):** the Events records are `"kind": "events"` rows in the run's
-  cycle file (`events.as_row`, `kind` first so `read_lines(key, events.ROW_PREFIX)` skips article lines unparsed);
-  `countries.day_records` reads them there and in old `events/` files (backfills still write there), once per
-  stamp and stream; the story build skips them. 2 writes a run: ~5,850 a month, plus the daily build (~15 a day)
-  and the API's lists of `stories/` (`/days`, `/countries`; 5-minute cache; 216 requests 26-29 Oct, ~10-30 lists
-  a day): ~6,600-7,200 a month, still over. Levers were a 30-minute interval (~4,000), 20 minutes (~5,400), or
-  the state in Firestore at 15 minutes (~4,000). Tom chose Firestore (30 Oct 2026).
-- **State in Firestore (`pipeline/statestore.py`, `MC_STATE=firestore` on both functions):** document
-  `mc_state/ingest` in the `(default)` database (Native, nam5, shared with v4.3; free 20,000 writes and 50,000
-  reads a day), gzip JSON in a bytes field over the REST API (no new library; `google-auth` and `requests` come
-  with the storage client). 95 KB compressed on 29 Oct, ~140 KB when every list is full, against 1 MiB a
-  document; bigger states split across `mc_state/ingest.1`, ... in one atomic commit. A missing document falls
-  back to the bucket's `state/state.json` (the switch), which the build run rewrites once a day as a backup; any
-  other Firestore error stops the run. Live round trip as Tom's gcloud user, 30 Oct 2026, on
-  `mc_state/roundtrip-test` (left in place): identical in one document and in three, under 1 s each way. The
-  service account (`mc-ingest@`, which both functions run as) needs `roles/datastore.user`, which also reaches
-  v4.3's collections. Bucket Class A after the switch: ~2,900 a run-month + ~450 build + API lists.
-  Live 30 Oct 2026 15:00 UTC (`mc-ingest-00016-lit`, `mc-api-00008-vix`, role granted by Tom the same morning):
-  the 15:05 run read the bucket copy, wrote `mc_state/ingest` (one part, 104,536 gzip bytes) and only its cycle
-  file to the bucket; `state/state.json` stayed at the 14:50 version until the next build run.
-  Back to the bucket: redeploy without `MC_STATE` (the state then restarts from the last daily backup: one
-  two-hour GDELT re-read and a day of repeat feed rows, which the build drops).
-- **Feed rates (27 and 29 Oct, each feed's first poll and post-outage runs left out):** busiest 15 minutes used at
-  most 37 of TASS-ru's 100 listed items; busiest 30 minutes would have used 16 of 20 for `tg_kpszsu` (Air Force
-  Telegram, 27 Oct) and 72 of 100 for `tass_ru`. A 30-minute poll risks dropping items on heavy strike nights;
-  15 minutes has 2.5x headroom. Batch publishers (Taipei Times, CGTN) post a whole list at once at any interval.
-- **Storage growth and gzip (30 Oct 2026):** measured that day: 1.1 GiB live (`cycles/` 576 MiB in 516 objects,
-  `stories/` 541 MiB in 250 back to July, `events/` 11 MiB, `state/` and `codings/` under 1 MiB), growing ~60 MiB
-  a day of cycle files + ~19 MiB of stories (~80 MiB a day): past the 5 GB free tier around mid-December. The bucket
-  sink now gzips every object it writes (`Content-Encoding: gzip`, `pipeline/sinks.py`); the 29 Oct cycle files
-  went 54.7 -> 11.9 MiB (4.6x), so ~17 MiB a day, into mid-2027 on 5 GB. Reads take gzip or plain (told apart by
-  gzip's first two bytes); keys and text are unchanged; local folders stay plain. `gcloud storage cp` unzips on
-  download, `gcloud storage cat` prints the raw gzip. Live check with google-cloud-storage 3.17.1 on
-  `_test/gzip-check.jsonl` (left in place). `scripts/recompress.py` converts plain objects in place (one Class A
-  write each, conditional on generation, checked lossless; dry run by default): 766 in `cycles/` and `stories/` on
-  30 Oct. Past 5 GB anyway, the free path is moving older files to Tom's own storage.
-  Live 31 Oct 2026 18:24 UTC (`mc-ingest-00017-wuc`, `mc-api-00009-now`): the first gzip cycle file, 18:35
-  (`183519.jsonl`), was 98,497 bytes for 293 rows against ~560-600 KB for the plain ones before it. The same day
-  `recompress.py` converted 858 plain objects, 1,175.8 -> 254.8 MiB, none skipped (October's account-wide Class
-  A: 2,690 before, ~3,560 after); the 85 converted 29 Oct cycle files unzip byte-identical to plain copies taken
-  on 29 Oct. Bucket 266 MiB live after (the plain copies sit in soft delete until ~7 Nov). That deploy was built
-  from af29a90 plus the new `pipeline/sinks.py`, not from main, so `/feed` (93a87bf) is still undeployed: the
-  next deploy from main ships it.
-- Class A measured in Cloud Monitoring (`storage.googleapis.com/api/request_count` by method, a free read): 2,545
-  in October to 30 Oct 20:27 UTC (backfill and analysis days 27-29 Oct included); 32 lists in the 24 hours to
-  30 Oct 20:00 UTC. Use hourly alignment: one window as long as the query mis-buckets (it reported 285 lists).
-- Every build read is bounded (one day of files + 28 or 90 daily summaries); no BigQuery anywhere in Watchfloor.
-- Same account: old GEO CONTEXT v4.0 in project `geo-context` (job `generate-watchcon-data`, 3 runs a day, deployed
-  16 Jan 2026) still scans ~350 GiB of BigQuery a month and nothing reads its output; October was at 962 of 1,024
-  free GiB on 29 Oct. Paused 29 Oct 2026 14:39 UTC on Tom's yes (a paused job still counts as one of the 3 free
-  Scheduler jobs; deleting it is Tom's). Scheduler has 6 jobs on the account (3 free).
+- **State lives in Firestore** (Tom's choice, 30 Oct 2026, to keep bucket Class A writes under the free 5,000):
+  `pipeline/statestore.py`, `MC_STATE=firestore` on both functions, document `mc_state/ingest` (gzip JSON, ~100 KB;
+  larger states split into `mc_state/ingest.1`, ... in one commit) in the `(default)` database shared with v4.3 (free
+  20,000 writes and 50,000 reads a day). A missing document falls back to the bucket's `state/state.json`, rewritten
+  daily as a backup; any other Firestore error stops the run. `mc-ingest@` needs `roles/datastore.user`, which also
+  reaches v4.3's collections. Back to the bucket: redeploy without `MC_STATE` (the state restarts from the last daily
+  backup: one two-hour GDELT re-read and a day of repeat feed rows, which the build drops).
+- Feeds remember 8-character fingerprints (`seen_fp`) in last-listed order, sized per feed (`max_items`); a forgotten
+  link seen again costs one cycle row, never a double count.
+- Events records ride in each run's cycle file as `"kind": "events"` rows (older ones, and backfills, in `events/`);
+  the story build skips them.
+- The bucket (soft delete 7 days) gzips every object it writes (`pipeline/sinks.py`; ~17 MiB a day, so 5 GB lasts
+  into mid-2027). Reads take gzip or plain; local folders stay plain. `gcloud storage cp` unzips, `gcloud storage
+  cat` prints raw gzip.
+  `scripts/recompress.py` converts plain objects (dry run by default). Past 5 GB, the free path is moving older files
+  to Tom's own storage.
+- Poll every 15 minutes: 30 risks dropping items from the busiest feeds (TASS-ru, the Air Force Telegram) on heavy
+  strike nights.
+- Count Class A in Cloud Monitoring (`storage.googleapis.com/api/request_count` by method, a free read) with hourly
+  alignment. Every build read is bounded; no BigQuery anywhere in Watchfloor.
+- Same account: GEO CONTEXT v4.0's job `generate-watchcon-data` (project `geo-context`) was paused 29 Oct 2026 on
+  Tom's yes; deleting it is Tom's. Scheduler has 6 jobs on the account (3 free).
 - Windows: use `python`, not `python3`; run downloaded-data tooling with `python -I`.
 - Current-situation research (charters, briefs): MORE CONTEXT's own stories first (`mc-api` `/zone`), then
   extended web searches with month, year, outlets and conflict trackers in the query; a date and source on every
   claim; say when nothing recent turns up, never call a zone quiet for lack of results (26 Oct 2026 lesson).
 
 ## Layout
-- `catalog/entities.json` - zones and Watch Topics. `match_v43` holds v4.3's exact rules (baseline for
-  comparison); MORE CONTEXT's own matching replaces them in Phase 2.
-- `catalog/sources.json` - 95 sources in 18 groups: 51 polled RSS feeds, 2 to retry, 17 dropped (reason
-  recorded), 13 GDELT-only outlets tagged by domain (wires, Russian/Chinese/Iranian outlets with no usable feed),
-  plus 12 front-line sources Tom approved on 27 Oct 2026: Suspilne, RBC-Ukraine, Meduza (ru, en), ISW (dropped:
-  HTTP 403 to automated requests), and 7 Telegram channels (`format: telegram`): Ukrainian Air Force (nightly
-  tallies), General Staff, Russian MoD, DeepState, Rybar, Two Majors, WarGonzo. New groups: russian_independent,
-  russian_milblog. Now (31 Oct 2026, catalog 2026-10-31.2): 120 sources in 20 groups; 96 polled (51 news feeds,
-  21 Google News searches by zone or topic, 17 outlets read through Google News `site:` searches, 7 Telegram
-  channels), 1 to retry (Granma), 9 dropped (not read at all), 14 GDELT-only. New group `iranian_exile` (Iran
-  International; doctrine grade proposed C). `rss_status` now means how a source is read: `dropped` = not read,
-  `none` = read only through GDELT (checked against measured GDELT counts, see Feeds and saved searches).
+- `catalog/entities.json` - zones and Watch Topics, each with a one-sentence `profile` (scope for embeddings and
+  prompts) and a `map` position. `match_v43` holds v4.3's exact rules (baseline for comparison); MORE CONTEXT's own
+  matching replaces them in Phase 2.
+- `catalog/sources.json` - 120 sources in 20 groups (catalog 2026-10-31.2): 96 polled (51 news feeds, 21 Google
+  News searches by zone or topic, 17 outlets read through Google News `site:` searches, 7 Telegram channels), 1 to
+  retry (Granma), 9 dropped (not read at all), 14 GDELT-only. They include the front-line sources Tom approved on
+  27 Oct 2026: Suspilne, RBC-Ukraine, Meduza (ru, en), ISW (now through a site search, since its site refuses
+  automated requests) and 7 Telegram channels (`format: telegram`): Ukrainian Air Force (nightly tallies), General
+  Staff, Russian MoD, DeepState, Rybar, Two Majors, WarGonzo. Group `iranian_exile` is Iran International (doctrine
+  grade proposed C). `rss_status` means how a source is read: `dropped` = not read, `none` = read only through
+  GDELT (checked against measured GDELT counts).
 - `catalog/blocklist.json` + `pipeline/blocklist.py` - sites left out (Tom, 31 Oct 2026), each with its reason:
   GDELT rows by domain or URL pattern at ingest (`cycle.gdelt_rows`) and again at day build (`daily.build_day`);
   Google News items by publisher tail at ingest (`feeds.poll`) and at build. GDELT Events (country counts) are
@@ -168,45 +131,34 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   (different outlets, not both from the same government); an official claim counts once an outlet outside that
   government reports it. Single-source hits are shown as "claimed" and do not move the ladder. Use `owner` + `group`.
 - `catalog/indicators/` - per-zone charters (key questions + indicator ladder). Tom writes these.
-- `catalog/entities.json` also holds a one-sentence `profile` per zone/topic (scope for embeddings and prompts).
 - `catalog/title_terms.json` - multilingual headline terms per entity: the free keyword baseline for relevance.
 - `catalog/eval/` - relevance test sets (`relevance_v1.jsonl`: 278 stories labelled on/off/unclear, Claude's
   draft, accepted by Tom 26 Oct 2026 as the working set) + population files for weighting. Rules and results: `catalog/eval/README.md`.
 - `catalog/vertex_prices.json` - Gemini prices with source and date checked.
-- `pipeline/` - Python, standard library only so far.
-  - `gdelt.py` - list, download and parse GDELT GKG 2.1 15-minute files (English + translation streams).
-  - `match.py` - zone/topic matching from the catalog.
-  - `stories.py` - title normalisation, exact + near-duplicate grouping (MinHash LSH) into stories.
-  - `rss.py` - fetch (ETag/Last-Modified) and parse RSS, Atom and RDF feeds; titles + short leads only.
-  - `health.py` - feed health (fresh / late / stale / failing / never) against each source's expected interval.
-  - `sources.py` - domain -> source group lookup, so GDELT articles get the same groups as RSS items.
-  - `cli.py` - `python -I run.py measure-reprints --hours 6`, `rss-poll`, `feed-health` (run.py makes `python -I` work)
-  - `feeds.py` - one RSS poll over the active sources (shared by the CLI and the cloud cycle).
-  - `telegram.py` - public Telegram channels via the web preview `t.me/s/<channel>` (no account or key); latest
-    ~20 posts per poll, so very busy channels can drop posts between 15-minute polls.
-  - `cycle.py` - one 15-minute ingest cycle: new GDELT files (late files retried up to 3 h, never blocking),
-    one RSS poll; writes `cycles/YYYY/MM/DD/HHMMSS.jsonl` + `state/state.json`. `sinks.py`: local folder or GCS.
-  - `relevance.py` - scores relevance methods against a labelled set (weighted precision, retention vs v4.3,
-    bootstrap intervals); headline-term matcher. `python -I run.py eval-relevance`.
-  - `coding.py` - story coding schema (PLOVER v0.8 event types + quads, actors, direction, casualties, frame,
-    confidence), prompt builder, answer validation. No calls.
-  - `vertex.py` - Vertex Gemini REST client (global endpoint, gcloud token locally, metadata token on Cloud Run)
-    that refuses to run without a spend cap and stops at it; token and cost estimates with no calls.
-    `python -I run.py vertex-estimate` (free). `python -I run.py code-stories --cap <USD>` is BILLABLE: Tom's yes first.
-  - `measures.py` - attention anomaly (log-scale z vs the entity's previous 28 complete days, weekday-adjusted)
-    The casualty-reporting share was removed on 27 Oct 2026 (it flagged deaths from other places and times;
-    see the module docstring); zone violence in `countries.py` replaced it on 28 Oct 2026.
-  - `daily.py` - daily story build inside the cycle: day D is built on the first run after D+1 03:15 UTC, from
-    rows published on D; writes `stories/YYYY/MM/DD/stories.jsonl` + `summary.json` (per-entity totals, reprint
-    inflation, source-group counts). Local: `python -I run.py build-stories --day YYYY-MM-DD --root <folder>`.
-  - `events.py` - GDELT Events 2.0 files (~100 KB per stream per 15 minutes, against ~20 MB for GKG): one
-    compact record per file with per-country article counts, sample links and placed violent events.
-  - `countries.py` - per-country days (`stories/YYYY/MM/DD/countries.json`), the Rising and Elevated lists, zone
-    violence, and `violent.jsonl` for the map. See "Rising, map and zone violence" below.
-  - `instance.py` - restarts the Cloud Run instance after a run whose saved searches were refused.
-- `scripts/backfill_events.py` (Events history, free), `scripts/eval_rising.py` (compares country counts),
-  `scripts/eval_xlang.py` (cross-language grouping test), `scripts/build_fips_names.py` (catalog/fips_countries.json),
-  `scripts/dev_server.py` (local preview of web/ against a local data folder; AI off).
+- `pipeline/` - Python, standard library only so far. `python -I run.py <command>` (run.py makes `python -I` work):
+  `cycle` (local dry run of one cycle), `measure-reprints --hours 6`, `rss-poll`, `feed-health`, `build-stories
+  --day YYYY-MM-DD --root <folder>`, `eval-relevance`, `vertex-estimate` (free), and `code-stories --cap <USD>`,
+  which is BILLABLE: Tom's yes first.
+  - Ingest: `cycle.py` (one 15-minute cycle: new GDELT files, late ones retried up to 3 h, never blocking; one feed
+    poll; writes `cycles/YYYY/MM/DD/HHMMSS.jsonl` and the state), `gdelt.py` (GKG 2.1 15-minute files, English +
+    translation streams), `events.py` (GDELT Events 2.0), `feeds.py` + `rss.py` (RSS, Atom and RDF with
+    ETag/Last-Modified; titles + short leads only), `telegram.py` (public channels via `t.me/s/<channel>`, no account;
+    latest ~20 posts, so very busy channels can drop posts between polls), `health.py` (fresh / late / stale /
+    failing / never against each source's interval), `sinks.py` (local folder or GCS), `statestore.py`,
+    `instance.py` (restarts the Cloud Run instance after refused searches).
+  - Build: `daily.py` (day D is built on the first run after D+1 03:15 UTC from rows published on D; writes
+    `stories/YYYY/MM/DD/stories.jsonl` + `summary.json`), `match.py`, `sources.py` (domain -> source group, so GDELT
+    articles get the same groups as RSS items), `stories.py` (exact + near-duplicate grouping, MinHash LSH),
+    `feedlabels.py`, `countries.py` (Rising, Elevated, zone violence, `violent.jsonl`), `measures.py` (attention:
+    log-scale z vs the entity's previous 28 complete days, weekday-adjusted; the casualty share was removed 27 Oct
+    2026, see its docstring).
+  - AI and API: `relevance.py` (scores relevance methods against a labelled set), `coding.py` (PLOVER v0.8 event
+    types + quads, actors, direction, casualties, frame, confidence; prompt and validation, no calls), `vertex.py`
+    (Vertex Gemini REST client, global endpoint, that refuses to run without a spend cap and stops at it),
+    `budget.py`, `ondemand.py`, `api.py` (`mc-api`), `feed_v2.py` (`/feed`), `suite.py` (`/suite`).
+- `scripts/` - backfills (`backfill.py`, `backfill_events.py`, free), `relabel.py`, `eval_*.py`, `build_*.py`
+  (`build_web.py`, `build_interests.py`, FIPS tables), `recompress.py`, `dev_server.py` (local preview of web/
+  against a local data folder; AI off), `deploy_ingest.sh`, `deploy_ai.sh`.
 - `main.py`, `requirements.txt`, `.gcloudignore` - Cloud Run function wrapper (`mc-ingest`).
   `scripts/deploy_ingest.sh` creates bucket, service accounts, private function, one Scheduler job.
   Local dry run: `python -I run.py cycle`. Redeploy after code changes with the `gcloud functions deploy`
@@ -228,115 +180,59 @@ Serves warning (did something change?) and awareness (what is the picture, how i
   war (from 23 Sep) was lost inside it. Main-location relevance was tested and dropped (see below); the
   per-country baseline and the Rising list followed on 28 Oct, so new crises surface without a catalog edit.
 
-## Feeds and saved searches (27 Oct 2026)
+## Feeds and saved searches
 - Feed items (RSS, Telegram, saved searches) get zone labels when the day is built (`pipeline/feedlabels.py`):
   a saved search (source with `"entity"`) belongs to its zone; other items count for each zone whose headline
   terms they contain, within the source's `focus` when it lists zones. They become `kind: "feed"` stories,
   shown on the zone page under "From news feeds and searches" and kept out of the GDELT counts and baselines.
-- 21 Google News searches (`group: "search"`, ids `gn_<entity>`, readable `query` field) are polled hourly
-  (`poll_minutes`). Google News headlines end in " - Publisher"; that becomes the outlet. Google's terms are
-  understood (secondary sources only, 27 Oct 2026) to allow personal, non-commercial use: review before
-  Watchfloor earns money.
-- From Cloud Run, Google News answers 503 to some runs and 200 to others, all 21 searches together (28 Oct 2026:
-  about 25 of 62 runs got through; from Tom's machine every try works). The egress address changes between runs.
-  So a failed search is retried next run (`RETRY_MINUTES` 15), and each run tries one search first and holds the
-  rest when it is refused (probe row `held`), keeping refused requests to one per run. A fixed egress address
-  (Cloud NAT) would cost money; not done.
-- Retrying alone did not help: a healthy function reuses one warm instance, and its address stays refused (four
-  runs in a row after the fix). Today's successes all came while the function was crashing, when every run got a
-  fresh instance (19 instances, about 4 in 10 got through). So after a run whose searches were all refused
-  (`summary.rss.searches_refused`), `pipeline/instance.py` sends SIGTERM to the gunicorn server 3 s after the
-  response, and the next run starts on a new instance (`restart_instance: true` in the run log). Only when
-  `K_SERVICE` is set (Cloud Run). If Google ever refuses every address, this restarts every run: harmless (free
-  cold starts), but then switch to another search source.
-- **Outlets that turn away cloud addresses** (31 Oct 2026): the feeds of france24_en, rfi_afrique, timesofisrael
-  (HTTP 403) and reliefweb (empty body) failed every run from 26 to 31 Oct (423 in a row) and answered HTTP 200 from
-  Tom's home connection. GDELT does not cover them either (29 and 30 Oct cycle files, ~30,000 matched GDELT rows a
-  day): france24.com 0, timesofisrael.com 0, reliefweb.int 0, suspilne.media 0, rfi.fr 2-3 a day, against
-  jpost.com 95 and aljazeera 95. So they were effectively missing.
-- Since catalog 2026-10-31.1 the four are read through **Google News `site:` searches**: same ids, groups and
-  focus; `url` is the search, `feed_url` the old feed, `query` the readable search, polled hourly. Measured from
-  Tom's machine on 31 Oct: timesofisrael 100 items (a new one every ~7 min; includes blogs, since
-  `-site:blogs...` brought in empty items and another publisher), france24.com/en 77, rfi.fr/fr/afrique 13
-  (French edition), reliefweb 47, of which 19 had no headline. `feeds.is_search` treats any
-  `news.google.com/rss/search` address as a search: probe-first, holds and `searches_refused` cover it, and
-  `feedlabels` cuts its " - Publisher" tail (otherwise "The Times of Israel" puts "Israel" in every headline) and
-  names the outlet after the catalog entry. Searches drop items with no headline ("- ReliefWeb") at ingest.
-  Not yet seen working from the cloud: check these four in feed health after the deploy.
-- suspilne returned 403 from 28 Oct 03:05 UTC and was fresh again by 31 Oct, so it comes in by RSS.
-- **GDELT coverage audit (31 Oct 2026; scratch scripts, not in the repo).** In 52,618 raw GKG articles (30 Oct
-  15:00-18:00 UTC, before any matching) and 2 days of matched rows: zero from Reuters, AP, AFP, Bloomberg, CNN, NYT,
-  Washington Post, WSJ, NHK, Kyodo, Yonhap, SCMP, Japan Times, Dawn, TASS, Kyiv Independent, Suspilne, Iran
-  International, Press TV, Tasnim, Fars, Al Arabiya, Hiiraan, Addis Standard, Sudan Tribune, Mizzima, ISW, Lloyd's
-  List, CiberCuba. Present: BBC, Guardian, Al Jazeera, Jerusalem Post, Hindustan Times, RIA, Xinhua. So the
-  attention counts (GDELT only) never see the wires.
-- Catalog 2026-10-31.2 added 13 Google News site searches, measured from Tom's machine (usable items in 24 h):
-  AP 80, Bloomberg 76, AFP 55, CiberCuba 48, Reuters /world 38, Al Arabiya 36, Hiiraan 28, Addis Standard 22,
-  NHK World 19, Efecto Cocuyo 10, Iran International 9, Garowe 5, ISW 4. No usable site search: Tasnim, Fars,
-  Mizzima, Myanmar Now, Caracas Chronicles, Novaya Gazeta Europe (0 items); Sudan Tribune and Sudans Post (old
-  archive pages); Diario de Cuba and Kyodo (mostly no headline); Lloyd's List (paywalled, ~2). Telegram previews
-  `presstv` and `farsna` (Fars, Persian) were live; ownership unconfirmed, not added. Myanmar and Sudan remain thin.
-- Statuses fixed the same day: xinhua_en, ria_ru, arabnews, peoplesdaily_en, chinadaily_world, focustaiwan,
-  mining_com were `dropped` but GDELT carries them (6-82 matched articles a day) -> `none`; farsnews and ifp were
-  `none` but GDELT carries none -> `dropped`.
-- **Blocklist measurement lesson:** counting distinct headlines said 72% of Cuba's filtered stories were junk; the
-  real story build (`build_stories` + headline filter, as `daily.build_day`) said 3%. iHeart's station-suffixed
-  copies group back into one story. Measure filters at story level. Removing all blocked sites changed attention
-  counts 0-3% (T1 critical minerals 9%, 3 stories); the blocklist is for story cards, outlet counts and storage
-  (~2,600 of ~30,000 matched rows a day).
-- Weekends: on Saturday 31 Oct 2026, 13 feeds were late and 4 stale with no fetch errors (Defense News, Breaking
-  Defense, Splash247, Irrawaddy quiet 24-34 h). Before calling a feed broken, check `consecutive_failures` and
-  the HTTP code, not the fresh count.
+- 21 Google News searches (`gn_<entity>`) and 17 `site:` searches (outlets that turn away cloud addresses, such as
+  france24_en, rfi_afrique, timesofisrael and reliefweb, and wires GDELT lacks) are polled hourly (`poll_minutes`).
+  A site search keeps the outlet's id, group and focus; `url` is the search, `feed_url` the old feed, `query` the
+  readable search. `feeds.is_search` treats any `news.google.com/rss/search` address as a search; `feedlabels` cuts
+  the " - Publisher" tail (otherwise "The Times of Israel" puts "Israel" in every headline) and names the outlet;
+  items with no headline are dropped at ingest. Google's terms are understood (secondary sources only, 27 Oct 2026)
+  to allow personal, non-commercial use: review before Watchfloor earns money.
+- Google refuses Cloud Run's changing addresses in multi-hour blocks (expected). Each run tries one search first and
+  holds the rest when refused (probe row `held`); failed searches retry next run (`RETRY_MINUTES`); after a run whose
+  searches were all refused (`summary.rss.searches_refused`), `pipeline/instance.py` restarts the instance (SIGTERM
+  3 s after the response, only when `K_SERVICE` is set; `restart_instance: true` in the run log) so the next run gets
+  a new address. If Google ever refuses every address, switch search source. A fixed address (Cloud NAT) would cost
+  money; not done.
+- **GDELT carries none of the wires** (Reuters, AP, AFP, Bloomberg, CNN, NYT and many regional outlets; audit 31 Oct
+  2026), so the attention counts (GDELT only) never see them; the site searches bring them in as feed stories.
+  Myanmar and Sudan remain thin.
+- Measure filters at story level, not by distinct headlines. Before calling a feed broken, check
+  `consecutive_failures` and the HTTP code, not the fresh count (weekend lulls run 24-34 h).
 - A partial day (ingest started or stopped mid-day) gets no attention z and no alarm.
 
-## Relevance and attention (28 Oct 2026)
-- `scripts/eval_location.py` scored "where + what" rules on relevance_v1 (zones only, weighted): v4.3 rules 42% on
-  topic; headline terms 82% precision / 78% retention; main location (GDELT V2 mention counts) 42% / 57%; main
-  location AND headline terms 99% / 55%. Main location alone is not a fix; the headline filter is the balance.
-- Attention and alarms therefore count headline-filtered stories (`filtered_stories`), and `history()` reads that
-  count. On 12-26 Oct this removed Somalia's Ilhan Omar alarms and raised Ukraine (16 Oct strikes, Starlink),
-  Somalia (Djibouti boat sinking) and DRC (Ebola past 9,000 cases). Known noise: Vietnamese weather headlines
-  naming "Bien Dong" (the South China Sea).
-- Incident, 28 Oct 2026: the first full-day cloud build (27 Oct) ran out of memory, and since state was saved after
-  the build, every run from 03:20 UTC repeated the same ingest and died. Fixes: the MinHash token cache is compact
-  and cleared per call (full-day peak 475 -> 200 MiB, nothing kept between runs), `load_day_rows` keeps only
-  `BUILD_FIELDS`, and `run_cycle` saves state before building.
-- Its leftovers: from 03:35 to 19:50 UTC 28 Oct each cycle file re-wrote up to 17 slots (0.4 -> 6-7 MB per file;
-  that day's cycles are 360 MiB against ~50 MiB normal). Loading them all for the 28 Oct build held 266,950 rows
-  for 41,208 distinct and peaked at 518 MiB locally, over the 512 MiB function. `load_day_rows` now keeps one
-  copy of each (record id, kind, source, link): peak 295 MiB, same 34,509 articles. The link is in the key
-  because GDELT reused 89 translation record ids for other articles that day.
+## Relevance and attention
+- Headline terms are the relevance filter: 82% precision / 78% retention on relevance_v1, against 42% on topic for
+  v4.3's rules; main location alone is not a fix (`scripts/eval_location.py`, 28 Oct 2026). Attention and alarms
+  count headline-filtered stories (`filtered_stories`), and `history()` reads that count. Known noise: Vietnamese
+  weather headlines naming "Bien Dong" (the South China Sea).
+- Memory guards (from the 28 Oct 2026 out-of-memory incident; the function has 512 MiB): `run_cycle` saves state
+  before building; the MinHash token cache is compact and cleared per call; `load_day_rows` keeps only
+  `BUILD_FIELDS` and one copy of each (record id, kind, source, link). The link is in the key because GDELT reused
+  translation record ids for other articles.
 
 ## Rising, map and zone violence (28 Oct 2026, Tom: "start the rising list, then the map, violent events...")
-- Source: GDELT Events 2.0 export files, not GKG: ~100 KB per stream per 15 minutes against ~20 MB, so every
-  country is counted live and 90 days back for free (`scripts/backfill_events.py`: 8,832 slots, 29 Jul-28 Oct,
-  ~20 minutes, ~550 MB local). Each ingest run fetches the Events files for the GKG slots it read and keeps
-  one record per file as a `kind: events` row in its cycle file (`events/YYYY/MM/DD/HHMMSS.json` before 30 Oct
-  2026); the daily build writes `stories/.../countries.json` and `violent.jsonl`.
+- From GDELT Events 2.0 (~100 KB per 15 minutes against GKG's ~20 MB, so every country is counted live and 90 days
+  back for free; `scripts/backfill_events.py`). The daily build writes `stories/.../countries.json` and `violent.jsonl`.
 - Counts per country-day: distinct articles with an event located there (`urls`, attention) and with an assault,
   fight or mass-violence event there (`violent`, CAMEO 18-20). Scored against the country's own last 28 complete
   days (log z, weekday-adjusted) and its 90-day median. Rising: z >= 2.5, >= 1.5x expected, >= 40 articles
   (violence: 15). Elevated: >= 2x the 90-day median. Country names: `catalog/fips_countries.json` (FIPS 10-4, as
-  GDELT; "RI" is Serbia, "CG" DR Congo, "NG" Niger, "NI" Nigeria).
-- Test (`scripts/eval_rising.py`, 63 scored days, 26 Aug-27 Oct): countries flagged per day, violence 4.5 (max
-  9), attention 7.1, events 8.4, lead-paragraph articles 7.0, placed articles 5.6. Ethiopia on 23 Sep (war restart):
-  violence z 5.6 (18x expected), attention z 4.8. Violence leads the page; attention is noisier (GDELT geocodes
-  names: "Guadalupe" became Guadeloupe; routine Finnish and Norwegian news). Codes GDELT uses for non-countries
-  ("OS", oceans) are never listed. On 27 Oct the 90-day reference keeps Ethiopia on "violence elevated for weeks"
-  (5.6x its 90-day median) while its 28-day z reads normal.
+  GDELT; "RI" is Serbia, "CG" DR Congo, "NG" Niger, "NI" Nigeria). Codes for non-countries ("OS", oceans) are
+  never listed. Violence leads the page; attention is noisier (GDELT geocodes names).
 - Zone violence replaces the casualty share: violent events placed inside the zone (`countries`, or `violence`
   for Russia-NATO: NATO states + Kaliningrad RS23) in articles whose headline names the zone, z against 28 days.
-  Display only, not an alarm reason (yet). Ethiopia & Eritrea on 23 Sep: 37 articles against 0.7 expected (z 6.6).
-  The map's event layer (`/violent?zone=`) shows the same events the measure counts.
-- Local preview: `scripts/dev_server.py` (launch config `watchfloor-dev`, port 8734) serves web/ and the API from
-  `data/backfill/baseline`; the site switches to it on localhost.
-- Map (`#/map`): Leaflet 1.9.4 served from `web/vendor/leaflet/` (identical from cdnjs and unpkg, sha256 db49d009...),
-  Natural Earth 110m outlines in `web/geo/world.json` (public domain, FIPS codes added). No tile server, so the
-  site's CSP stays self-only. Zone positions in `entities.json` `map` (CONTEXT v4.3's, plus the two Horn zones).
-- Cross-language grouping via GDELT mentions (`scripts/eval_xlang.py`, 26 Oct): too noisy and too sparse. It joined
-  the UN crimes-against-humanity finding across English and Ukrainian, but chained unrelated Ukraine stories through
-  broad events, and most events sit in one story only (about 2% of Ukraine's stories could merge). Multilingual
-  embeddings (Vertex, billable) remain the route; needs Tom's yes after a measured sample.
+  Display only, not an alarm reason (yet). The map's event layer (`/violent?zone=`) shows the same events the
+  measure counts.
+- Map (`#/map`): Leaflet 1.9.4 from `web/vendor/leaflet/`, Natural Earth 110m outlines in `web/geo/world.json`; no tile
+  server, so the CSP stays self-only. Local preview: `scripts/dev_server.py` (launch config `watchfloor-dev`, port
+  8734) serves web/ and the API from `data/backfill/baseline`; the site switches to it on localhost.
+- Cross-language grouping: multilingual embeddings (Vertex, billable) are the route (GDELT mentions were too noisy
+  and too sparse); needs Tom's yes after a measured sample.
 
 ## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
 Most stories are never read by a person, so model work waits for a reason to spend:
@@ -350,12 +246,11 @@ Most stories are never read by a person, so model work waits for a reason to spe
 - **Ledger:** `state/ai_spend.json` (`pipeline/budget.py`), compare-and-swap on the GCS generation. Hard cap
   $5 per UTC month; on-view work at most $0.50 per day and never the last $1 (kept for alarms). Every call
   reserves estimate x 1.5 first and settles to the cost from Vertex's token counts.
-- **Switch:** Vertex calls from the cloud happen only with env `MC_AI=on`. Deployed with `scripts/deploy_ai.sh`
-  on 26 Oct 2026 22:11-22:14 UTC (approved by Tom): mc-ingest@ holds roles/aiplatform.user; mc-ingest revision
-  mc-ingest-00005-muw and mc-api revision mc-api-00001-zoy both run with MC_AI=on. Kill switch: redeploy with MC_AI=off.
-- **Public API:** https://mc-api-odg3xhcd4a-uc.a.run.app (`/status`, `/zone?entity=&day=`, `POST /code`), open to
-  anyone, max 1 instance, concurrency 1. First call, 26 Oct 22:14 UTC: 13_Sudan / 2026-10-26, 25 stories coded for
-  $0.0049 (22 on-topic); a repeat call was served from the cache for $0.
+- **Switch:** Vertex calls from the cloud happen only with env `MC_AI=on` (both functions since 26 Oct 2026, approved
+  by Tom; `mc-ingest@` holds roles/aiplatform.user). Kill switch: redeploy with MC_AI=off.
+- **Public API:** https://mc-api-odg3xhcd4a-uc.a.run.app (`/status`, `/zone?entity=&day=`, `POST /code`; also
+  `/entities`, `/days`, `/summary`, `/countries`, `/violent`, `/feed`, `/suite`), open to anyone, max 1 instance,
+  concurrency 1. The first call coded 25 stories for $0.0049; a repeat is served from the cache for $0.
 - The ledger counts list prices; Google's bill is the final word. A Cloud Billing budget alert is the backstop.
 
 ## Cloud (deployed 26 Oct 2026, approved by Tom)
@@ -369,33 +264,22 @@ Most stories are never read by a person, so model work waits for a reason to spe
   retry lists, feed health, last run summary). Since 30 Oct 2026 the live state is the Firestore document
   `mc_state/ingest` and `state/state.json` is its daily backup; objects are gzip, so download rather than cat:
   `gcloud storage cp gs://more-context-484804/state/state.json .` (cp unzips).
-- First cloud run 26 Oct 17:10 UTC: 46 s for a 2-hour catch-up, 4,001 rows. From Google Cloud,
-  france24_en, rfi_afrique and timesofisrael answer HTTP 403 (they block cloud addresses; fine from a home
-  connection) and reliefweb returned an empty body. GDELT carries almost none of their articles; since 31 Oct 2026
-  they are read through Google News site: searches (see Feeds and saved searches).
 - `tests/` - `python -m unittest discover -s tests -t .` (CI runs this on every push).
 - `data/` - downloads and reports, git-ignored.
 
 ## Build status
-- Phase 0 done. Phase 1: GDELT + RSS ingest running in the cloud every 15 minutes since 26 Oct 2026;
-  gate = 7 days of stored data (about 2 Nov) and reprint inflation measured (done: 1.25x overall).
-- First finding: only ~32% of English articles v4.3's rules assign to a zone name that zone in the headline,
-  so Phase 2 starts with a relevance check (embeddings + model) before coding.
-- Phase 2 started 26 Oct 2026. Relevance v1 (Claude-drafted labels): v4.3's rules are on-topic
-  for ~42% of matched stories (90% range 30-53%); a free headline-term filter reaches ~82% while keeping ~78%
-  of on-topic stories (likely flattered: same reviewer wrote terms and labels). Coding all 278 test stories with
-  gemini-3.1-flash-lite: est. $0.07; coding every v4.3 match daily: est. ~$219/month, so code only filtered or top stories.
-- First Vertex run (approved by Tom, cap $0.25), 26 Oct 21:00 UTC: 278 stories, 19 requests, $0.0595 billed
-  (56,135 in / 30,314 out / 0 thinking tokens). Gemini's relevance call: 94% on-topic (86-100%), ~100% retention,
-  agrees with Claude's labels on 243/253. It rarely says unclear and rates nearly everything high confidence.
-  Prompt fixed in code-v0.2 (topics overlap zones; confidence rule), not yet re-run. Score a codings file with
-  `python -I run.py eval-relevance --codings data/coding/relevance_v1.codings.jsonl`. Estimator recalibrated:
-  ~$188/month for every v4.3 match, ~$12/month ($6 batch) for the top 100 stories per entity per day.
-- Casualty flags (`killed`/`wounded` on GDELT rows, per-story tallies) and the two measures deployed 26 Oct 2026
-  20:57 UTC (revision mc-ingest-00004-yuq, approved by Tom). Rows before that lack the fields; measures count
-  only rows that have them. Attention z needs 14 complete days, so it first appears around 10 Nov.
+- Phase 1: GDELT + RSS ingest in the cloud every 15 minutes since 26 Oct 2026 (gate: 7 days of stored data, about
+  2 Nov, and reprint inflation measured: 1.25x overall). Phase 2 (relevance, then coding) started 26 Oct 2026; its
+  first findings and the first Vertex run are in `HISTORY.md`.
+- Coding prompt code-v0.2 (topics overlap zones; confidence rule) is not yet re-run. Score a codings file with
+  `python -I run.py eval-relevance --codings data/coding/relevance_v1.codings.jsonl`. Estimates: ~$188/month to code
+  every v4.3 match, ~$12/month ($6 batch) for the top 100 stories per entity per day, so code only filtered or top
+  stories.
+- Casualty flags (`killed`/`wounded` on GDELT rows, per-story tallies) exist from 26 Oct 2026 20:57 UTC; measures
+  count only rows that have them. Attention z needs 14 complete days, so it first appears around 10 Nov.
 - Charters: Claude drafted four (Ukraine, Israel-Gaza-Lebanon, Iran & Red Sea, India-Pakistan) on 26 Oct 2026 in
   the plan doc's "Indicator charters (draft)" tab; Tom marks them up, then an interview settles open questions;
   the final versions go to `catalog/indicators/` as catalog data. Budget decided: $5/month AI cap (see above);
   a Cloud Billing budget alert ($5, project context-484804, 50/90/100% actual + 100% forecast) emails billing admins.
 - Waiting on Tom: charter mark-up and interview; decisions on the source list (plan doc, "Source list (draft)" tab).
+  Current decisions and next steps: `HANDOFF.md`.
