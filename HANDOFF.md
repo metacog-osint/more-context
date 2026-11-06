@@ -6,6 +6,10 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CT.
 step 1's `CLAUDE.md` note is done: the boxes are in its Doctrine kit section and the parked branch in its
 header.
 
+**Update 6 Nov 2026, later:** decision 1 is done. mc-api is `mc-api-00016-duh`, deployed from 070ee8f with
+`doctrine/kit/geo/` no longer in `.gcloudignore` (the first try, 00014, failed `/suite` without it). NGA warnings
+now land in zones: Ukraine 3, Russia-NATO 1, Taiwan Strait 1, South China Sea 3, Iran & Red Sea 1 (was 0).
+
 ## Where things stand (4 Nov 2026, 3:01 PM CT, when the usage limit hit)
 - **Live and healthy.** mc-ingest-00019-gux and mc-api-00013-bif (built from df04a4b), website deployed 1 Nov.
   4 Nov 20:05 UTC run: 80 feeds fresh, 16 late, 0 failing. The 17 Google News `site:` searches work from the cloud

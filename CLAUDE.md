@@ -56,7 +56,8 @@ moved there verbatim on 6 Nov 2026. It isn't auto-loaded; read the matching sect
   by geometry, such as NGA navigational warnings, land in a zone through eleven sea-area `boxes` ([west, south, east,
   north]: Black Sea and Azov, Taiwan Strait, Red Sea / Gulf of Aden / Hormuz and others) in `scripts/build_interests.py`
   (kit 0.4.1, `6f3a63d`, 4 Nov 2026: 13 of 48 NGA warnings placed). Run the script after changing a zone's countries,
-  boxes or an interest. The live panel uses the boxes only after an mc-api deploy (Tom's yes; waiting as of 4 Nov).
+  boxes or an interest. Live in the panel since mc-api-00016-duh (6 Nov 2026): `doctrine/kit/geo/` must ship with
+  the API (`.gcloudignore` excluded it until then, and `/suite` failed with a missing `geo/countries.json`).
 - **"From the suite" panel** (1 Nov 2026): `GET /suite?entity=<id>` (`pipeline/suite.py`) gathers and matches the
   interests at most every 30 minutes per instance (5 after a failed source), then picks a zone's tips by area and a
   topic's by `warning_problems` (topics have no countries). Anomalies first, then standing items newest first, at most
@@ -167,7 +168,10 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   unquoted `a,b` into a list and rejoins it with a space: on 29 Oct 2026 that deployed `MC_BUCKET` as
   `more-context-484804 MC_AI=on` and every run failed with "Invalid bucket name" until redeployed. After any
   deploy, check `gcloud functions describe mc-ingest --gen2 --region=us-central1 --project=context-484804
-  --format="json(serviceConfig.environmentVariables)"` shows each variable separately.
+  --format="json(serviceConfig.environmentVariables)"` shows each variable separately. **No rollback by traffic:**
+  old revisions' images are cleaned up ("Container import failed"), and a failed `gcloud run services
+  update-traffic` still pins the spec to the dead revision, so later deploys are refused until
+  `gcloud run services update-traffic mc-api --to-latest` (6 Nov 2026). Fix forward and redeploy instead.
 
 ## Changing the watchlist
 - Zones and topics live in `catalog/entities.json` (order matters: first zone match wins). A retired id goes in
