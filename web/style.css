@@ -40,6 +40,8 @@ select, button { font: inherit; color: var(--ink); background: var(--panel); bor
 button { cursor: pointer; }
 button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 @media (prefers-color-scheme: dark) { button.primary { color: #1a1206; } }
+/* The shared Time dialog (tic-time.css) puts white text on --accent: 4.0:1 on light amber, 1.9:1 on dark. */
+.tic-time-dialog .tic-time-actions .tic-time-done { color: #1a1206; }
 button:disabled { opacity: .5; cursor: not-allowed; }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
 table { width: 100%; border-collapse: collapse; }
