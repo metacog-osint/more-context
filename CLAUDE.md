@@ -116,9 +116,11 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
 - `catalog/entities.json` - zones and Watch Topics, each with a one-sentence `profile` (scope for embeddings and
   prompts) and a `map` position. `match_v43` holds v4.3's exact rules (baseline for comparison); MORE CONTEXT's own
   matching replaces them in Phase 2.
-- `catalog/sources.json` - 120 sources in 20 groups (catalog 2026-10-31.2): 96 polled (51 news feeds, 21 Google
-  News searches by zone or topic, 17 outlets read through Google News `site:` searches, 7 Telegram channels), 1 to
-  retry (Granma), 9 dropped (not read at all), 14 GDELT-only. They include the front-line sources Tom approved on
+- `catalog/sources.json` - 124 sources in 20 groups (catalog 2026-11-14.1): 99 polled (53 news feeds, 21 Google
+  News searches by zone or topic, 18 outlets read through Google News `site:` searches, 7 Telegram channels), 1 to
+  retry (Granma), 10 dropped (not read at all), 14 GDELT-only. 2026-11-14.1 added Radio Tamazuj, DVB English and
+  Sudan War Monitor (an ordinary feed with `entity`, so every item is a Sudan item), moved Crisis Group to a site
+  search (its feed stopped at 30 Oct) and recorded Oryx as dropped (its loss lists are updated in place). They include the front-line sources Tom approved on
   27 Oct 2026: Suspilne, RBC-Ukraine, Meduza (ru, en), ISW (now through a site search, since its site refuses
   automated requests) and 7 Telegram channels (`format: telegram`): Ukrainian Air Force (nightly tallies), General
   Staff, Russian MoD, DeepState, Rybar, Two Majors, WarGonzo. Group `iranian_exile` is Iran International (doctrine
@@ -206,7 +208,14 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   2026), so the attention counts (GDELT only) never see them; the site searches bring them in as feed stories.
   Myanmar and Sudan remain thin.
 - Measure filters at story level, not by distinct headlines. Before calling a feed broken, check
-  `consecutive_failures` and the HTTP code, not the fresh count (weekend lulls run 24-34 h).
+  `consecutive_failures` and the HTTP code, not the fresh count (weekend lulls run 24-34 h). `/status` on a Saturday
+  evening reads worse than on a weekday: 15 Nov 2026 01:50 UTC (Saturday 14 Nov, 7:50 PM CST) gave 9 stale and 23
+  late, all fetching cleanly.
+  A feed can also freeze while still answering 200 or 304 (Crisis Group, 30 Oct 2026), which health never flags; the
+  test is new rows per source per day from the cycle files against the source's own weekdays (feed health pass,
+  14 Nov 2026, in `HANDOFF.md`).
+- A Sudan headline term (`sudan*`) also matches "South Sudan": 9 of 167 Sudan stories on 13 Nov 2026 were South
+  Sudan's, GDELT ones included, so they reach the Sudan attention count. Not fixed yet (see `HANDOFF.md`).
 - A partial day (ingest started or stopped mid-day) gets no attention z and no alarm.
 
 ## Relevance and attention

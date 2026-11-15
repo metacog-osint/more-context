@@ -1,5 +1,5 @@
 {
- "catalog_version": "2026-10-31.2",
+ "catalog_version": "2026-11-14.1",
  "notes": "Draft list for Tom's approval. group = the perspective a source speaks from (used for framing divergence); owner = state | public | private | intergovernmental | ngo. domains tag GDELT articles with the same groups, so outlets without a usable feed still count. rss_status: active (polled) | candidate (retry) | dropped (reason in rss_note) | none (GDELT only). expected_minutes = normal gap between new items, calibrated from the 26 Oct probe. clock_skew_hours = hours to subtract from a feed that labels local time as UTC. format: telegram = a public channel's web preview (t.me/s/<channel>), parsed by pipeline/telegram.py. Front-line sources added 27 Oct 2026 (Tom); two-source rule: an indicator hit counts once two independent sources report it (different outlets, not both from the same government).",
  "groups": {
   "western_public": "Western public broadcasters",
@@ -764,6 +764,23 @@
    "rss_status": "active"
   },
   {
+   "id": "dvb_en",
+   "name": "DVB (Democratic Voice of Burma)",
+   "url": "https://english.dvb.no/feed/",
+   "group": "southeast_asian",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "16_Myanmar"
+   ],
+   "expected_minutes": 360,
+   "domains": [
+    "dvb.no"
+   ],
+   "rss_status": "active",
+   "rss_note": "Added 14 Nov 2026 (plan step 1, approved by Tom 1 Nov). From Tom's machine on 15 Nov: 10 items over 2 days, about 5.5 a day."
+  },
+  {
    "id": "mizzima",
    "name": "Mizzima",
    "url": "https://eng.mizzima.com/feed",
@@ -812,6 +829,38 @@
     "dabangasudan.org"
    ],
    "rss_status": "active"
+  },
+  {
+   "id": "radiotamazuj",
+   "name": "Radio Tamazuj",
+   "url": "https://www.radiotamazuj.org/en/rss",
+   "group": "african",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "13_Sudan"
+   ],
+   "expected_minutes": 180,
+   "domains": [
+    "radiotamazuj.org"
+   ],
+   "rss_status": "active",
+   "rss_note": "Added 14 Nov 2026 (plan step 1, approved by Tom 1 Nov). Editorially independent, covering Sudan and South Sudan (its About page). From Tom's machine on 15 Nov: 12 items over 1.2 days, about 13 a day, median gap 33 min. Most items are about South Sudan, and \"South Sudan\" contains a Sudan headline term, so its South Sudan items count as Sudan feed stories until the Sudan terms learn to exclude it; feed stories stay out of the attention counts."
+  },
+  {
+   "id": "sudanwarmonitor",
+   "name": "Sudan War Monitor",
+   "url": "https://sudanwarmonitor.com/feed",
+   "group": "african",
+   "owner": "private",
+   "lang": "ara",
+   "entity": "13_Sudan",
+   "expected_minutes": 720,
+   "domains": [
+    "sudanwarmonitor.com"
+   ],
+   "rss_status": "active",
+   "rss_note": "Added 14 Nov 2026 (plan step 1, approved by Tom 1 Nov). Covers only Sudan's war, so every item belongs to the Sudan zone (\"entity\", as a saved search does) rather than needing a headline term. On 15 Nov 19 of its 20 latest items were in Arabic, most naming places (Darfur, Kordofan, a locality) rather than Sudan. From Tom's machine: 20 items over 8.6 days, about 2.4 a day, median gap 11 h."
   },
   {
    "id": "addisstandard",
@@ -1115,18 +1164,22 @@
   {
    "id": "crisisgroup",
    "name": "International Crisis Group",
-   "url": "https://www.crisisgroup.org/rss.xml",
+   "url": "https://news.google.com/rss/search?q=site%3Acrisisgroup.org%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
+   "feed_url": "https://www.crisisgroup.org/rss.xml",
+   "query": "site:crisisgroup.org",
    "group": "specialist",
    "owner": "ngo",
    "lang": "eng",
    "focus": [
     "global"
    ],
-   "expected_minutes": 4320,
+   "expected_minutes": 1440,
+   "poll_minutes": 60,
    "domains": [
     "crisisgroup.org"
    ],
-   "rss_status": "active"
+   "rss_status": "active",
+   "rss_note": "Read through a Google News site: search since 14 Nov 2026. Its own feed (feed_url) still answers but stopped at 30 Oct 2026: read 15 Nov 2026 01:55 UTC, its newest item was 30 Oct, and the cloud stored nothing from it after 3 Nov, while Google News listed six Crisis Group pieces dated 5-13 Nov. Its site answers HTTP 403 to automated requests. From Tom's machine on 15 Nov the 7-day search returned 5 items (about 1.6 a day); the 1-day search can be empty."
   },
   {
    "id": "defensenews",
@@ -1606,6 +1659,23 @@
    ],
    "rss_status": "active",
    "rss_note": "Read through a Google News site: search since 31 Oct 2026: every feed address answers HTTP 403 to automated requests and GDELT carries none of it (0 on 29-30 Oct 2026). From Tom's machine on 31 Oct the search returned 4 usable items in 24 h; not yet seen from the cloud."
+  },
+  {
+   "id": "oryx",
+   "name": "Oryx",
+   "url": "https://www.oryxspioenkop.com/feeds/posts/default",
+   "group": "specialist",
+   "owner": "private",
+   "lang": "eng",
+   "focus": [
+    "01_Ukraine_Conflict"
+   ],
+   "expected_minutes": 10080,
+   "domains": [
+    "oryxspioenkop.com"
+   ],
+   "rss_status": "dropped",
+   "rss_note": "Approved for plan step 1 (Tom, 1 Nov 2026) but not polled (14 Nov 2026): the feed answers, but its newest post is from 7 Dec 2024. Oryx's equipment-loss lists are two posts from 24 Feb 2022 updated in place (last updated 8 Nov 2026, read with orderby=updated), and a link already seen is never a new item, so a news feed reader gets nothing from it. The loss counts are a dataset: a lane for a military-activity layer (Tempo, planned), not a news feed."
   },
   {
    "id": "tg_kpszsu",
