@@ -198,8 +198,10 @@ def _listed(scored: dict[str, dict], metric: str) -> tuple[list[str], list[str]]
     return rising[:MAX_LISTED], elevated[:MAX_LISTED]
 
 
-def build_day(sink, day: date) -> dict:
-    recs = day_records(sink, day)
+def build_day(sink, day: date, recs: list[dict] | None = None) -> dict:
+    """`recs`: the day's Events records when the caller already read them (the cycle passes them on to
+    relations.build_day too, so the day's cycle files are read once)."""
+    recs = day_records(sink, day) if recs is None else recs
     partial = is_partial(recs)
     tot = totals(recs)
     hist, complete = history(sink, day) if not partial else ({m: {} for m in (*SCORED, "zone_named")}, [])

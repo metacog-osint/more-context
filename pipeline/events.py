@@ -13,6 +13,8 @@ One file becomes one compact record:
 - `violent`: assault, fight and mass-violence events (CAMEO roots 18-20) placed below country level, for the map
   and the in-zone violence measure. GDELT's coding is noisy (28 Oct sample: a Seville traffic report and an
   Italian strike notice coded as fights), so consumers filter them further.
+- `pairs` (since 15 Nov 2026): per directed pair of actor countries, articles and the kinds of events they carry
+  (`pipeline/relations.py`), for the relations layer.
 Events dated more than two days before the file are references to the past ("a year ago...") and are skipped.
 
 Since 30 Oct 2026 the records ride in the run's cycle file as rows with `"kind": "events"` first (`as_row`), so a
@@ -27,6 +29,7 @@ import zipfile
 from datetime import datetime, timedelta
 
 from . import gdelt
+from .relations import pair_table
 
 FILE_NAMES = {"english": "{stamp}.export.CSV.zip", "translation": "{stamp}.translation.export.CSV.zip"}
 FIELDS = 61
@@ -123,7 +126,7 @@ def record(rows: list[list[str]], stamp: str, stream: str) -> dict:
     samples = {cc: [u for u, _ in sorted(b.items(), key=lambda kv: -kv[1])[:SAMPLES_PER_COUNTRY]]
                for cc, b in best.items()}
     return {"stamp": stamp, "stream": stream, "rows": len(rows), "countries": countries,
-            "samples": samples, "violent": violent}
+            "samples": samples, "violent": violent, "pairs": pair_table(rows, stamp)}
 
 
 def country_names(rows: list[list[str]]) -> dict[str, str]:

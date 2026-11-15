@@ -5,7 +5,8 @@ state (last GDELT stamp per stream, feed health, the last run's summary): `state
 Firestore document with that object as fallback and daily backup (statestore.py, MC_STATE=firestore).
 For each GKG slot read, the matching GDELT Events files are read too (events.py; ~100 KB each) and kept as one
 compact record per file, a kind=events row in the same cycle file (in `events/YYYY/MM/DD/HHMMSS.json` before
-30 Oct 2026: one write a run saved); the daily build turns them into country counts.
+30 Oct 2026: one write a run saved); the daily build turns them into country counts and, since 15 Nov 2026, the
+relations between countries (relations.py).
 GDELT rows carry their zone/topic labels and, when the outlet is catalogued, its source group.
 """
 from __future__ import annotations
@@ -13,7 +14,7 @@ from __future__ import annotations
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 
-from . import blocklist, countries, daily, events, feeds, gdelt, health, ondemand, statestore
+from . import blocklist, countries, daily, events, feeds, gdelt, health, ondemand, relations, statestore
 from .budget import BudgetExceeded
 from .match import Matcher
 from .sources import lookup_domain
@@ -173,9 +174,16 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
                 summary["stories_error"] = sstate["last_error"]
                 break
             try:  # country counts never hold up the story build
-                summary.setdefault("countries_built", []).append(countries.build_day(sink, day))
+                recs = countries.day_records(sink, day)
+                summary.setdefault("countries_built", []).append(countries.build_day(sink, day, recs))
             except Exception as e:
                 summary["countries_error"] = f"{day}: {e}"[:200]
+                continue
+            try:  # nor do relations (pipeline/relations.py), built from the same records
+                summary.setdefault("relations_built", []).append(relations.build_day(sink, day, recs))
+            except Exception as e:
+                summary["relations_error"] = f"{day}: {e}"[:200]
+            del recs
 
     run_alarms(sink, state, summary, ai_on, code_alarm)
     state["last_run"] = summary
