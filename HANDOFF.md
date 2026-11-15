@@ -2,7 +2,7 @@
 
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
-## Where things stand (14 Nov 2026, about 8:45 PM CST; feed health pass)
+## Where things stand (14 Nov 2026, about 9:15 PM CST; feed health pass live, South Sudan exclusion built)
 - **Live and healthy** (measured 15 Nov 01:35-01:55 UTC): ingest every 15 minutes (last run 01:35 UTC, GDELT read
   through 01:45 UTC), days built through 13 Nov (14 Nov builds after 03:15 UTC 15 Nov), `/feed` in COP fresh
   (41 items for 13 Nov, 19 anomalies, all country-level; no zone or topic above normal). AI spend $0.05 of $5 for
@@ -12,9 +12,14 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
 - **Website:** live with house bar tic-nav v1.10 and another session's contrast fix `ba51ad7` (WCAG AA badges,
   primary button, alarm column header), pushed 14 Nov 7:53 PM. Worktrees `_worktrees\watchfloor-contrast`
   (`contrast-fix`) and `_worktrees\watchfloor-nav110` (`tic-nav-v1.10`) belong to those sessions.
-- **Uncommitted on `main` (this pass, not deployed):** `catalog/sources.json` (catalog 2026-11-14.1),
-  `tests/test_feedlabels.py` (2 tests), `CLAUDE.md`, this file. Catalog changes reach the cloud only with an
-  `mc-ingest` deploy (Tom's yes); the Sources page needs `scripts/build_web.py` and a hosting deploy.
+- **Feed health pass: live.** `32115ec` pushed to `main` on Tom's "Yes, all three" (14 Nov); `mc-ingest-00020-sif`
+  deployed 02:43 UTC 15 Nov, env vars checked separate (`MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`). The 03:05
+  UTC run: 99 sources; Sudan War Monitor fresh (20 items), DVB English fresh, Radio Tamazuj late (12 items, newest
+  19:57 UTC). Crisis Group's search had not run yet (polls hourly; its last read was the old feed at 02:35 UTC):
+  check it. The website's Sources page still lists the old catalog (`scripts/build_web.py` + hosting deploy, Tom's
+  yes).
+- **Uncommitted on `main`: the South Sudan exclusion** (Tom's "Build the South Sudan exclusion", 14 Nov). See the
+  section below.
 
 ## Feed health pass (14 Nov 2026)
 - **`/status` said 64 fresh, 23 late, 9 stale** at 01:50 UTC 15 Nov, a Saturday evening. All 96 sources fetched
@@ -40,22 +45,57 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
   between security forces and artisanal gold miners in Siguiri and Balato (Kouroussa) after a mining crackdown
   (DW, Senenews, Koaci, Mining.com, The Northern Miner, AP via US papers). Not a geocoding error.
 - **Found: "South Sudan" counts as Sudan.** `sudan*` matches it: 9 of 167 Sudan stories on 13 Nov, GDELT ones too,
-  so they reach Sudan's attention count. Fix proposed, not built: exclusion phrases per entity in
-  `catalog/title_terms.json` ("south sudan*" and its translations) removed before matching, scored on
-  `relevance_v1`, then a relabel of stored days so the baseline matches.
+  so they reach Sudan's attention count. Built (uncommitted); next section.
+
+## South Sudan exclusion (built 14-15 Nov 2026, uncommitted, not deployed)
+- **Files:** `pipeline/relevance.py` (`TermMatcher(terms, exclude)`: an entity's exclusion phrases are blanked out
+  of the folded headline before its terms are searched, so "Sudan and South Sudan sign deal" still counts for Sudan;
+  given `terms` alone nothing is excluded), `catalog/title_terms.json` (version 2026-11-14.1, `exclude.13_Sudan`:
+  21 phrases in 16 languages, note added), `tests/test_relevance.py` (2 tests), `scripts/rescore_terms.py` (new),
+  `tests/test_rescore_terms.py` (new, 3 tests). Relevance and feed-label tests pass (32), rescore tests pass (3);
+  **the full suite was not rerun after these edits.**
+- **Scoring:** `relevance_v1` cannot measure it. None of its 16 Sudan rows mention South Sudan, so precision and
+  retention are unchanged (no regressions anywhere). The evidence is the stored stories (dry run below).
+- **Every user of the matcher picks it up:** the daily build's `filtered_stories` (attention z, alarms), zone
+  violence `named` (URL words), feed labels (Radio Tamazuj's South Sudan items stop counting for Sudan), and
+  mc-api's `/zone` (needs an mc-api deploy too).
+- **Stored days:** `scripts/rescore_terms.py` re-scores only the term fields of stored days (summary.json
+  `filtered_stories`, `filtered_articles`, attention, alarms; countries.json zone `named`, `named_score`) from each
+  day's stored stories.jsonl and violent.jsonl, oldest first, without a rebuild. Feed stories stay as built.
+  `--check` reruns with no exclusions and must reproduce every stored count before anything is trusted. `--write`
+  uploads only changed files, gzip, each only if its generation still matches the manifest.
+- **15 Nov session: the first check's PASS was false, fixed.** `--check` from 28 Sep reproduced every count but
+  rewrote all 47 Sudan `named_score` blocks without `median90`/`ratio90` (28 also without `z`): a zone's score reads
+  90 days of countries.json and the copy started at 28 Sep, while the first stored day is 29 Jul (countries.json and
+  violent.jsonl from the events backfill; stories from 28 Sep). A `--write` would have stripped those fields. Fixed in
+  `scripts/rescore_terms.py`: `--check` now fails on any changed field (new test), the window starts at 29 Jul, and a
+  dry run works on a copy (`data/rescore-dry`); before, a dry run re-scored `data/rescore` in place, so a later
+  `--write` would have found no changes and uploaded nothing. 29 Jul-27 Sep and 14 Nov fetched; 194 tests pass.
+- **Where the first session stopped (about 03:15 UTC 15 Nov):** `--fetch --check` for 28 Sep to 13 Nov (47 days) was running in a
+  background shell. The download finished (`data/rescore/manifest.json` exists; git-ignored); the check result
+  was not seen. Rerun without `--fetch`: `python -I scripts/rescore_terms.py --start 2026-09-28 --end 2026-11-13
+  --root data/rescore --check`. 14 Nov was being built in the cloud at about 03:20 UTC with the old terms: fetch it
+  too (`--start 2026-11-14 --end 2026-11-14 --root data/rescore --fetch`; `fetch` adds to `manifest.json`).
+  Re-fetch any day the cloud rebuilt after its fetch, or its `--write` is refused (generation mismatch, HTTP 412).
+- **To go live, in order, each step on Tom's yes:** full test suite; dry run with exclusions (what changes for
+  Sudan, day by day); commit and push; deploy mc-ingest and mc-api (commands in `scripts/deploy_ai.sh`, single-quote
+  the env vars in PowerShell, check them after); then `--write` for every stored day through the last built one,
+  away from the daily build at about 03:20 UTC. Then update `CLAUDE.md` (its South Sudan line still says "Not
+  fixed yet").
 
 ## Decisions waiting on Tom
-1. Commit this pass (catalog, test, notes) to `main` and deploy `mc-ingest` so the cloud reads the new sources.
+1. The South Sudan exclusion's go-live steps (above).
 2. Oryx: keep dropped, or poll it anyway.
-3. The South Sudan exclusion (above): build it.
+3. Website deploy so the Sources page shows catalog 2026-11-14.1.
 4. The zone charters: still none in `catalog/indicators/`. The AI-drafted ones on `wip/2026-11-01-unreviewed`
    (`459d578`) were reviewed 14 Nov in `[local path]`: do not merge; use the 13 indicators as a
    draft for Tom's own charters.
 5. October usage totals (Class A and BigQuery), carried from 4 Nov.
 
 ## Next steps, in order
-1. After a deploy: check the three new feeds and the Crisis Group search from the cloud (`feed_health` in the
-   Firestore state, `mc_state/ingest`).
+1. Check the Crisis Group search from the cloud (`feed_health` and `rss.crisisgroup` in the Firestore state
+   document `mc_state/ingest`; read it over the Firestore REST API with `gcloud auth print-access-token`, never
+   printing the token). Then finish the South Sudan exclusion.
 2. Charter interview, one zone at a time, Iran & Red Sea first (December three-signal watch).
 3. Indicators that act on tips (step 3 of the tipping plan), after the charters.
 4. Headline service for other programs (step 4); Bluesky/Telegram lists need Tom's picks (`presstv`, `farsna`

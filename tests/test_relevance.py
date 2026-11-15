@@ -35,6 +35,28 @@ class FoldAndTermTests(unittest.TestCase):
     def test_unknown_entity_never_hits(self):
         self.assertFalse(relevance.TermMatcher({"A": ["x"]}).hit("B", "x"))
 
+    def test_excluded_phrase_is_blanked_but_the_place_named_elsewhere_still_counts(self):
+        m = relevance.TermMatcher({"S": ["sudan*"]}, {"S": ["south sudan*"]})
+        self.assertFalse(m.hit("S", "South Sudan to start registration for first ever polls"))
+        self.assertFalse(m.hit("S", "South Sudanese refugees return home"))
+        self.assertFalse(m.hit("S", "south-sudan-ruling-party-nominee-shot-dead"))  # URL words (zone violence)
+        self.assertTrue(m.hit("S", "Sudan and South Sudan agree on oil transit fees"))
+        self.assertTrue(m.hit("S", "South Sudanese flee fighting in Sudan's Kordofan"))
+        self.assertTrue(m.hit("S", "Sudan's army retakes El Fasher"))
+        self.assertTrue(relevance.TermMatcher({"S": ["sudan*"]}).hit("S", "South Sudan votes"))  # no exclude given
+
+    def test_catalog_excludes_south_sudan_in_each_language(self):
+        m = relevance.TermMatcher()
+        for headline in ("South Sudan ruling party nominee shot dead", "Le Soudan du Sud reporte ses élections",
+                         "Elecciones en Sudán del Sur", "Sud Sudan, elezioni rinviate", "Güney Sudan'da seçim",
+                         "Выборы в Южном Судане", "Вибори у Південному Судані", "انتخابات جنوب السودان",
+                         "南苏丹选举推迟", "Dél-Szudán választás", "Sudão do Sul adia eleições"):
+            self.assertFalse(m.hit("13_Sudan", headline), headline)
+        for headline in ("RSF drone strike on Port Sudan", "الجيش السوداني يسترد مدينة في السودان",
+                         "Soudan : les FSR prennent El-Fasher", "Судан: бои в Дарфуре", "Sudan and South Sudan sign deal"):
+            self.assertTrue(m.hit("13_Sudan", headline), headline)
+        self.assertLessEqual(set(m.ex), set(m.rx))  # every exclusion belongs to an entity that has terms
+
     def test_catalog_terms_compile_and_cover_entities(self):
         m = relevance.TermMatcher()
         cat = load_catalog()
