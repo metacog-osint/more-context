@@ -219,7 +219,7 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   for Sudan while "Sudan and South Sudan sign deal" still does (21 phrases in 16 languages). Stored days 29 Jul-14 Nov
   were re-scored with `scripts/rescore_terms.py` (term fields only, no rebuild; `--check` first, from the first
   stored day, 29 Jul). Known misses: Arabic "جنوب السودان" also means "southern Sudan" (a 9 Oct Blue Nile story was
-  dropped), and the 20-21 Oct Abyei market strike left Sudan's counts (Abyei is not a Sudan term; Tom's call).
+  dropped), and the 20-21 Oct Abyei market strike left Sudan's counts (Abyei is not a Sudan term; Tom, 15 Nov: leave it out).
 - A partial day (ingest started or stopped mid-day) gets no attention z and no alarm.
 
 ## Relevance and attention
