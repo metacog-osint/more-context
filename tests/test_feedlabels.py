@@ -14,6 +14,8 @@ SOURCES = {
     "toi": {"id": "toi", "name": "The Times of Israel", "group": "israeli",
             "url": "https://news.google.com/rss/search?q=site%3Atimesofisrael.com%20when%3A1d&hl=en-US&gl=US&ceid=US:en",
             "focus": ["10_Israel_Gaza_Lebanon", "11_Iran_Red_Sea"]},
+    "swm": {"id": "swm", "name": "Sudan War Monitor", "group": "african", "url": "https://sudanwarmonitor.com/feed",
+            "entity": "13_Sudan"},
 }
 
 
@@ -30,6 +32,22 @@ class FeedLabelTests(unittest.TestCase):
     def test_search_belongs_to_its_zone_whatever_the_headline(self):
         row = {"source": "gn_19_somalia", "title": "Election crisis deepens"}
         self.assertEqual(feedlabels.labels(row, self.m, self.ids, SOURCES), ["19_Somalia"])
+
+    def test_single_zone_outlet_belongs_to_its_zone_and_keeps_its_name(self):
+        # Sudan War Monitor (catalog 2026-11-14.1): an ordinary feed with "entity"; its Arabic headlines name places
+        # ("Deteriorating security in Darfur's main cities") rather than Sudan, so a headline term would miss them.
+        row = {"source": "swm", "group": "african", "title": "تدهور مقلق للاوضاع الامنية في مدن رئيسية في اقليم دارفور"}
+        self.assertEqual(feedlabels.labels(row, self.m, self.ids, SOURCES), ["13_Sudan"])
+        self.assertFalse(feeds.is_search(SOURCES["swm"]))
+        out = feedlabels.prepared([row], sources=SOURCES)
+        self.assertEqual(out["13_Sudan"][0]["domain"], "Sudan War Monitor")
+
+    def test_catalog_entity_sources_name_real_zones(self):
+        cat = feedlabels._sources()
+        for sid, src in cat.items():
+            if src.get("entity"):
+                self.assertIn(src["entity"], self.ids, sid)
+        self.assertEqual(cat["sudanwarmonitor"]["entity"], "13_Sudan")
 
     def test_focused_feed_matches_only_its_focus(self):
         row = {"source": "kyiv", "title": "Sudan's army retakes a town in Darfur"}
