@@ -251,11 +251,12 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
 - Cross-language grouping: multilingual embeddings (Vertex, billable) are the route (GDELT mentions were too noisy
   and too sparse); needs Tom's yes after a measured sample.
 
-## Relations between countries (built 15 Nov 2026 on `relations-tone`; not deployed)
+## Relations between countries (live 15 Nov 2026)
 - Tom, 15 Nov 2026: casualty counts are a small part of what matters; track relations between nations and changes in
   tone, every zone. Probe, findings and design: `docs/relations/2026-11-15-relations-tone.md` (Korea, 16 Aug-14 Nov:
   20 of 26 dated events flagged; 18 of 20 unlisted flags were real news). Tom approved building the pair layer the
-  same day ("Yes, build it").
+  same day ("Yes, build it") and shipping it ("Yes, ship it"): `f35fa78` on main, `mc-ingest-00022-zul` and
+  `mc-api-00019-bad` deployed 18:07-18:08 UTC 15 Nov (env vars checked separate), website deployed the same hour.
 - `pipeline/relations.py`: per Events file, `pair_table` counts articles (distinct source URLs) per directed actor
   pair (CAMEO codes; the UN and NATO as UNO and NAT) by QuadClass, with Goldstein and tone per article; it rides in
   each Events record as `pairs` (about 1.1 KB gzip a file, 0.2 MB a day, in the cycle files; 22 ms a file). The daily build, after the country
@@ -266,8 +267,11 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   under "Relations between countries". Display only: no alarm, no `/feed` items.
 - `catalog/relations.json`: Korea's pairs were measured; every other zone's are Claude's draft for Tom to edit.
 - Days built before deploy have no `pairs` in their Events records and count as partial unless backfilled:
-  `scripts/backfill_relations.py` (free GDELT download; `--bucket` writes to the live bucket, Tom's yes first;
-  `--series-only` rebuilds the series after a catalog change).
+  `scripts/backfill_relations.py` (free GDELT download; `--bucket` reads and writes the live bucket with the gcloud
+  user's token, no storage library needed, Tom's yes first; `--series-only` rebuilds the series after a catalog
+  change). 18 Jul-14 Nov were backfilled into the bucket on 15 Nov (120 days, all complete). 15 Nov itself builds as
+  partial (pair tables only from 18:20 UTC): redo it after 03:20 UTC 16 Nov with `--start 2026-11-15 --end
+  2026-11-15 --force`, which also rebuilds the series.
 - Not built: press tone by outlet country (GKG) and the state-and-people layer (both measured in the note).
 
 ## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
