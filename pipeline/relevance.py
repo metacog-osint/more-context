@@ -60,14 +60,28 @@ def term_pattern(term: str) -> str:
 
 
 class TermMatcher:
-    def __init__(self, terms: dict[str, list[str]] | None = None):
+    """Headline terms per entity. `exclude` lists phrases that contain a term but name somewhere else ("South Sudan"
+    contains "Sudan"): they are blanked out before the terms are searched, so "Sudan and South Sudan sign an oil
+    deal" still counts for Sudan and "South Sudan to hold elections" does not. Given `terms`, nothing is excluded
+    unless `exclude` is given too; with neither, both come from catalog/title_terms.json."""
+
+    def __init__(self, terms: dict[str, list[str]] | None = None, exclude: dict[str, list[str]] | None = None):
         if terms is None:
-            terms = json.loads(TERMS.read_text(encoding="utf-8"))["terms"]
+            catalog = json.loads(TERMS.read_text(encoding="utf-8"))
+            terms = catalog["terms"]
+            exclude = catalog.get("exclude", {}) if exclude is None else exclude
         self.rx = {eid: re.compile("|".join(term_pattern(t) for t in ts)) for eid, ts in terms.items()}
+        self.ex = {eid: re.compile("|".join(term_pattern(t) for t in ts)) for eid, ts in (exclude or {}).items() if ts}
 
     def hit(self, entity: str, text: str) -> bool:
         rx = self.rx.get(entity)
-        return bool(rx and text and rx.search(fold(text)))
+        if not (rx and text):
+            return False
+        folded = fold(text)
+        ex = self.ex.get(entity)
+        if ex:
+            folded = ex.sub(" ", folded)
+        return bool(rx.search(folded))
 
 
 def load_set(path: str | Path) -> tuple[list[dict], dict]:
