@@ -1,0 +1,728 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 774" width="1000" height="774" role="img" aria-label="North Korea with five partners, GDELT Events, 2026-08-16 to 2026-11-14">
+<style>
+.bg{fill:#fcfcfb}.t1{fill:#0b0b0b}.t2{fill:#52514e}.grid{stroke:#e4e3de}.axis{stroke:#b9b8b2}
+.bar{fill:#c8c7c1}.spike{fill:#2a78d6}.out{stroke:#2a78d6}.in{stroke:#eb6834}.tick{stroke:#9b9a94}
+.tickall{stroke:#e4e3de}.launch{fill:#52514e}
+@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.grid{stroke:#33332f}
+.axis{stroke:#5b5a55}.bar{fill:#4a4945}.spike{fill:#3987e5}.out{stroke:#3987e5}.in{stroke:#d95926}
+.tick{stroke:#7d7c76}.tickall{stroke:#33332f}.launch{fill:#c3c2b7}}
+text{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+</style>
+<rect class="bg" width="1000" height="774"/>
+<text class="t1" x="16" y="24" font-size="15" font-weight="600">North Korea with five partners: GDELT Events, 16 Aug to 14 Nov 2026 (UTC days)</text>
+<text class="t2" x="16" y="44" font-size="12">Counted per article (distinct source URL). Blue line: North Korea as actor (PRK&#8594;partner). Orange line: partner as actor (partner&#8594;PRK).</text>
+<text class="t2" x="16" y="60" font-size="12">Dashed ticks: dated events naming that partner (docs/relations/korea_events.json); triangles: missile launches. Lines start after 7 complete days.</text>
+<text class="t2" x="110" y="90" font-size="12">Articles a day, both directions (blue: z &#8805; 2.5)</text>
+<text class="t2" x="410" y="90" font-size="12">Conflict share, 7 days (quad 3+4)</text>
+<text class="t2" x="710" y="90" font-size="12">Mean Goldstein, 7 days (&#8722;10 to +10)</text>
+<text class="t1" x="16" y="156.0" font-size="13" font-weight="600">South Korea</text>
+<line class="axis" x1="110" x2="384" y1="208" y2="208"/>
+<line class="tick" x1="116.1" x2="116.1" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="122.2" x2="122.2" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M118.2 97 L126.2 97 L122.2 103 Z"><title>2026-08-20: SRBM barrage during UFS; Kim Yo Jong mocks Seoul, calls Trump ties excellent</title></path>
+<line class="tick" x1="173.9" x2="173.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="177.0" x2="177.0" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="192.2" x2="192.2" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M188.2 97 L196.2 97 L192.2 103 Z"><title>2026-09-12: Several SRBMs, about 250 km</title></path>
+<line class="tick" x1="210.5" x2="210.5" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="216.6" x2="216.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M212.6 97 L220.6 97 L216.6 103 Z"><title>2026-09-20: Two SRBMs, one about 440 km (Japan MoD)</title></path>
+<line class="tick" x1="219.6" x2="219.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="240.9" x2="240.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="247.0" x2="247.0" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="253.1" x2="253.1" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M249.1 97 L257.1 97 L253.1 103 Z"><title>2026-10-02: Ballistic missile about 680 km (3 Oct KST); KCNA: hypersonic IRBM</title></path>
+<line class="tick" x1="283.5" x2="283.5" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M279.5 97 L287.5 97 L283.5 103 Z"><title>2026-10-12: Several ballistic missiles, one over 900 km, Kim present</title></path>
+<line class="tick" x1="289.6" x2="289.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M285.6 97 L293.6 97 L289.6 103 Z"><title>2026-10-14: Submarine-launched strategic cruise missiles (KCNA)</title></path>
+<line class="tick" x1="304.8" x2="304.8" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="310.9" x2="310.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="335.3" x2="335.3" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M331.3 97 L339.3 97 L335.3 103 Z"><title>2026-10-29: Salvo of about 10 SRBMs (28 or 29 Oct)</title></path>
+<line class="tick" x1="338.3" x2="338.3" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="353.6" x2="353.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M349.6 97 L357.6 97 L353.6 103 Z"><title>2026-11-04: Multiple missiles from Sondok</title></path>
+<line class="tick" x1="371.8" x2="371.8" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="374.9" x2="374.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="axis" x1="410" x2="684" y1="208" y2="208"/>
+<line class="tick" x1="416.1" x2="416.1" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="422.2" x2="422.2" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="473.9" x2="473.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="477.0" x2="477.0" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="492.2" x2="492.2" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="510.5" x2="510.5" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="516.6" x2="516.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="519.6" x2="519.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="540.9" x2="540.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="547.0" x2="547.0" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="553.1" x2="553.1" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="583.5" x2="583.5" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="589.6" x2="589.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="604.8" x2="604.8" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="610.9" x2="610.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="635.3" x2="635.3" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="638.3" x2="638.3" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="653.6" x2="653.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="671.8" x2="671.8" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="674.9" x2="674.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="axis" x1="710" x2="984" y1="208" y2="208"/>
+<line class="tick" x1="716.1" x2="716.1" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="722.2" x2="722.2" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="773.9" x2="773.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="777.0" x2="777.0" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="792.2" x2="792.2" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="810.5" x2="810.5" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="816.6" x2="816.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="819.6" x2="819.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="840.9" x2="840.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="847.0" x2="847.0" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="853.1" x2="853.1" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="883.5" x2="883.5" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="889.6" x2="889.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="904.8" x2="904.8" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="910.9" x2="910.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="935.3" x2="935.3" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="938.3" x2="938.3" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="953.6" x2="953.6" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="971.8" x2="971.8" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="974.9" x2="974.9" y1="104" y2="208" stroke-width="1" stroke-dasharray="2 2"/>
+<rect class="spike" x="109.0" y="160.0" width="2.0" height="48.0"><title>2026-08-16: 118.0 articles, z 3.99</title></rect>
+<rect class="spike" x="112.0" y="110.0" width="2.0" height="98.0"><title>2026-08-17: 241.0 articles, z 3.36</title></rect>
+<rect class="bar" x="115.1" y="153.9" width="2.0" height="54.1"><title>2026-08-18: 133.0 articles, z 1.97</title></rect>
+<rect class="bar" x="118.1" y="133.2" width="2.0" height="74.8"><title>2026-08-19: 184.0 articles, z 2.06</title></rect>
+<rect class="bar" x="121.2" y="115.7" width="2.0" height="92.3"><title>2026-08-20: 227.0 articles, z 2.49</title></rect>
+<rect class="bar" x="124.2" y="154.3" width="2.0" height="53.7"><title>2026-08-21: 132.0 articles, z 1.59</title></rect>
+<rect class="bar" x="127.3" y="197.4" width="2.0" height="10.6"><title>2026-08-22: 26.0 articles, z 0.65</title></rect>
+<rect class="bar" x="130.3" y="200.7" width="2.0" height="7.3"><title>2026-08-23: 18.0 articles, z -0.03</title></rect>
+<rect class="bar" x="133.4" y="185.2" width="2.0" height="22.8"><title>2026-08-24: 56.0 articles, z 0.43</title></rect>
+<rect class="bar" x="136.4" y="192.5" width="2.0" height="15.5"><title>2026-08-25: 38.0 articles, z 0.04</title></rect>
+<rect class="bar" x="139.4" y="194.2" width="2.0" height="13.8"><title>2026-08-26: 34.0 articles, z -0.44</title></rect>
+<rect class="bar" x="142.5" y="195.8" width="2.0" height="12.2"><title>2026-08-27: 30.0 articles, z -0.31</title></rect>
+<rect class="bar" x="145.5" y="187.3" width="2.0" height="20.7"><title>2026-08-28: 51.0 articles, z 0.12</title></rect>
+<rect class="bar" x="148.6" y="205.2" width="2.0" height="2.8"><title>2026-08-29: 7.0 articles, z -1.13</title></rect>
+<rect class="bar" x="151.6" y="204.3" width="2.0" height="3.7"><title>2026-08-30: 9.0 articles, z -0.91</title></rect>
+<rect class="bar" x="154.7" y="199.1" width="2.0" height="8.9"><title>2026-08-31: 22.0 articles, z -0.81</title></rect>
+<rect class="bar" x="157.7" y="196.6" width="2.0" height="11.4"><title>2026-09-01: 28.0 articles, z -0.56</title></rect>
+<rect class="bar" x="160.8" y="199.1" width="2.0" height="8.9"><title>2026-09-02: 22.0 articles, z -1.28</title></rect>
+<rect class="bar" x="163.8" y="203.1" width="2.0" height="4.9"><title>2026-09-03: 12.0 articles, z -1.79</title></rect>
+<rect class="bar" x="166.8" y="204.7" width="2.0" height="3.3"><title>2026-09-04: 8.0 articles, z -2.16</title></rect>
+<rect class="bar" x="169.9" y="204.3" width="2.0" height="3.7"><title>2026-09-05: 9.0 articles, z -0.77</title></rect>
+<rect class="bar" x="172.9" y="204.3" width="2.0" height="3.7"><title>2026-09-06: 9.0 articles, z -0.91</title></rect>
+<rect class="bar" x="176.0" y="193.0" width="2.0" height="15.0"><title>2026-09-07: 37.0 articles, z -0.34</title></rect>
+<rect class="bar" x="179.0" y="197.8" width="2.0" height="10.2"><title>2026-09-08: 25.0 articles, z -0.69</title></rect>
+<rect class="bar" x="182.1" y="196.2" width="2.0" height="11.8"><title>2026-09-09: 29.0 articles, z -0.79</title></rect>
+<rect class="bar" x="185.1" y="198.6" width="2.0" height="9.4"><title>2026-09-10: 23.0 articles, z -0.6</title></rect>
+<rect class="bar" x="188.2" y="201.9" width="2.0" height="6.1"><title>2026-09-11: 15.0 articles, z -1.1</title></rect>
+<rect class="bar" x="191.2" y="183.2" width="2.0" height="24.8"><title>2026-09-12: 61.0 articles, z 1.12</title></rect>
+<rect class="bar" x="194.2" y="203.5" width="2.0" height="4.5"><title>2026-09-13: 11.0 articles, z -0.66</title></rect>
+<rect class="bar" x="197.3" y="182.8" width="2.0" height="25.2"><title>2026-09-14: 62.0 articles, z 0.08</title></rect>
+<rect class="bar" x="200.3" y="202.3" width="2.0" height="5.7"><title>2026-09-15: 14.0 articles, z -1.4</title></rect>
+<rect class="bar" x="203.4" y="186.0" width="2.0" height="22.0"><title>2026-09-16: 54.0 articles, z 0.24</title></rect>
+<rect class="bar" x="206.4" y="193.4" width="2.0" height="14.6"><title>2026-09-17: 36.0 articles, z -0.06</title></rect>
+<rect class="bar" x="209.5" y="193.8" width="2.0" height="14.2"><title>2026-09-18: 35.0 articles, z 0.22</title></rect>
+<rect class="bar" x="212.5" y="193.8" width="2.0" height="14.2"><title>2026-09-19: 35.0 articles, z 1.27</title></rect>
+<rect class="spike" x="215.6" y="166.1" width="2.0" height="41.9"><title>2026-09-20: 103.0 articles, z 4.2</title></rect>
+<rect class="bar" x="218.6" y="186.9" width="2.0" height="21.1"><title>2026-09-21: 52.0 articles, z 0.37</title></rect>
+<rect class="bar" x="221.6" y="175.1" width="2.0" height="32.9"><title>2026-09-22: 81.0 articles, z 1.86</title></rect>
+<rect class="bar" x="224.7" y="189.7" width="2.0" height="18.3"><title>2026-09-23: 45.0 articles, z 0.47</title></rect>
+<rect class="bar" x="227.7" y="188.1" width="2.0" height="19.9"><title>2026-09-24: 49.0 articles, z 1.09</title></rect>
+<rect class="bar" x="230.8" y="190.9" width="2.0" height="17.1"><title>2026-09-25: 42.0 articles, z 0.96</title></rect>
+<rect class="bar" x="233.8" y="204.7" width="2.0" height="3.3"><title>2026-09-26: 8.0 articles, z -1.26</title></rect>
+<rect class="bar" x="236.9" y="201.1" width="2.0" height="6.9"><title>2026-09-27: 17.0 articles, z -0.07</title></rect>
+<rect class="bar" x="239.9" y="166.5" width="2.0" height="41.5"><title>2026-09-28: 102.0 articles, z 1.43</title></rect>
+<rect class="bar" x="243.0" y="176.3" width="2.0" height="31.7"><title>2026-09-29: 78.0 articles, z 1.47</title></rect>
+<rect class="bar" x="246.0" y="167.3" width="2.0" height="40.7"><title>2026-09-30: 100.0 articles, z 1.57</title></rect>
+<rect class="bar" x="249.0" y="190.1" width="2.0" height="17.9"><title>2026-10-01: 44.0 articles, z 0.74</title></rect>
+<rect class="bar" x="252.1" y="181.2" width="2.0" height="26.8"><title>2026-10-02: 66.0 articles, z 1.76</title></rect>
+<rect class="spike" x="255.1" y="162.0" width="2.0" height="46.0"><title>2026-10-03: 113.0 articles, z 2.69</title></rect>
+<rect class="bar" x="258.2" y="186.4" width="2.0" height="21.6"><title>2026-10-04: 53.0 articles, z 1.4</title></rect>
+<rect class="bar" x="261.2" y="190.1" width="2.0" height="17.9"><title>2026-10-05: 44.0 articles, z -0.46</title></rect>
+<rect class="bar" x="264.3" y="193.8" width="2.0" height="14.2"><title>2026-10-06: 35.0 articles, z -0.16</title></rect>
+<rect class="bar" x="267.3" y="193.0" width="2.0" height="15.0"><title>2026-10-07: 37.0 articles, z -0.52</title></rect>
+<rect class="bar" x="270.4" y="177.1" width="2.0" height="30.9"><title>2026-10-08: 76.0 articles, z 1.16</title></rect>
+<rect class="bar" x="273.4" y="197.4" width="2.0" height="10.6"><title>2026-10-09: 26.0 articles, z -0.46</title></rect>
+<rect class="bar" x="276.4" y="202.3" width="2.0" height="5.7"><title>2026-10-10: 14.0 articles, z -1.59</title></rect>
+<rect class="bar" x="279.5" y="204.7" width="2.0" height="3.3"><title>2026-10-11: 8.0 articles, z -2.16</title></rect>
+<rect class="bar" x="282.5" y="171.4" width="2.0" height="36.6"><title>2026-10-12: 90.0 articles, z 0.6</title></rect>
+<rect class="bar" x="285.6" y="187.3" width="2.0" height="20.7"><title>2026-10-13: 51.0 articles, z 0.29</title></rect>
+<rect class="bar" x="288.6" y="197.0" width="2.0" height="11.0"><title>2026-10-14: 27.0 articles, z -1.18</title></rect>
+<rect class="bar" x="291.7" y="194.2" width="2.0" height="13.8"><title>2026-10-15: 34.0 articles, z -0.61</title></rect>
+<rect class="bar" x="294.7" y="197.8" width="2.0" height="10.2"><title>2026-10-16: 25.0 articles, z -0.76</title></rect>
+<rect class="bar" x="297.8" y="203.9" width="2.0" height="4.1"><title>2026-10-17: 10.0 articles, z -1.51</title></rect>
+<rect class="bar" x="300.8" y="203.1" width="2.0" height="4.9"><title>2026-10-18: 12.0 articles, z -1.42</title></rect>
+<rect class="bar" x="303.8" y="191.3" width="2.0" height="16.7"><title>2026-10-19: 41.0 articles, z -0.89</title></rect>
+<rect class="bar" x="306.9" y="164.5" width="2.0" height="43.5"><title>2026-10-20: 107.0 articles, z 1.08</title></rect>
+<rect class="bar" x="309.9" y="173.4" width="2.0" height="34.6"><title>2026-10-21: 85.0 articles, z 1.06</title></rect>
+<rect class="bar" x="313.0" y="170.2" width="2.0" height="37.8"><title>2026-10-22: 93.0 articles, z 1.11</title></rect>
+<rect class="bar" x="316.0" y="170.2" width="2.0" height="37.8"><title>2026-10-23: 93.0 articles, z 1.56</title></rect>
+<rect class="bar" x="319.1" y="179.9" width="2.0" height="28.1"><title>2026-10-24: 69.0 articles, z 2.04</title></rect>
+<rect class="bar" x="322.1" y="194.6" width="2.0" height="13.4"><title>2026-10-25: 33.0 articles, z 1.02</title></rect>
+<rect class="bar" x="325.2" y="177.1" width="2.0" height="30.9"><title>2026-10-26: 76.0 articles, z 0.28</title></rect>
+<rect class="bar" x="328.2" y="192.5" width="2.0" height="15.5"><title>2026-10-27: 38.0 articles, z -0.8</title></rect>
+<rect class="bar" x="331.2" y="197.4" width="2.0" height="10.6"><title>2026-10-28: 26.0 articles, z -1.18</title></rect>
+<rect class="bar" x="334.3" y="165.7" width="2.0" height="42.3"><title>2026-10-29: 104.0 articles, z 0.99</title></rect>
+<rect class="bar" x="337.3" y="168.1" width="2.0" height="39.9"><title>2026-10-30: 98.0 articles, z 1.28</title></rect>
+<rect class="bar" x="340.4" y="193.4" width="2.0" height="14.6"><title>2026-10-31: 36.0 articles, z 0.14</title></rect>
+<rect class="bar" x="343.4" y="193.0" width="2.0" height="15.0"><title>2026-11-01: 37.0 articles, z 1.02</title></rect>
+<rect class="bar" x="346.5" y="187.3" width="2.0" height="20.7"><title>2026-11-02: 51.0 articles, z -0.28</title></rect>
+<rect class="bar" x="349.5" y="182.8" width="2.0" height="25.2"><title>2026-11-03: 62.0 articles, z 0.32</title></rect>
+<rect class="bar" x="352.6" y="184.8" width="2.0" height="23.2"><title>2026-11-04: 57.0 articles, z 0.72</title></rect>
+<rect class="bar" x="355.6" y="192.1" width="2.0" height="15.9"><title>2026-11-05: 39.0 articles, z -1.1</title></rect>
+<rect class="bar" x="358.6" y="198.6" width="2.0" height="9.4"><title>2026-11-06: 23.0 articles, z -1.38</title></rect>
+<rect class="bar" x="361.7" y="204.7" width="2.0" height="3.3"><title>2026-11-07: 8.0 articles, z -1.91</title></rect>
+<rect class="bar" x="364.7" y="206.0" width="2.0" height="2.0"><title>2026-11-08: 5.0 articles, z -2.09</title></rect>
+<rect class="bar" x="367.8" y="205.6" width="2.0" height="2.4"><title>2026-11-09: 6.0 articles, z -3.69</title></rect>
+<rect class="bar" x="370.8" y="194.6" width="2.0" height="13.4"><title>2026-11-10: 33.0 articles, z -0.86</title></rect>
+<rect class="bar" x="373.9" y="203.1" width="2.0" height="4.9"><title>2026-11-11: 12.0 articles, z -1.78</title></rect>
+<rect class="bar" x="376.9" y="193.4" width="2.0" height="14.6"><title>2026-11-12: 36.0 articles, z -0.7</title></rect>
+<rect class="bar" x="380.0" y="200.7" width="2.0" height="7.3"><title>2026-11-13: 18.0 articles, z -1.33</title></rect>
+<rect class="bar" x="383.0" y="206.4" width="2.0" height="1.6"><title>2026-11-14: 4.0 articles, z -2.08</title></rect>
+<text class="t2" x="104" y="114" font-size="10" text-anchor="end">241</text>
+<text class="t2" x="104" y="208" font-size="10" text-anchor="end">0</text>
+<line class="grid" x1="410" x2="684" y1="208.0" y2="208.0"/>
+<text class="t2" x="406" y="211.0" font-size="10" text-anchor="end">0%</text>
+<line class="grid" x1="410" x2="684" y1="156.0" y2="156.0"/>
+<text class="t2" x="406" y="159.0" font-size="10" text-anchor="end">40%</text>
+<line class="grid" x1="410" x2="684" y1="104.0" y2="104.0"/>
+<text class="t2" x="406" y="107.0" font-size="10" text-anchor="end">80%</text>
+<polyline class="out" fill="none" stroke-width="2" stroke-linejoin="round" points="410.0,129.4 413.0,126.5 416.1,126.8 419.1,136.3 422.2,138.2 425.2,139.6 428.3,138.1 431.3,137.4 434.4,141.1 437.4,142.3 440.4,139.4 443.5,140.9 446.5,144.0 449.6,145.1 452.6,144.7 455.7,147.5 458.7,153.8 461.8,149.9 464.8,151.8 467.8,149.7 470.9,146.2 473.9,148.3 477.0,158.0 480.0,152.9 483.1,159.7 486.1,156.4 489.2,158.1 492.2,147.5 495.2,147.4 498.3,148.1 501.3,145.4 504.4,135.1 507.4,140.1 510.5,141.1 513.5,148.8 516.6,136.7 519.6,132.8 522.6,143.0 525.7,148.8 528.7,150.4 531.8,150.6 534.8,151.9 537.9,167.3 540.9,170.3 544.0,166.4 547.0,160.9 550.0,158.5 553.1,158.1 556.1,148.1 559.2,146.1 562.2,144.1 565.3,139.6 568.3,137.2 571.4,137.6 574.4,136.4 577.4,145.1 580.5,150.4 583.5,137.0 586.6,135.6 589.6,134.2 592.7,132.2 595.7,130.4 598.8,128.6 601.8,130.4 604.8,144.2 607.9,146.0 610.9,154.3 614.0,153.7 617.0,156.2 620.1,160.2 623.1,161.2 626.2,160.0 629.2,160.4 632.2,160.4 635.3,154.3 638.3,147.3 641.4,138.3 644.4,134.1 647.5,128.8 650.5,130.5 653.6,130.8 656.6,131.3 659.6,133.6 662.7,137.7 665.7,140.0 668.8,143.6 671.8,140.9 674.9,135.4 677.9,149.8 681.0,152.3 684.0,151.7"/>
+<polyline class="in" fill="none" stroke-width="2" stroke-linejoin="round" points="410.0,175.0 413.0,169.7 416.1,166.5 419.1,170.3 422.2,169.1 425.2,169.3 428.3,166.3 431.3,165.0 434.4,167.0 437.4,171.7 440.4,169.5 443.5,177.3 446.5,181.3 449.6,179.6 452.6,177.9 455.7,176.2 458.7,175.9 461.8,174.0 464.8,174.2 467.8,161.2 470.9,160.3 473.9,162.9 477.0,171.2 480.0,170.9 483.1,170.5 486.1,171.9 489.2,171.1 492.2,166.9 495.2,166.9 498.3,163.5 501.3,160.6 504.4,153.6 507.4,155.6 510.5,162.1 513.5,168.2 516.6,167.9 519.6,173.6 522.6,175.2 525.7,182.5 528.7,182.6 531.8,181.9 534.8,181.9 537.9,186.9 540.9,181.9 544.0,177.8 547.0,171.1 550.0,170.1 553.1,167.0 556.1,163.6 559.2,161.5 562.2,154.8 565.3,156.2 568.3,155.3 571.4,155.3 574.4,155.5 577.4,155.5 580.5,156.2 583.5,161.3 586.6,158.2 589.6,156.3 592.7,153.0 595.7,150.6 598.8,149.8 601.8,152.6 604.8,144.4 607.9,142.0 610.9,141.8 614.0,143.0 617.0,146.5 620.1,150.1 623.1,152.4 626.2,155.9 629.2,159.0 632.2,165.9 635.3,162.1 638.3,158.3 641.4,156.4 644.4,151.9 647.5,152.1 650.5,150.4 653.6,148.4 656.6,146.6 659.6,149.2 662.7,149.4 665.7,151.3 668.8,147.9 671.8,154.4 674.9,156.4 677.9,182.5 681.0,184.4 684.0,183.9"/>
+<line class="grid" x1="710" x2="984" y1="208.0" y2="208.0"/>
+<text class="t2" x="706" y="211.0" font-size="10" text-anchor="end">-4</text>
+<line class="grid" x1="710" x2="984" y1="156.0" y2="156.0"/>
+<text class="t2" x="706" y="159.0" font-size="10" text-anchor="end">+0</text>
+<line class="grid" x1="710" x2="984" y1="104.0" y2="104.0"/>
+<text class="t2" x="706" y="107.0" font-size="10" text-anchor="end">+4</text>
+<polyline class="out" fill="none" stroke-width="2" stroke-linejoin="round" points="710.0,185.5 713.0,183.3 716.1,181.7 719.1,168.7 722.2,168.1 725.2,167.5 728.3,168.8 731.3,169.7 734.4,168.5 737.4,168.2 740.4,172.3 743.5,168.2 746.5,163.0 749.6,163.2 752.6,164.7 755.7,158.5 758.7,155.3 761.8,156.1 764.8,153.9 767.8,154.6 770.9,156.6 773.9,156.3 777.0,151.7 780.0,151.0 783.1,147.6 786.1,152.5 789.2,151.5 792.2,171.7 795.2,172.9 798.3,173.2 801.3,178.1 804.4,182.1 807.4,176.0 810.5,173.9 813.5,158.6 816.6,177.4 819.6,181.8 822.6,170.4 825.7,168.0 828.7,165.4 831.8,167.7 834.8,168.9 837.9,149.2 840.9,147.1 844.0,154.1 847.0,157.5 850.0,161.8 853.1,161.8 856.1,170.8 859.2,174.0 862.2,173.1 865.3,175.8 868.3,179.2 871.4,175.8 874.4,174.1 877.4,163.8 880.5,152.9 883.5,174.9 886.6,177.0 889.6,177.5 892.7,186.3 895.7,190.3 898.8,191.2 901.8,188.3 904.8,171.7 907.9,167.9 910.9,167.5 914.0,164.9 917.0,161.6 920.1,157.6 923.1,157.2 926.2,156.4 929.2,157.1 932.2,152.9 935.3,160.8 938.3,167.3 941.4,173.0 944.4,176.3 947.5,181.7 950.5,180.3 953.6,180.7 956.6,177.6 959.6,172.2 962.7,170.3 965.7,168.3 968.8,166.2 971.8,165.4 974.9,165.8 977.9,151.8 981.0,154.8 984.0,157.0"/>
+<polyline class="in" fill="none" stroke-width="2" stroke-linejoin="round" points="710.0,147.1 713.0,150.0 716.1,152.4 719.1,147.7 722.2,150.2 725.2,150.0 728.3,152.7 731.3,154.5 734.4,153.9 737.4,149.8 740.4,153.0 743.5,141.8 746.5,137.1 749.6,139.0 752.6,139.5 755.7,144.0 758.7,145.4 761.8,146.7 764.8,146.2 767.8,153.4 770.9,155.1 773.9,155.0 777.0,145.3 780.0,144.9 783.1,146.0 786.1,145.8 789.2,147.8 792.2,152.2 795.2,153.2 798.3,158.7 801.3,162.8 804.4,168.8 807.4,167.5 810.5,159.3 813.5,148.8 816.6,153.6 819.6,148.1 822.6,144.3 825.7,136.7 828.7,137.4 831.8,140.8 834.8,144.3 837.9,137.6 840.9,142.3 844.0,149.1 847.0,157.0 850.0,155.5 853.1,155.4 856.1,157.4 859.2,158.5 862.2,160.3 865.3,157.4 868.3,155.6 871.4,155.2 874.4,154.0 877.4,151.5 880.5,149.5 883.5,153.1 886.6,157.8 889.6,159.6 892.7,167.5 895.7,171.6 898.8,171.7 901.8,169.0 904.8,169.0 907.9,169.3 910.9,169.5 914.0,165.9 917.0,161.2 920.1,160.0 923.1,159.0 926.2,158.1 929.2,155.7 932.2,150.7 935.3,156.8 938.3,163.9 941.4,164.3 944.4,166.1 947.5,164.9 950.5,165.0 953.6,167.2 956.6,167.1 959.6,163.0 962.7,163.9 965.7,164.5 968.8,167.5 971.8,162.4 974.9,156.3 977.9,138.4 981.0,138.3 984.0,139.3"/>
+<text class="t1" x="16" y="282.0" font-size="13" font-weight="600">United States</text>
+<line class="axis" x1="110" x2="384" y1="334" y2="334"/>
+<line class="tick" x1="116.1" x2="116.1" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="173.9" x2="173.9" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="177.0" x2="177.0" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="210.5" x2="210.5" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="289.6" x2="289.6" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M285.6 223 L293.6 223 L289.6 229 Z"><title>2026-10-14: Submarine-launched strategic cruise missiles (KCNA)</title></path>
+<line class="tick" x1="332.2" x2="332.2" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="338.3" x2="338.3" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="344.4" x2="344.4" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="350.5" x2="350.5" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="axis" x1="410" x2="684" y1="334" y2="334"/>
+<line class="tick" x1="416.1" x2="416.1" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="473.9" x2="473.9" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="477.0" x2="477.0" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="510.5" x2="510.5" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="589.6" x2="589.6" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="632.2" x2="632.2" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="638.3" x2="638.3" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="644.4" x2="644.4" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="650.5" x2="650.5" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="axis" x1="710" x2="984" y1="334" y2="334"/>
+<line class="tick" x1="716.1" x2="716.1" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="773.9" x2="773.9" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="777.0" x2="777.0" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="810.5" x2="810.5" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="889.6" x2="889.6" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="932.2" x2="932.2" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="938.3" x2="938.3" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="944.4" x2="944.4" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="950.5" x2="950.5" y1="230" y2="334" stroke-width="1" stroke-dasharray="2 2"/>
+<rect class="spike" x="109.0" y="322.4" width="2.0" height="11.6"><title>2026-08-16: 21.0 articles, z 3.57</title></rect>
+<rect class="spike" x="112.0" y="265.2" width="2.0" height="68.8"><title>2026-08-17: 125.0 articles, z 4.47</title></rect>
+<rect class="spike" x="115.1" y="275.6" width="2.0" height="58.4"><title>2026-08-18: 106.0 articles, z 3.26</title></rect>
+<rect class="spike" x="118.1" y="236.0" width="2.0" height="98.0"><title>2026-08-19: 178.0 articles, z 3.02</title></rect>
+<rect class="spike" x="121.2" y="255.3" width="2.0" height="78.7"><title>2026-08-20: 143.0 articles, z 2.94</title></rect>
+<rect class="bar" x="124.2" y="303.7" width="2.0" height="30.3"><title>2026-08-21: 55.0 articles, z 1.46</title></rect>
+<rect class="bar" x="127.3" y="323.0" width="2.0" height="11.0"><title>2026-08-22: 20.0 articles, z 1.38</title></rect>
+<rect class="bar" x="130.3" y="328.5" width="2.0" height="5.5"><title>2026-08-23: 10.0 articles, z 0.71</title></rect>
+<rect class="bar" x="133.4" y="321.9" width="2.0" height="12.1"><title>2026-08-24: 22.0 articles, z 0.27</title></rect>
+<rect class="bar" x="136.4" y="320.8" width="2.0" height="13.2"><title>2026-08-25: 24.0 articles, z 0.33</title></rect>
+<rect class="bar" x="139.4" y="324.1" width="2.0" height="9.9"><title>2026-08-26: 18.0 articles, z -0.39</title></rect>
+<rect class="bar" x="142.5" y="316.4" width="2.0" height="17.6"><title>2026-08-27: 32.0 articles, z 0.61</title></rect>
+<rect class="bar" x="145.5" y="316.9" width="2.0" height="17.1"><title>2026-08-28: 31.0 articles, z 0.57</title></rect>
+<rect class="bar" x="148.6" y="327.4" width="2.0" height="6.6"><title>2026-08-29: 12.0 articles, z 0.66</title></rect>
+<rect class="bar" x="151.6" y="327.4" width="2.0" height="6.6"><title>2026-08-30: 12.0 articles, z 0.4</title></rect>
+<rect class="bar" x="154.7" y="316.9" width="2.0" height="17.1"><title>2026-08-31: 31.0 articles, z 0.5</title></rect>
+<rect class="bar" x="157.7" y="319.1" width="2.0" height="14.9"><title>2026-09-01: 27.0 articles, z 0.12</title></rect>
+<rect class="bar" x="160.8" y="321.9" width="2.0" height="12.1"><title>2026-09-02: 22.0 articles, z -0.49</title></rect>
+<rect class="bar" x="163.8" y="330.7" width="2.0" height="3.3"><title>2026-09-03: 6.0 articles, z -1.98</title></rect>
+<rect class="bar" x="166.8" y="332.9" width="2.0" height="1.1"><title>2026-09-04: 2.0 articles, z -2.61</title></rect>
+<rect class="bar" x="169.9" y="331.8" width="2.0" height="2.2"><title>2026-09-05: 4.0 articles, z -0.82</title></rect>
+<rect class="bar" x="172.9" y="332.9" width="2.0" height="1.1"><title>2026-09-06: 2.0 articles, z -1.53</title></rect>
+<rect class="bar" x="176.0" y="326.8" width="2.0" height="7.2"><title>2026-09-07: 13.0 articles, z -0.94</title></rect>
+<rect class="bar" x="179.0" y="331.2" width="2.0" height="2.8"><title>2026-09-08: 5.0 articles, z -1.6</title></rect>
+<rect class="bar" x="182.1" y="327.4" width="2.0" height="6.6"><title>2026-09-09: 12.0 articles, z -1.17</title></rect>
+<rect class="bar" x="185.1" y="329.6" width="2.0" height="4.4"><title>2026-09-10: 8.0 articles, z -1.1</title></rect>
+<rect class="bar" x="188.2" y="327.9" width="2.0" height="6.1"><title>2026-09-11: 11.0 articles, z -0.42</title></rect>
+<rect class="bar" x="191.2" y="325.2" width="2.0" height="8.8"><title>2026-09-12: 16.0 articles, z 0.45</title></rect>
+<rect class="bar" x="194.2" y="329.6" width="2.0" height="4.4"><title>2026-09-13: 8.0 articles, z -0.1</title></rect>
+<rect class="bar" x="197.3" y="330.1" width="2.0" height="3.9"><title>2026-09-14: 7.0 articles, z -1.55</title></rect>
+<rect class="bar" x="200.3" y="331.2" width="2.0" height="2.8"><title>2026-09-15: 5.0 articles, z -1.63</title></rect>
+<rect class="bar" x="203.4" y="326.3" width="2.0" height="7.7"><title>2026-09-16: 14.0 articles, z -0.87</title></rect>
+<rect class="bar" x="206.4" y="324.1" width="2.0" height="9.9"><title>2026-09-17: 18.0 articles, z -0.27</title></rect>
+<rect class="bar" x="209.5" y="319.1" width="2.0" height="14.9"><title>2026-09-18: 27.0 articles, z 0.85</title></rect>
+<rect class="bar" x="212.5" y="323.5" width="2.0" height="10.5"><title>2026-09-19: 19.0 articles, z 0.77</title></rect>
+<rect class="bar" x="215.6" y="316.4" width="2.0" height="17.6"><title>2026-09-20: 32.0 articles, z 2.28</title></rect>
+<rect class="bar" x="218.6" y="327.9" width="2.0" height="6.1"><title>2026-09-21: 11.0 articles, z -0.51</title></rect>
+<rect class="bar" x="221.6" y="323.0" width="2.0" height="11.0"><title>2026-09-22: 20.0 articles, z 0.76</title></rect>
+<rect class="bar" x="224.7" y="314.2" width="2.0" height="19.8"><title>2026-09-23: 36.0 articles, z 1.16</title></rect>
+<rect class="bar" x="227.7" y="322.4" width="2.0" height="11.6"><title>2026-09-24: 21.0 articles, z 0.66</title></rect>
+<rect class="bar" x="230.8" y="327.4" width="2.0" height="6.6"><title>2026-09-25: 12.0 articles, z -0.05</title></rect>
+<rect class="bar" x="233.8" y="333.4" width="2.0" height="0.6"><title>2026-09-26: 1.0 articles, z -2.84</title></rect>
+<rect class="bar" x="236.9" y="331.2" width="2.0" height="2.8"><title>2026-09-27: 5.0 articles, z -0.78</title></rect>
+<rect class="bar" x="239.9" y="324.6" width="2.0" height="9.4"><title>2026-09-28: 17.0 articles, z 0.32</title></rect>
+<rect class="bar" x="243.0" y="322.4" width="2.0" height="11.6"><title>2026-09-29: 21.0 articles, z 0.88</title></rect>
+<rect class="bar" x="246.0" y="328.5" width="2.0" height="5.5"><title>2026-09-30: 10.0 articles, z -0.9</title></rect>
+<rect class="bar" x="249.0" y="331.8" width="2.0" height="2.2"><title>2026-10-01: 4.0 articles, z -1.37</title></rect>
+<rect class="bar" x="252.1" y="331.2" width="2.0" height="2.8"><title>2026-10-02: 5.0 articles, z -0.83</title></rect>
+<rect class="bar" x="255.1" y="331.8" width="2.0" height="2.2"><title>2026-10-03: 4.0 articles, z -0.65</title></rect>
+<rect class="bar" x="258.2" y="329.0" width="2.0" height="5.0"><title>2026-10-04: 9.0 articles, z 0.24</title></rect>
+<rect class="bar" x="261.2" y="331.2" width="2.0" height="2.8"><title>2026-10-05: 5.0 articles, z -1.19</title></rect>
+<rect class="bar" x="264.3" y="327.4" width="2.0" height="6.6"><title>2026-10-06: 12.0 articles, z 0.22</title></rect>
+<rect class="bar" x="267.3" y="325.7" width="2.0" height="8.3"><title>2026-10-07: 15.0 articles, z -0.08</title></rect>
+<rect class="bar" x="270.4" y="329.6" width="2.0" height="4.4"><title>2026-10-08: 8.0 articles, z -0.43</title></rect>
+<rect class="bar" x="273.4" y="329.0" width="2.0" height="5.0"><title>2026-10-09: 9.0 articles, z -0.4</title></rect>
+<rect class="bar" x="276.4" y="329.6" width="2.0" height="4.4"><title>2026-10-10: 8.0 articles, z 0.27</title></rect>
+<rect class="bar" x="282.5" y="326.8" width="2.0" height="7.2"><title>2026-10-12: 13.0 articles, z 0.46</title></rect>
+<rect class="bar" x="285.6" y="319.7" width="2.0" height="14.3"><title>2026-10-13: 26.0 articles, z 0.94</title></rect>
+<rect class="bar" x="288.6" y="320.2" width="2.0" height="13.8"><title>2026-10-14: 25.0 articles, z 0.55</title></rect>
+<rect class="bar" x="291.7" y="325.7" width="2.0" height="8.3"><title>2026-10-15: 15.0 articles, z 0.45</title></rect>
+<rect class="bar" x="294.7" y="329.6" width="2.0" height="4.4"><title>2026-10-16: 8.0 articles, z -0.43</title></rect>
+<rect class="bar" x="297.8" y="332.9" width="2.0" height="1.1"><title>2026-10-17: 2.0 articles, z -1.16</title></rect>
+<rect class="bar" x="300.8" y="331.2" width="2.0" height="2.8"><title>2026-10-18: 5.0 articles, z -0.17</title></rect>
+<rect class="bar" x="303.8" y="330.1" width="2.0" height="3.9"><title>2026-10-19: 7.0 articles, z -0.71</title></rect>
+<rect class="bar" x="306.9" y="321.3" width="2.0" height="12.7"><title>2026-10-20: 23.0 articles, z 0.34</title></rect>
+<rect class="bar" x="309.9" y="329.0" width="2.0" height="5.0"><title>2026-10-21: 9.0 articles, z -1.34</title></rect>
+<rect class="bar" x="313.0" y="330.7" width="2.0" height="3.3"><title>2026-10-22: 6.0 articles, z -0.91</title></rect>
+<rect class="spike" x="316.0" y="315.8" width="2.0" height="18.2"><title>2026-10-23: 33.0 articles, z 2.62</title></rect>
+<rect class="bar" x="319.1" y="327.4" width="2.0" height="6.6"><title>2026-10-24: 12.0 articles, z 2.13</title></rect>
+<rect class="bar" x="322.1" y="327.4" width="2.0" height="6.6"><title>2026-10-25: 12.0 articles, z 2.0</title></rect>
+<rect class="bar" x="325.2" y="326.8" width="2.0" height="7.2"><title>2026-10-26: 13.0 articles, z 0.5</title></rect>
+<rect class="bar" x="328.2" y="331.2" width="2.0" height="2.8"><title>2026-10-27: 5.0 articles, z -2.18</title></rect>
+<rect class="bar" x="331.2" y="326.8" width="2.0" height="7.2"><title>2026-10-28: 13.0 articles, z -0.07</title></rect>
+<rect class="bar" x="334.3" y="323.0" width="2.0" height="11.0"><title>2026-10-29: 20.0 articles, z 1.52</title></rect>
+<rect class="bar" x="337.3" y="314.7" width="2.0" height="19.3"><title>2026-10-30: 35.0 articles, z 1.88</title></rect>
+<rect class="bar" x="340.4" y="324.1" width="2.0" height="9.9"><title>2026-10-31: 18.0 articles, z 1.79</title></rect>
+<rect class="spike" x="343.4" y="310.9" width="2.0" height="23.1"><title>2026-11-01: 42.0 articles, z 3.37</title></rect>
+<rect class="bar" x="346.5" y="315.8" width="2.0" height="18.2"><title>2026-11-02: 33.0 articles, z 1.74</title></rect>
+<rect class="bar" x="349.5" y="296.6" width="2.0" height="37.4"><title>2026-11-03: 68.0 articles, z 2.1</title></rect>
+<rect class="bar" x="352.6" y="308.7" width="2.0" height="25.3"><title>2026-11-04: 46.0 articles, z 1.45</title></rect>
+<rect class="bar" x="355.6" y="323.0" width="2.0" height="11.0"><title>2026-11-05: 20.0 articles, z 0.7</title></rect>
+<rect class="bar" x="358.6" y="328.5" width="2.0" height="5.5"><title>2026-11-06: 10.0 articles, z -0.64</title></rect>
+<rect class="bar" x="361.7" y="330.1" width="2.0" height="3.9"><title>2026-11-07: 7.0 articles, z -0.16</title></rect>
+<rect class="bar" x="364.7" y="332.9" width="2.0" height="1.1"><title>2026-11-08: 2.0 articles, z -1.18</title></rect>
+<rect class="bar" x="367.8" y="332.3" width="2.0" height="1.7"><title>2026-11-09: 3.0 articles, z -1.9</title></rect>
+<rect class="bar" x="370.8" y="328.5" width="2.0" height="5.5"><title>2026-11-10: 10.0 articles, z -0.99</title></rect>
+<rect class="bar" x="373.9" y="332.3" width="2.0" height="1.7"><title>2026-11-11: 3.0 articles, z -2.19</title></rect>
+<rect class="bar" x="376.9" y="327.4" width="2.0" height="6.6"><title>2026-11-12: 12.0 articles, z -0.18</title></rect>
+<rect class="bar" x="380.0" y="326.8" width="2.0" height="7.2"><title>2026-11-13: 13.0 articles, z -0.37</title></rect>
+<rect class="bar" x="383.0" y="321.3" width="2.0" height="12.7"><title>2026-11-14: 23.0 articles, z 1.31</title></rect>
+<text class="t2" x="104" y="240" font-size="10" text-anchor="end">178</text>
+<text class="t2" x="104" y="334" font-size="10" text-anchor="end">0</text>
+<line class="grid" x1="410" x2="684" y1="334.0" y2="334.0"/>
+<text class="t2" x="406" y="337.0" font-size="10" text-anchor="end">0%</text>
+<line class="grid" x1="410" x2="684" y1="282.0" y2="282.0"/>
+<text class="t2" x="406" y="285.0" font-size="10" text-anchor="end">40%</text>
+<line class="grid" x1="410" x2="684" y1="230.0" y2="230.0"/>
+<text class="t2" x="406" y="233.0" font-size="10" text-anchor="end">80%</text>
+<polyline class="out" fill="none" stroke-width="2" stroke-linejoin="round" points="410.0,235.6 413.0,249.0 416.1,263.1 419.1,284.5 422.2,285.7 425.2,288.3 428.3,291.3 431.3,292.7 434.4,298.9 437.4,299.6 440.4,293.7 443.5,299.5 446.5,303.5 449.6,299.8 452.6,297.1 455.7,283.3 458.7,286.4 461.8,286.4 464.8,286.7 467.8,283.8 470.9,282.5 473.9,284.0 477.0,300.0 480.0,296.3 483.1,289.0 486.1,289.0 489.2,289.3 492.2,280.1 495.2,279.6 498.3,278.8 501.3,272.1 504.4,257.7 507.4,261.2 510.5,261.5 513.5,265.6 516.6,253.6 519.6,252.3 522.6,254.1 525.7,269.0 528.7,273.9 531.8,272.2 534.8,270.7 537.9,287.6 540.9,295.9 544.0,283.5 547.0,271.4 550.0,259.3 553.1,261.4 556.1,261.8 559.2,260.5 562.2,252.8 565.3,269.0 568.3,252.3 571.4,256.0 574.4,256.7 577.4,254.0 580.5,256.0 583.5,258.7 586.6,267.3 589.6,290.7 592.7,292.9 595.7,291.8 598.8,298.5 601.8,296.9 604.8,298.5 607.9,296.4 610.9,294.3 614.0,293.4 617.0,310.4 620.1,310.1 623.1,314.7 626.2,317.5 629.2,320.2 632.2,328.3 635.3,326.5 638.3,305.4 641.4,296.5 644.4,300.4 647.5,298.7 650.5,287.0 653.6,282.4 656.6,281.2 659.6,282.4 662.7,283.6 665.7,276.5 668.8,271.4 671.8,275.6 674.9,275.3 677.9,269.0 681.0,271.6 684.0,289.3"/>
+<polyline class="in" fill="none" stroke-width="2" stroke-linejoin="round" points="410.0,277.1 413.0,286.7 416.1,293.1 419.1,297.7 422.2,298.4 425.2,299.0 428.3,300.4 431.3,299.6 434.4,301.5 437.4,300.6 440.4,299.1 443.5,301.1 446.5,304.9 449.6,303.7 452.6,308.7 455.7,314.0 458.7,316.3 461.8,320.2 464.8,320.1 467.8,319.8 470.9,316.2 473.9,312.3 477.0,307.2 480.0,300.1 483.1,290.7 486.1,288.5 489.2,294.4 492.2,304.0 495.2,308.0 498.3,305.1 501.3,313.2 504.4,305.7 507.4,311.6 510.5,307.2 513.5,311.8 516.6,302.9 519.6,309.6 522.6,311.6 525.7,313.9 528.7,314.4 531.8,317.0 534.8,313.5 537.9,321.0 540.9,317.2 544.0,317.0 547.0,322.2 550.0,322.7 553.1,314.5 556.1,315.4 559.2,312.3 562.2,319.6 565.3,321.6 568.3,320.3 571.4,311.4 574.4,313.2 577.4,314.7 580.5,316.3 583.5,319.6 586.6,308.0 589.6,294.5 592.7,291.4 595.7,291.4 598.8,289.9 601.8,292.1 604.8,289.1 607.9,287.0 610.9,298.5 614.0,310.8 617.0,315.0 620.1,317.0 623.1,317.8 626.2,314.4 629.2,318.9 632.2,320.5 635.3,315.4 638.3,303.7 641.4,299.5 644.4,301.5 647.5,296.1 650.5,292.1 653.6,291.6 656.6,292.9 659.6,295.3 662.7,296.7 665.7,291.1 668.8,293.0 671.8,299.5 674.9,301.5 677.9,303.0 681.0,297.6 684.0,291.9"/>
+<line class="grid" x1="710" x2="984" y1="334.0" y2="334.0"/>
+<text class="t2" x="706" y="337.0" font-size="10" text-anchor="end">-4</text>
+<line class="grid" x1="710" x2="984" y1="282.0" y2="282.0"/>
+<text class="t2" x="706" y="285.0" font-size="10" text-anchor="end">+0</text>
+<line class="grid" x1="710" x2="984" y1="230.0" y2="230.0"/>
+<text class="t2" x="706" y="233.0" font-size="10" text-anchor="end">+4</text>
+<polyline class="out" fill="none" stroke-width="2" stroke-linejoin="round" points="710.0,319.4 713.0,304.6 716.1,295.1 719.1,279.1 722.2,278.9 725.2,276.6 728.3,274.5 731.3,273.1 734.4,269.8 737.4,269.5 740.4,273.4 743.5,265.6 746.5,261.1 749.6,264.1 752.6,266.1 755.7,273.8 758.7,264.8 761.8,260.5 764.8,256.2 767.8,256.9 770.9,257.7 773.9,256.1 777.0,250.0 780.0,259.6 783.1,266.6 786.1,272.1 789.2,272.2 792.2,282.1 795.2,285.5 798.3,282.5 801.3,289.9 804.4,298.4 807.4,295.0 810.5,292.6 813.5,285.0 816.6,293.4 819.6,293.7 822.6,290.9 825.7,283.6 828.7,281.2 831.8,284.0 834.8,286.1 837.9,272.4 840.9,265.1 844.0,267.5 847.0,274.1 850.0,278.5 853.1,278.2 856.1,280.8 859.2,286.0 862.2,292.7 865.3,292.9 868.3,294.2 871.4,293.1 874.4,287.3 877.4,287.2 880.5,281.0 883.5,284.8 886.6,280.3 889.6,274.2 892.7,271.5 895.7,275.3 898.8,272.5 901.8,272.8 904.8,267.6 907.9,266.7 910.9,267.4 914.0,269.3 917.0,253.9 920.1,254.4 923.1,249.6 926.2,244.4 929.2,246.8 932.2,235.8 935.3,234.8 938.3,252.4 941.4,259.4 944.4,265.0 947.5,267.9 950.5,275.8 953.6,281.6 956.6,284.6 959.6,284.0 962.7,283.0 965.7,285.8 968.8,289.9 971.8,289.0 974.9,290.0 977.9,287.9 981.0,282.1 984.0,274.8"/>
+<polyline class="in" fill="none" stroke-width="2" stroke-linejoin="round" points="710.0,292.4 713.0,279.9 716.1,278.2 719.1,269.7 722.2,267.9 725.2,268.5 728.3,267.3 731.3,267.6 734.4,266.1 737.4,264.4 740.4,267.6 743.5,269.0 746.5,262.0 749.6,264.2 752.6,261.0 755.7,259.5 758.7,253.7 761.8,247.5 764.8,247.9 767.8,245.7 770.9,246.9 773.9,247.8 777.0,246.6 780.0,254.8 783.1,258.7 786.1,259.3 789.2,256.1 792.2,245.8 795.2,249.0 798.3,246.4 801.3,242.1 804.4,254.1 807.4,258.1 810.5,255.6 813.5,246.5 816.6,252.3 819.6,246.2 822.6,245.2 825.7,244.8 828.7,241.2 831.8,240.9 834.8,248.7 837.9,240.7 840.9,245.7 844.0,245.5 847.0,238.6 850.0,239.8 853.1,255.2 856.1,256.5 859.2,266.2 862.2,265.2 865.3,261.8 868.3,270.1 871.4,268.2 874.4,256.9 877.4,257.8 880.5,251.0 883.5,249.9 886.6,259.6 889.6,276.9 892.7,277.0 895.7,281.9 898.8,282.4 901.8,280.2 904.8,283.2 907.9,284.2 910.9,266.1 914.0,266.8 917.0,254.6 920.1,251.8 923.1,249.4 926.2,249.9 929.2,247.4 932.2,246.1 935.3,246.6 938.3,252.1 941.4,257.0 944.4,260.9 947.5,268.6 950.5,270.9 953.6,270.9 956.6,270.5 959.6,271.4 962.7,271.3 965.7,274.1 968.8,270.0 971.8,267.0 974.9,270.1 977.9,272.8 981.0,275.6 984.0,275.1"/>
+<text class="t1" x="16" y="408.0" font-size="13" font-weight="600">Japan</text>
+<line class="axis" x1="110" x2="384" y1="460" y2="460"/>
+<line class="tick" x1="122.2" x2="122.2" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M118.2 349 L126.2 349 L122.2 355 Z"><title>2026-08-20: SRBM barrage during UFS; Kim Yo Jong mocks Seoul, calls Trump ties excellent</title></path>
+<line class="tick" x1="173.9" x2="173.9" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="177.0" x2="177.0" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="192.2" x2="192.2" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M188.2 349 L196.2 349 L192.2 355 Z"><title>2026-09-12: Several SRBMs, about 250 km</title></path>
+<line class="tick" x1="210.5" x2="210.5" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="216.6" x2="216.6" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M212.6 349 L220.6 349 L216.6 355 Z"><title>2026-09-20: Two SRBMs, one about 440 km (Japan MoD)</title></path>
+<line class="tick" x1="253.1" x2="253.1" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M249.1 349 L257.1 349 L253.1 355 Z"><title>2026-10-02: Ballistic missile about 680 km (3 Oct KST); KCNA: hypersonic IRBM</title></path>
+<line class="tick" x1="283.5" x2="283.5" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M279.5 349 L287.5 349 L283.5 355 Z"><title>2026-10-12: Several ballistic missiles, one over 900 km, Kim present</title></path>
+<line class="tick" x1="289.6" x2="289.6" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M285.6 349 L293.6 349 L289.6 355 Z"><title>2026-10-14: Submarine-launched strategic cruise missiles (KCNA)</title></path>
+<line class="tick" x1="335.3" x2="335.3" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M331.3 349 L339.3 349 L335.3 355 Z"><title>2026-10-29: Salvo of about 10 SRBMs (28 or 29 Oct)</title></path>
+<line class="tick" x1="338.3" x2="338.3" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="353.6" x2="353.6" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<path class="launch" d="M349.6 349 L357.6 349 L353.6 355 Z"><title>2026-11-04: Multiple missiles from Sondok</title></path>
+<line class="axis" x1="410" x2="684" y1="460" y2="460"/>
+<line class="tick" x1="422.2" x2="422.2" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="473.9" x2="473.9" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="477.0" x2="477.0" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="492.2" x2="492.2" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="510.5" x2="510.5" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="516.6" x2="516.6" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="553.1" x2="553.1" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="583.5" x2="583.5" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="589.6" x2="589.6" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="635.3" x2="635.3" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="638.3" x2="638.3" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="653.6" x2="653.6" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="axis" x1="710" x2="984" y1="460" y2="460"/>
+<line class="tick" x1="722.2" x2="722.2" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="773.9" x2="773.9" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="777.0" x2="777.0" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="792.2" x2="792.2" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="810.5" x2="810.5" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="816.6" x2="816.6" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="853.1" x2="853.1" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="883.5" x2="883.5" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="889.6" x2="889.6" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="935.3" x2="935.3" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="938.3" x2="938.3" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="tick" x1="953.6" x2="953.6" y1="356" y2="460" stroke-width="1" stroke-dasharray="2 2"/>
+<rect class="spike" x="109.0" y="409.9" width="2.0" height="50.1"><title>2026-08-16: 23.0 articles, z 2.76</title></rect>
+<rect class="bar" x="112.0" y="403.4" width="2.0" height="56.6"><title>2026-08-17: 26.0 articles, z 2.34</title></rect>
+<rect class="bar" x="115.1" y="446.9" width="2.0" height="13.1"><title>2026-08-18: 6.0 articles, z 0.23</title></rect>
+<rect class="bar" x="118.1" y="446.9" width="2.0" height="13.1"><title>2026-08-19: 6.0 articles, z -0.75</title></rect>
+<rect class="bar" x="121.2" y="388.1" width="2.0" height="71.9"><title>2026-08-20: 33.0 articles, z 1.43</title></rect>
+<rect class="bar" x="124.2" y="440.4" width="2.0" height="19.6"><title>2026-08-21: 9.0 articles, z 0.24</title></rect>
+<rect class="bar" x="127.3" y="429.5" width="2.0" height="30.5"><title>2026-08-22: 14.0 articles, z 1.13</title></rect>
+<rect class="bar" x="130.3" y="455.6" width="2.0" height="4.4"><title>2026-08-23: 2.0 articles, z -0.13</title></rect>
+<rect class="bar" x="133.4" y="433.9" width="2.0" height="26.1"><title>2026-08-24: 12.0 articles, z 0.91</title></rect>
+<rect class="bar" x="136.4" y="449.1" width="2.0" height="10.9"><title>2026-08-25: 5.0 articles, z -0.1</title></rect>
+<rect class="bar" x="139.4" y="442.6" width="2.0" height="17.4"><title>2026-08-26: 8.0 articles, z -0.69</title></rect>
+<rect class="bar" x="142.5" y="457.8" width="2.0" height="2.2"><title>2026-08-27: 1.0 articles, z -1.92</title></rect>
+<rect class="bar" x="145.5" y="455.6" width="2.0" height="4.4"><title>2026-08-28: 2.0 articles, z -1.52</title></rect>
+<rect class="bar" x="151.6" y="453.5" width="2.0" height="6.5"><title>2026-08-30: 3.0 articles, z -0.14</title></rect>
+<rect class="bar" x="154.7" y="446.9" width="2.0" height="13.1"><title>2026-08-31: 6.0 articles, z 0.03</title></rect>
+<rect class="bar" x="157.7" y="451.3" width="2.0" height="8.7"><title>2026-09-01: 4.0 articles, z -0.81</title></rect>
+<rect class="bar" x="160.8" y="457.8" width="2.0" height="2.2"><title>2026-09-02: 1.0 articles, z -2.6</title></rect>
+<rect class="bar" x="169.9" y="457.8" width="2.0" height="2.2"><title>2026-09-05: 1.0 articles, z -0.97</title></rect>
+<rect class="bar" x="176.0" y="457.8" width="2.0" height="2.2"><title>2026-09-07: 1.0 articles, z -1.39</title></rect>
+<rect class="bar" x="179.0" y="457.8" width="2.0" height="2.2"><title>2026-09-08: 1.0 articles, z -1.26</title></rect>
+<rect class="bar" x="182.1" y="455.6" width="2.0" height="4.4"><title>2026-09-09: 2.0 articles, z -1.05</title></rect>
+<rect class="bar" x="188.2" y="457.8" width="2.0" height="2.2"><title>2026-09-11: 1.0 articles, z -0.79</title></rect>
+<rect class="bar" x="191.2" y="420.8" width="2.0" height="39.2"><title>2026-09-12: 18.0 articles, z 1.39</title></rect>
+<rect class="bar" x="194.2" y="457.8" width="2.0" height="2.2"><title>2026-09-13: 1.0 articles, z -0.71</title></rect>
+<rect class="bar" x="197.3" y="449.1" width="2.0" height="10.9"><title>2026-09-14: 5.0 articles, z -0.35</title></rect>
+<rect class="bar" x="200.3" y="451.3" width="2.0" height="8.7"><title>2026-09-15: 4.0 articles, z 0.11</title></rect>
+<rect class="bar" x="203.4" y="457.8" width="2.0" height="2.2"><title>2026-09-16: 1.0 articles, z -0.88</title></rect>
+<rect class="bar" x="206.4" y="446.9" width="2.0" height="13.1"><title>2026-09-17: 6.0 articles, z 0.99</title></rect>
+<rect class="bar" x="209.5" y="444.8" width="2.0" height="15.2"><title>2026-09-18: 7.0 articles, z 1.36</title></rect>
+<rect class="bar" x="212.5" y="455.6" width="2.0" height="4.4"><title>2026-09-19: 2.0 articles, z -0.64</title></rect>
+<rect class="spike" x="215.6" y="370.7" width="2.0" height="89.3"><title>2026-09-20: 41.0 articles, z 4.06</title></rect>
+<rect class="bar" x="218.6" y="425.2" width="2.0" height="34.8"><title>2026-09-21: 16.0 articles, z 1.24</title></rect>
+<rect class="bar" x="221.6" y="403.4" width="2.0" height="56.6"><title>2026-09-22: 26.0 articles, z 2.11</title></rect>
+<rect class="bar" x="224.7" y="423.0" width="2.0" height="37.0"><title>2026-09-23: 17.0 articles, z 1.83</title></rect>
+<rect class="bar" x="227.7" y="446.9" width="2.0" height="13.1"><title>2026-09-24: 6.0 articles, z 1.32</title></rect>
+<rect class="bar" x="230.8" y="455.6" width="2.0" height="4.4"><title>2026-09-25: 2.0 articles, z 0.13</title></rect>
+<rect class="bar" x="233.8" y="451.3" width="2.0" height="8.7"><title>2026-09-26: 4.0 articles, z 0.43</title></rect>
+<rect class="bar" x="239.9" y="455.6" width="2.0" height="4.4"><title>2026-09-28: 2.0 articles, z -0.72</title></rect>
+<rect class="bar" x="243.0" y="440.4" width="2.0" height="19.6"><title>2026-09-29: 9.0 articles, z 0.5</title></rect>
+<rect class="bar" x="246.0" y="453.5" width="2.0" height="6.5"><title>2026-09-30: 3.0 articles, z 0.04</title></rect>
+<rect class="bar" x="249.0" y="453.5" width="2.0" height="6.5"><title>2026-10-01: 3.0 articles, z 0.42</title></rect>
+<rect class="bar" x="252.1" y="453.5" width="2.0" height="6.5"><title>2026-10-02: 3.0 articles, z 0.43</title></rect>
+<rect class="bar" x="255.1" y="407.7" width="2.0" height="52.3"><title>2026-10-03: 24.0 articles, z 1.73</title></rect>
+<rect class="bar" x="258.2" y="449.1" width="2.0" height="10.9"><title>2026-10-04: 5.0 articles, z 0.72</title></rect>
+<rect class="bar" x="261.2" y="446.9" width="2.0" height="13.1"><title>2026-10-05: 6.0 articles, z 0.37</title></rect>
+<rect class="bar" x="264.3" y="453.5" width="2.0" height="6.5"><title>2026-10-06: 3.0 articles, z -0.66</title></rect>
+<rect class="bar" x="270.4" y="457.8" width="2.0" height="2.2"><title>2026-10-08: 1.0 articles, z -0.69</title></rect>
+<rect class="bar" x="279.5" y="455.6" width="2.0" height="4.4"><title>2026-10-11: 2.0 articles, z -0.48</title></rect>
+<rect class="bar" x="282.5" y="362.0" width="2.0" height="98.0"><title>2026-10-12: 45.0 articles, z 2.05</title></rect>
+<rect class="bar" x="285.6" y="449.1" width="2.0" height="10.9"><title>2026-10-13: 5.0 articles, z -0.36</title></rect>
+<rect class="bar" x="288.6" y="457.8" width="2.0" height="2.2"><title>2026-10-14: 1.0 articles, z -0.56</title></rect>
+<rect class="bar" x="291.7" y="451.3" width="2.0" height="8.7"><title>2026-10-15: 4.0 articles, z 0.12</title></rect>
+<rect class="bar" x="294.7" y="455.6" width="2.0" height="4.4"><title>2026-10-16: 2.0 articles, z -0.04</title></rect>
+<rect class="bar" x="297.8" y="451.3" width="2.0" height="8.7"><title>2026-10-17: 4.0 articles, z 0.13</title></rect>
+<rect class="bar" x="303.8" y="457.8" width="2.0" height="2.2"><title>2026-10-19: 1.0 articles, z -2.04</title></rect>
+<rect class="bar" x="306.9" y="455.6" width="2.0" height="4.4"><title>2026-10-20: 2.0 articles, z -1.24</title></rect>
+<rect class="bar" x="309.9" y="453.5" width="2.0" height="6.5"><title>2026-10-21: 3.0 articles, z 0.17</title></rect>
+<rect class="bar" x="313.0" y="455.6" width="2.0" height="4.4"><title>2026-10-22: 2.0 articles, z -0.39</title></rect>
+<rect class="bar" x="316.0" y="446.9" width="2.0" height="13.1"><title>2026-10-23: 6.0 articles, z 1.35</title></rect>
+<rect class="bar" x="319.1" y="455.6" width="2.0" height="4.4"><title>2026-10-24: 2.0 articles, z -0.64</title></rect>
+<rect class="bar" x="322.1" y="457.8" width="2.0" height="2.2"><title>2026-10-25: 1.0 articles, z -0.04</title></rect>
+<rect class="bar" x="325.2" y="455.6" width="2.0" height="4.4"><title>2026-10-26: 2.0 articles, z -1.0</title></rect>
+<rect class="bar" x="328.2" y="457.8" width="2.0" height="2.2"><title>2026-10-27: 1.0 articles, z -1.2</title></rect>
+<rect class="bar" x="331.2" y="457.8" width="2.0" height="2.2"><title>2026-10-28: 1.0 articles, z -0.22</title></rect>
+<rect class="spike" x="334.3" y="399.0" width="2.0" height="61.0"><title>2026-10-29: 28.0 articles, z 2.79</title></rect>
+<rect class="bar" x="337.3" y="442.6" width="2.0" height="17.4"><title>2026-10-30: 8.0 articles, z 1.27</title></rect>
+<rect class="bar" x="340.4" y="431.7" width="2.0" height="28.3"><title>2026-10-31: 13.0 articles, z 1.32</title></rect>
+<rect class="bar" x="343.4" y="440.4" width="2.0" height="19.6"><title>2026-11-01: 9.0 articles, z 1.67</title></rect>
+<rect class="bar" x="346.5" y="442.6" width="2.0" height="17.4"><title>2026-11-02: 8.0 articles, z 0.35</title></rect>
+<rect class="bar" x="349.5" y="451.3" width="2.0" height="8.7"><title>2026-11-03: 4.0 articles, z 0.42</title></rect>
+<rect class="bar" x="352.6" y="427.3" width="2.0" height="32.7"><title>2026-11-04: 15.0 articles, z 2.39</title></rect>
+<rect class="bar" x="355.6" y="457.8" width="2.0" height="2.2"><title>2026-11-05: 1.0 articles, z -1.1</title></rect>
+<rect class="bar" x="358.6" y="427.3" width="2.0" height="32.7"><title>2026-11-06: 15.0 articles, z 1.61</title></rect>
+<rect class="bar" x="364.7" y="449.1" width="2.0" height="10.9"><title>2026-11-08: 5.0 articles, z 0.88</title></rect>
+<rect class="bar" x="367.8" y="457.8" width="2.0" height="2.2"><title>2026-11-09: 1.0 articles, z -1.42</title></rect>
+<rect class="bar" x="370.8" y="455.6" width="2.0" height="4.4"><title>2026-11-10: 2.0 articles, z -0.25</title></rect>
+<rect class="bar" x="376.9" y="457.8" width="2.0" height="2.2"><title>2026-11-12: 1.0 articles, z -1.22</title></rect>
+<rect class="bar" x="380.0" y="455.6" width="2.0" height="4.4"><title>2026-11-13: 2.0 articles, z -1.09</title></rect>
+<rect class="bar" x="383.0" y="451.3" width="2.0" height="8.7"><title>2026-11-14: 4.0 articles, z 0.33</title></rect>
+<text class="t2" x="104" y="366" font-size="10" text-anchor="end">45</text>
+<text class="t2" x="104" y="460" font-size="10" text-anchor="end">0</text>
+<line class="grid" x1="410" x2="684" y1="460.0" y2="460.0"/>
+<text class="t2" x="406" y="463.0" font-size="10" text-anchor="end">0%</text>
+<line class="grid" x1="410" x2="684" y1="408.0" y2="408.0"/>
+<text class="t2" x="406" y="411.0" font-size="10" text-anchor="end">40%</text>
+<line class="grid" x1="410" x2="684" y1="356.0" y2="356.0"/>
+<text class="t2" x="406" y="359.0" font-size="10" text-anchor="end">80%</text>
+<polyline class="out" fill="none" stroke-width="2" stroke-linejoin="round" points="410.0,377.8 413.0,376.1 416.1,379.9 419.1,402.2 422.2,392.7 425.2,395.0 428.3,381.1 431.3,360.0 434.4,356.0 437.4,356.0 440.4,356.0 443.5,356.0 446.5,356.0 449.6,356.0 452.6,358.9 455.7,364.7 458.7,364.7 461.8,358.9 464.8,356.0 467.8,356.0 470.9,356.0 473.9,356.0 477.0,356.0 480.0,356.0 483.1,362.5 486.1,362.5 489.2,356.0 492.2,356.0 495.2,356.0 498.3,356.0 501.3,356.0 504.4,356.0 507.4,356.0 510.5,356.0 513.5,385.7 516.6,360.2 519.6,359.8 522.6,361.3 525.7,365.6 528.7,366.2 531.8,365.3 534.8,364.7 537.9,382.0 540.9,395.0 544.0,416.7 547.0,425.3 550.0,419.4 553.1,427.5 556.1,410.3 559.2,408.7 562.2,400.0 565.3,389.7 568.3,391.2 571.4,389.1 574.4,386.9 577.4,365.5 580.5,362.5 583.5,365.5 586.6,365.5 589.6,365.5 592.7,363.4 595.7,365.1 598.8,370.0 601.8,367.6 604.8,389.1 607.9,395.0 610.9,390.0 614.0,416.7 617.0,405.8 620.1,395.0 623.1,389.1 626.2,382.0 629.2,378.8 632.2,382.0 635.3,356.0 638.3,356.0 641.4,370.0 644.4,373.3 647.5,373.3 650.5,369.4 653.6,372.4 656.6,382.0 659.6,391.2 662.7,383.8 665.7,386.3 668.8,390.4 671.8,392.6 674.9,404.3 677.9,404.3 681.0,395.0 684.0,400.9"/>
+<polyline class="in" fill="none" stroke-width="2" stroke-linejoin="round" points="410.0,403.9 413.0,405.3 416.1,407.0 419.1,413.9 422.2,414.3 425.2,413.1 428.3,408.8 431.3,405.5 434.4,410.7 437.4,408.9 440.4,410.7 443.5,421.8 446.5,422.9 449.6,416.7 452.6,410.0 455.7,382.0 458.7,373.3 461.8,362.5 464.8,362.5 467.8,373.3 470.9,373.3 473.9,362.5 477.0,356.0 480.0,356.0 483.1,460.0 486.1,460.0 489.2,460.0 492.2,382.0 495.2,382.0 498.3,385.7 501.3,402.2 504.4,395.0 507.4,416.7 510.5,427.5 513.5,449.2 516.6,403.5 519.6,410.7 522.6,416.7 525.7,410.9 528.7,411.8 531.8,409.0 534.8,410.0 537.9,425.1 540.9,424.5 544.0,425.8 547.0,460.0 550.0,460.0 553.1,460.0 556.1,447.0 559.2,436.4 562.2,441.4 565.3,434.0 568.3,434.0 571.4,431.1 574.4,422.9 577.4,427.5 580.5,460.0 583.5,416.7 586.6,421.0 589.6,416.7 592.7,412.7 595.7,412.7 598.8,405.8 601.8,403.5 604.8,373.3 607.9,356.0 610.9,356.0 614.0,356.0 617.0,373.3 620.1,416.7 623.1,416.7 626.2,427.5 629.2,431.1 632.2,434.0 635.3,418.6 638.3,412.7 641.4,418.2 644.4,415.4 647.5,408.7 650.5,408.7 653.6,406.7 656.6,408.9 659.6,422.3 662.7,414.8 665.7,416.7 668.8,430.0 671.8,427.5 674.9,434.0 677.9,434.0 681.0,416.7 684.0,395.0"/>
+<line class="grid" x1="710" x2="984" y1="460.0" y2="460.0"/>
+<text class="t2" x="706" y="463.0" font-size="10" text-anchor="end">-4</text>
+<line class="grid" x1="710" x2="984" y1="408.0" y2="408.0"/>
+<text class="t2" x="706" y="411.0" font-size="10" text-anchor="end">+0</text>
+<line class="grid" x1="710" x2="984" y1="356.0" y2="356.0"/>
+<text class="t2" x="706" y="359.0" font-size="10" text-anchor="end">+4</text>
+<polyline class="out" fill="none" stroke-width="2" stroke-linejoin="round" points="710.0,434.4 713.0,435.7 716.1,436.5 719.1,415.1 722.2,431.6 725.2,431.5 728.3,440.0 731.3,460.0 734.4,460.0 737.4,460.0 740.4,460.0 743.5,454.2 746.5,454.4 749.6,460.0 752.6,457.2 755.7,446.1 758.7,440.3 761.8,454.1 764.8,460.0 767.8,460.0 770.9,460.0 773.9,460.0 777.0,460.0 780.0,460.0 783.1,439.5 786.1,439.5 789.2,459.2 792.2,460.0 795.2,460.0 798.3,460.0 801.3,460.0 804.4,460.0 807.4,460.0 810.5,460.0 813.5,436.7 816.6,460.0 819.6,460.0 822.6,460.0 825.7,460.0 828.7,460.0 831.8,460.0 834.8,460.0 837.9,443.7 840.9,429.2 844.0,407.3 847.0,412.7 850.0,422.1 853.1,416.0 856.1,435.3 859.2,436.6 862.2,446.8 865.3,457.4 868.3,454.1 871.4,452.7 874.4,455.6 877.4,460.0 880.5,460.0 883.5,460.0 886.6,460.0 889.6,460.0 892.7,460.0 895.7,460.0 898.8,460.0 901.8,460.0 904.8,416.0 907.9,406.7 910.9,414.0 914.0,388.0 917.0,397.6 920.1,413.7 923.1,415.6 926.2,421.5 929.2,418.7 932.2,407.0 935.3,460.0 938.3,460.0 941.4,460.0 944.4,460.0 947.5,460.0 950.5,460.0 953.6,460.0 956.6,442.7 959.6,429.8 962.7,446.5 965.7,445.3 968.8,440.3 971.8,440.8 974.9,416.4 977.9,416.4 981.0,452.9 984.0,443.6"/>
+<polyline class="in" fill="none" stroke-width="2" stroke-linejoin="round" points="710.0,420.2 713.0,419.8 716.1,417.7 719.1,417.8 722.2,422.8 725.2,423.4 728.3,426.2 731.3,430.3 734.4,428.5 737.4,431.4 740.4,426.8 743.5,413.0 746.5,417.1 749.6,422.1 752.6,426.9 755.7,446.5 758.7,446.4 761.8,460.0 764.8,460.0 767.8,453.3 770.9,453.3 773.9,455.8 777.0,456.8 780.0,453.5 783.1,362.5 786.1,362.5 789.2,362.5 792.2,460.0 795.2,460.0 798.3,460.0 801.3,444.0 804.4,454.1 807.4,445.3 810.5,425.9 813.5,403.4 816.6,431.9 819.6,419.6 822.6,410.3 825.7,409.2 828.7,403.7 831.8,405.7 834.8,405.1 837.9,389.6 840.9,389.1 844.0,385.0 847.0,371.6 850.0,380.5 853.1,392.7 856.1,410.5 859.2,417.3 862.2,409.8 865.3,420.4 868.3,420.4 871.4,423.2 874.4,423.8 877.4,408.0 880.5,367.7 883.5,410.3 886.6,408.8 889.6,410.0 892.7,411.1 895.7,411.1 898.8,421.7 901.8,425.9 904.8,455.9 907.9,460.0 910.9,460.0 914.0,460.0 917.0,460.0 920.1,419.1 923.1,419.1 926.2,419.5 929.2,413.2 932.2,415.3 935.3,422.3 938.3,420.8 941.4,400.4 944.4,401.5 947.5,401.2 950.5,401.2 953.6,401.5 956.6,390.3 959.6,388.1 962.7,402.6 965.7,407.8 968.8,408.1 971.8,411.8 974.9,409.6 977.9,410.1 981.0,444.4 984.0,460.0"/>
+<text class="t1" x="16" y="534.0" font-size="13" font-weight="600">China</text>
+<line class="axis" x1="110" x2="384" y1="586" y2="586"/>
+<line class="tick" x1="320.1" x2="320.1" y1="482" y2="586" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="axis" x1="410" x2="684" y1="586" y2="586"/>
+<line class="tick" x1="620.1" x2="620.1" y1="482" y2="586" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="axis" x1="710" x2="984" y1="586" y2="586"/>
+<line class="tick" x1="920.1" x2="920.1" y1="482" y2="586" stroke-width="1" stroke-dasharray="2 2"/>
+<rect class="bar" x="109.0" y="583.2" width="2.0" height="2.8"><title>2026-08-16: 4.0 articles, z 0.3</title></rect>
+<rect class="bar" x="112.0" y="577.5" width="2.0" height="8.5"><title>2026-08-17: 12.0 articles, z 0.59</title></rect>
+<rect class="bar" x="115.1" y="576.1" width="2.0" height="9.9"><title>2026-08-18: 14.0 articles, z 1.16</title></rect>
+<rect class="spike" x="118.1" y="566.1" width="2.0" height="19.9"><title>2026-08-19: 28.0 articles, z 2.87</title></rect>
+<rect class="bar" x="121.2" y="567.5" width="2.0" height="18.5"><title>2026-08-20: 26.0 articles, z 1.94</title></rect>
+<rect class="bar" x="124.2" y="576.1" width="2.0" height="9.9"><title>2026-08-21: 14.0 articles, z 1.87</title></rect>
+<rect class="bar" x="127.3" y="582.4" width="2.0" height="3.6"><title>2026-08-22: 5.0 articles, z 1.07</title></rect>
+<rect class="bar" x="130.3" y="581.7" width="2.0" height="4.3"><title>2026-08-23: 6.0 articles, z 1.12</title></rect>
+<rect class="bar" x="133.4" y="579.6" width="2.0" height="6.4"><title>2026-08-24: 9.0 articles, z 0.26</title></rect>
+<rect class="bar" x="136.4" y="583.2" width="2.0" height="2.8"><title>2026-08-25: 4.0 articles, z -0.54</title></rect>
+<rect class="bar" x="139.4" y="578.2" width="2.0" height="7.8"><title>2026-08-26: 11.0 articles, z 0.57</title></rect>
+<rect class="bar" x="142.5" y="582.4" width="2.0" height="3.6"><title>2026-08-27: 5.0 articles, z -1.1</title></rect>
+<rect class="bar" x="145.5" y="583.2" width="2.0" height="2.8"><title>2026-08-28: 4.0 articles, z -0.25</title></rect>
+<rect class="bar" x="148.6" y="583.2" width="2.0" height="2.8"><title>2026-08-29: 4.0 articles, z 0.68</title></rect>
+<rect class="bar" x="151.6" y="584.6" width="2.0" height="1.4"><title>2026-08-30: 2.0 articles, z -0.35</title></rect>
+<rect class="bar" x="154.7" y="581.0" width="2.0" height="5.0"><title>2026-08-31: 7.0 articles, z -0.19</title></rect>
+<rect class="bar" x="157.7" y="583.9" width="2.0" height="2.1"><title>2026-09-01: 3.0 articles, z -0.81</title></rect>
+<rect class="bar" x="160.8" y="583.2" width="2.0" height="2.8"><title>2026-09-02: 4.0 articles, z -1.42</title></rect>
+<rect class="bar" x="163.8" y="584.6" width="2.0" height="1.4"><title>2026-09-03: 2.0 articles, z -2.88</title></rect>
+<rect class="bar" x="166.8" y="582.4" width="2.0" height="3.6"><title>2026-09-04: 5.0 articles, z -0.38</title></rect>
+<rect class="bar" x="169.9" y="581.7" width="2.0" height="4.3"><title>2026-09-05: 6.0 articles, z 0.62</title></rect>
+<rect class="bar" x="172.9" y="585.3" width="2.0" height="0.7"><title>2026-09-06: 1.0 articles, z -0.85</title></rect>
+<rect class="bar" x="176.0" y="585.3" width="2.0" height="0.7"><title>2026-09-07: 1.0 articles, z -2.9</title></rect>
+<rect class="bar" x="179.0" y="584.6" width="2.0" height="1.4"><title>2026-09-08: 2.0 articles, z -1.27</title></rect>
+<rect class="bar" x="182.1" y="572.5" width="2.0" height="13.5"><title>2026-09-09: 19.0 articles, z 0.83</title></rect>
+<rect class="bar" x="185.1" y="582.4" width="2.0" height="3.6"><title>2026-09-10: 5.0 articles, z -0.64</title></rect>
+<rect class="bar" x="188.2" y="581.0" width="2.0" height="5.0"><title>2026-09-11: 7.0 articles, z 0.25</title></rect>
+<rect class="bar" x="191.2" y="582.4" width="2.0" height="3.6"><title>2026-09-12: 5.0 articles, z 0.09</title></rect>
+<rect class="bar" x="194.2" y="578.9" width="2.0" height="7.1"><title>2026-09-13: 10.0 articles, z 1.82</title></rect>
+<rect class="bar" x="197.3" y="580.3" width="2.0" height="5.7"><title>2026-09-14: 8.0 articles, z 0.47</title></rect>
+<rect class="bar" x="200.3" y="578.9" width="2.0" height="7.1"><title>2026-09-15: 10.0 articles, z 1.16</title></rect>
+<rect class="bar" x="203.4" y="575.3" width="2.0" height="10.7"><title>2026-09-16: 15.0 articles, z 0.27</title></rect>
+<rect class="bar" x="206.4" y="577.5" width="2.0" height="8.5"><title>2026-09-17: 12.0 articles, z 1.01</title></rect>
+<rect class="bar" x="209.5" y="578.9" width="2.0" height="7.1"><title>2026-09-18: 10.0 articles, z 0.68</title></rect>
+<rect class="bar" x="212.5" y="583.2" width="2.0" height="2.8"><title>2026-09-19: 4.0 articles, z -0.35</title></rect>
+<rect class="bar" x="215.6" y="581.7" width="2.0" height="4.3"><title>2026-09-20: 6.0 articles, z 0.82</title></rect>
+<rect class="bar" x="218.6" y="578.9" width="2.0" height="7.1"><title>2026-09-21: 10.0 articles, z 1.15</title></rect>
+<rect class="bar" x="221.6" y="582.4" width="2.0" height="3.6"><title>2026-09-22: 5.0 articles, z 0.33</title></rect>
+<rect class="bar" x="224.7" y="582.4" width="2.0" height="3.6"><title>2026-09-23: 5.0 articles, z -1.33</title></rect>
+<rect class="bar" x="227.7" y="581.0" width="2.0" height="5.0"><title>2026-09-24: 7.0 articles, z 0.52</title></rect>
+<rect class="bar" x="230.8" y="578.9" width="2.0" height="7.1"><title>2026-09-25: 10.0 articles, z 0.82</title></rect>
+<rect class="bar" x="233.8" y="583.2" width="2.0" height="2.8"><title>2026-09-26: 4.0 articles, z -0.25</title></rect>
+<rect class="bar" x="236.9" y="583.2" width="2.0" height="2.8"><title>2026-09-27: 4.0 articles, z 0.15</title></rect>
+<rect class="bar" x="239.9" y="584.6" width="2.0" height="1.4"><title>2026-09-28: 2.0 articles, z -1.46</title></rect>
+<rect class="bar" x="243.0" y="577.5" width="2.0" height="8.5"><title>2026-09-29: 12.0 articles, z 1.73</title></rect>
+<rect class="bar" x="246.0" y="582.4" width="2.0" height="3.6"><title>2026-09-30: 5.0 articles, z -0.94</title></rect>
+<rect class="bar" x="249.0" y="580.3" width="2.0" height="5.7"><title>2026-10-01: 8.0 articles, z 0.6</title></rect>
+<rect class="bar" x="252.1" y="584.6" width="2.0" height="1.4"><title>2026-10-02: 2.0 articles, z -2.16</title></rect>
+<rect class="bar" x="255.1" y="584.6" width="2.0" height="1.4"><title>2026-10-03: 2.0 articles, z -1.22</title></rect>
+<rect class="bar" x="258.2" y="584.6" width="2.0" height="1.4"><title>2026-10-04: 2.0 articles, z -1.06</title></rect>
+<rect class="bar" x="261.2" y="580.3" width="2.0" height="5.7"><title>2026-10-05: 8.0 articles, z 1.18</title></rect>
+<rect class="bar" x="264.3" y="583.9" width="2.0" height="2.1"><title>2026-10-06: 3.0 articles, z -1.23</title></rect>
+<rect class="bar" x="267.3" y="580.3" width="2.0" height="5.7"><title>2026-10-07: 8.0 articles, z -0.31</title></rect>
+<rect class="bar" x="270.4" y="583.9" width="2.0" height="2.1"><title>2026-10-08: 3.0 articles, z -1.79</title></rect>
+<rect class="bar" x="273.4" y="579.6" width="2.0" height="6.4"><title>2026-10-09: 9.0 articles, z 0.69</title></rect>
+<rect class="bar" x="276.4" y="583.2" width="2.0" height="2.8"><title>2026-10-10: 4.0 articles, z 0.18</title></rect>
+<rect class="bar" x="279.5" y="585.3" width="2.0" height="0.7"><title>2026-10-11: 1.0 articles, z -2.39</title></rect>
+<rect class="bar" x="282.5" y="583.2" width="2.0" height="2.8"><title>2026-10-12: 4.0 articles, z -0.81</title></rect>
+<rect class="bar" x="285.6" y="579.6" width="2.0" height="6.4"><title>2026-10-13: 9.0 articles, z 0.6</title></rect>
+<rect class="spike" x="288.6" y="554.8" width="2.0" height="31.2"><title>2026-10-14: 44.0 articles, z 3.74</title></rect>
+<rect class="spike" x="291.7" y="513.6" width="2.0" height="72.4"><title>2026-10-15: 102.0 articles, z 4.92</title></rect>
+<rect class="bar" x="294.7" y="571.8" width="2.0" height="14.2"><title>2026-10-16: 20.0 articles, z 1.46</title></rect>
+<rect class="bar" x="297.8" y="585.3" width="2.0" height="0.7"><title>2026-10-17: 1.0 articles, z -1.12</title></rect>
+<rect class="bar" x="300.8" y="583.2" width="2.0" height="2.8"><title>2026-10-18: 4.0 articles, z 0.38</title></rect>
+<rect class="bar" x="303.8" y="575.3" width="2.0" height="10.7"><title>2026-10-19: 15.0 articles, z 1.35</title></rect>
+<rect class="spike" x="306.9" y="539.1" width="2.0" height="46.9"><title>2026-10-20: 66.0 articles, z 3.06</title></rect>
+<rect class="bar" x="309.9" y="572.5" width="2.0" height="13.5"><title>2026-10-21: 19.0 articles, z 0.75</title></rect>
+<rect class="bar" x="313.0" y="580.3" width="2.0" height="5.7"><title>2026-10-22: 8.0 articles, z -0.48</title></rect>
+<rect class="bar" x="316.0" y="573.9" width="2.0" height="12.1"><title>2026-10-23: 17.0 articles, z 0.87</title></rect>
+<rect class="spike" x="319.1" y="488.0" width="2.0" height="98.0"><title>2026-10-24: 138.0 articles, z 4.65</title></rect>
+<rect class="spike" x="322.1" y="518.5" width="2.0" height="67.5"><title>2026-10-25: 95.0 articles, z 3.3</title></rect>
+<rect class="bar" x="325.2" y="554.0" width="2.0" height="32.0"><title>2026-10-26: 45.0 articles, z 1.66</title></rect>
+<rect class="bar" x="328.2" y="578.9" width="2.0" height="7.1"><title>2026-10-27: 10.0 articles, z -0.19</title></rect>
+<rect class="bar" x="331.2" y="573.2" width="2.0" height="12.8"><title>2026-10-28: 18.0 articles, z 0.21</title></rect>
+<rect class="bar" x="334.3" y="569.0" width="2.0" height="17.0"><title>2026-10-29: 24.0 articles, z 0.54</title></rect>
+<rect class="bar" x="337.3" y="571.1" width="2.0" height="14.9"><title>2026-10-30: 21.0 articles, z 0.66</title></rect>
+<rect class="bar" x="340.4" y="583.2" width="2.0" height="2.8"><title>2026-10-31: 4.0 articles, z -0.42</title></rect>
+<rect class="bar" x="343.4" y="582.4" width="2.0" height="3.6"><title>2026-11-01: 5.0 articles, z -0.18</title></rect>
+<rect class="bar" x="346.5" y="582.4" width="2.0" height="3.6"><title>2026-11-02: 5.0 articles, z -0.74</title></rect>
+<rect class="bar" x="349.5" y="583.2" width="2.0" height="2.8"><title>2026-11-03: 4.0 articles, z -0.88</title></rect>
+<rect class="bar" x="352.6" y="581.7" width="2.0" height="4.3"><title>2026-11-04: 6.0 articles, z -0.95</title></rect>
+<rect class="bar" x="355.6" y="577.5" width="2.0" height="8.5"><title>2026-11-05: 12.0 articles, z -0.27</title></rect>
+<rect class="bar" x="358.6" y="578.9" width="2.0" height="7.1"><title>2026-11-06: 10.0 articles, z -0.41</title></rect>
+<rect class="bar" x="361.7" y="578.9" width="2.0" height="7.1"><title>2026-11-07: 10.0 articles, z 0.18</title></rect>
+<rect class="bar" x="367.8" y="581.7" width="2.0" height="4.3"><title>2026-11-09: 6.0 articles, z -0.51</title></rect>
+<rect class="bar" x="370.8" y="583.2" width="2.0" height="2.8"><title>2026-11-10: 4.0 articles, z -0.95</title></rect>
+<rect class="bar" x="373.9" y="583.2" width="2.0" height="2.8"><title>2026-11-11: 4.0 articles, z -1.2</title></rect>
+<rect class="bar" x="376.9" y="578.2" width="2.0" height="7.8"><title>2026-11-12: 11.0 articles, z -0.62</title></rect>
+<rect class="bar" x="380.0" y="580.3" width="2.0" height="5.7"><title>2026-11-13: 8.0 articles, z -0.63</title></rect>
+<rect class="bar" x="383.0" y="576.1" width="2.0" height="9.9"><title>2026-11-14: 14.0 articles, z 0.29</title></rect>
+<text class="t2" x="104" y="492" font-size="10" text-anchor="end">138</text>
+<text class="t2" x="104" y="586" font-size="10" text-anchor="end">0</text>
+<line class="grid" x1="410" x2="684" y1="586.0" y2="586.0"/>
+<text class="t2" x="406" y="589.0" font-size="10" text-anchor="end">0%</text>
+<line class="grid" x1="410" x2="684" y1="534.0" y2="534.0"/>
+<text class="t2" x="406" y="537.0" font-size="10" text-anchor="end">40%</text>
+<line class="grid" x1="410" x2="684" y1="482.0" y2="482.0"/>
+<text class="t2" x="406" y="485.0" font-size="10" text-anchor="end">80%</text>
+<polyline class="out" fill="none" stroke-width="2" stroke-linejoin="round" points="410.0,578.8 413.0,580.3 416.1,581.4 419.1,579.3 422.2,580.3 425.2,581.0 428.3,581.0 431.3,581.1 434.4,580.7 437.4,577.3 440.4,574.5 443.5,566.0 446.5,562.4 449.6,563.4 452.6,561.2 455.7,555.0 458.7,558.6 461.8,568.7 464.8,576.7 467.8,576.7 470.9,577.3 473.9,577.3 477.0,586.0 480.0,586.0 483.1,570.7 486.1,564.3 489.2,538.1 492.2,521.0 495.2,535.1 498.3,533.0 501.3,536.7 504.4,539.6 507.4,545.4 510.5,563.1 513.5,570.2 516.6,565.7 519.6,566.9 522.6,562.4 525.7,559.1 528.7,546.0 531.8,531.8 534.8,531.8 537.9,532.8 540.9,535.4 544.0,544.6 547.0,546.4 550.0,565.2 553.1,574.2 556.1,573.6 559.2,573.0 562.2,557.7 565.3,558.6 568.3,567.4 571.4,553.5 574.4,552.1 577.4,553.5 580.5,552.1 583.5,566.5 586.6,569.8 589.6,550.9 592.7,566.9 595.7,568.9 598.8,568.7 601.8,567.2 604.8,568.1 607.9,567.3 610.9,572.2 614.0,565.8 617.0,567.4 620.1,572.7 623.1,572.7 626.2,568.9 629.2,568.7 632.2,569.6 635.3,569.8 638.3,569.9 641.4,565.5 644.4,562.2 647.5,573.6 650.5,572.7 653.6,570.7 656.6,576.4 659.6,575.2 662.7,576.4 665.7,575.6 668.8,576.0 671.8,576.7 674.9,576.0 677.9,576.0 681.0,574.7 684.0,575.6"/>
+<polyline class="in" fill="none" stroke-width="2" stroke-linejoin="round" points="410.0,571.0 413.0,572.1 416.1,574.2 419.1,575.7 422.2,574.7 425.2,573.0 428.3,575.8 431.3,576.0 434.4,578.6 437.4,577.7 440.4,573.3 443.5,567.4 446.5,568.3 449.6,566.5 452.6,557.1 455.7,545.4 458.7,547.8 461.8,539.6 464.8,542.7 467.8,546.0 470.9,548.9 473.9,556.0 477.0,547.0 480.0,528.2 483.1,538.1 486.1,542.7 489.2,544.6 492.2,544.6 495.2,556.0 498.3,563.6 501.3,563.7 504.4,569.8 507.4,563.7 510.5,564.3 513.5,564.3 516.6,562.4 519.6,558.4 522.6,559.1 525.7,557.7 528.7,567.4 531.8,569.0 534.8,569.0 537.9,569.0 540.9,572.3 544.0,568.3 547.0,567.4 550.0,566.5 553.1,560.0 556.1,548.9 559.2,546.0 562.2,545.4 565.3,550.5 568.3,553.5 571.4,553.5 574.4,553.5 577.4,556.0 580.5,546.0 583.5,553.5 586.6,558.1 589.6,568.4 592.7,568.7 595.7,570.3 598.8,571.3 601.8,571.6 604.8,569.0 607.9,561.4 610.9,558.6 614.0,549.6 617.0,547.4 620.1,558.1 623.1,558.1 626.2,559.1 629.2,563.4 632.2,563.9 635.3,564.7 638.3,563.5 641.4,559.8 644.4,562.7 647.5,565.8 650.5,567.4 653.6,571.1 656.6,573.0 659.6,586.0 662.7,586.0 665.7,586.0 668.8,586.0 671.8,586.0 674.9,586.0 677.9,579.2 681.0,579.5 684.0,580.1"/>
+<line class="grid" x1="710" x2="984" y1="586.0" y2="586.0"/>
+<text class="t2" x="706" y="589.0" font-size="10" text-anchor="end">-4</text>
+<line class="grid" x1="710" x2="984" y1="534.0" y2="534.0"/>
+<text class="t2" x="706" y="537.0" font-size="10" text-anchor="end">+0</text>
+<line class="grid" x1="710" x2="984" y1="482.0" y2="482.0"/>
+<text class="t2" x="706" y="485.0" font-size="10" text-anchor="end">+4</text>
+<polyline class="out" fill="none" stroke-width="2" stroke-linejoin="round" points="710.0,495.4 713.0,494.0 716.1,495.5 719.1,496.2 722.2,498.0 725.2,497.7 728.3,498.8 731.3,499.5 734.4,502.6 737.4,507.2 740.4,520.0 743.5,534.4 746.5,547.4 749.6,542.5 752.6,545.5 755.7,549.4 758.7,540.6 761.8,527.3 764.8,516.5 767.8,511.2 770.9,514.9 773.9,514.9 777.0,505.4 780.0,507.6 783.1,519.7 786.1,521.4 789.2,533.0 792.2,545.2 795.2,533.5 798.3,535.4 801.3,534.3 804.4,529.0 807.4,524.3 810.5,518.8 813.5,512.2 816.6,517.9 819.6,511.3 822.6,515.0 825.7,515.4 828.7,525.4 831.8,527.7 834.8,528.1 837.9,522.3 840.9,521.4 844.0,520.5 847.0,523.8 850.0,510.6 853.1,504.5 856.1,506.1 859.2,508.3 862.2,532.8 865.3,530.2 868.3,519.9 871.4,528.6 874.4,533.9 877.4,526.0 880.5,528.0 883.5,506.2 886.6,505.3 889.6,504.2 892.7,495.0 895.7,490.6 898.8,491.6 901.8,492.3 904.8,491.4 907.9,495.3 910.9,494.7 914.0,503.5 917.0,501.6 920.1,505.8 923.1,507.1 926.2,510.1 929.2,511.7 932.2,511.6 935.3,510.4 938.3,510.9 941.4,512.7 944.4,512.8 947.5,505.8 950.5,504.7 953.6,508.2 956.6,505.3 959.6,508.5 962.7,505.0 965.7,507.3 968.8,505.7 971.8,499.7 974.9,500.9 977.9,503.4 981.0,501.3 984.0,501.0"/>
+<polyline class="in" fill="none" stroke-width="2" stroke-linejoin="round" points="710.0,501.7 713.0,507.4 716.1,507.5 719.1,501.8 722.2,505.9 725.2,508.5 728.3,507.6 731.3,508.6 734.4,504.3 737.4,504.4 740.4,511.8 743.5,514.0 746.5,513.5 749.6,516.0 752.6,520.4 755.7,535.8 758.7,529.1 761.8,530.0 764.8,530.2 767.8,529.7 770.9,527.8 773.9,523.7 777.0,521.9 780.0,546.6 783.1,538.9 786.1,534.9 789.2,536.1 792.2,537.2 795.2,526.4 798.3,522.8 801.3,521.2 804.4,516.0 807.4,518.0 810.5,515.9 813.5,514.6 816.6,518.1 819.6,515.1 822.6,515.6 825.7,512.4 828.7,502.6 831.8,501.2 834.8,502.0 837.9,499.4 840.9,499.2 844.0,497.8 847.0,505.2 850.0,511.6 853.1,512.6 856.1,518.7 859.2,522.6 862.2,515.9 865.3,507.5 868.3,493.7 871.4,488.0 874.4,486.9 877.4,482.5 880.5,490.1 883.5,489.6 886.6,489.8 889.6,487.8 892.7,492.0 895.7,491.8 898.8,491.4 901.8,491.5 904.8,493.6 907.9,502.1 910.9,506.6 914.0,518.5 917.0,521.9 920.1,514.5 923.1,513.9 926.2,514.0 929.2,511.7 932.2,511.3 935.3,510.4 938.3,511.0 941.4,513.3 944.4,511.6 947.5,508.5 950.5,504.4 953.6,502.4 956.6,499.7 959.6,488.5 962.7,489.5 965.7,492.2 968.8,486.8 971.8,486.4 974.9,485.2 977.9,492.0 981.0,497.5 984.0,497.3"/>
+<text class="t1" x="16" y="660.0" font-size="13" font-weight="600">Russia</text>
+<line class="axis" x1="110" x2="384" y1="712" y2="712"/>
+<line class="tick" x1="384.0" x2="384.0" y1="608" y2="712" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="axis" x1="410" x2="684" y1="712" y2="712"/>
+<line class="tick" x1="684.0" x2="684.0" y1="608" y2="712" stroke-width="1" stroke-dasharray="2 2"/>
+<line class="axis" x1="710" x2="984" y1="712" y2="712"/>
+<line class="tick" x1="984.0" x2="984.0" y1="608" y2="712" stroke-width="1" stroke-dasharray="2 2"/>
+<rect class="bar" x="109.0" y="663.6" width="2.0" height="48.4"><title>2026-08-16: 75.0 articles, z 0.73</title></rect>
+<rect class="bar" x="112.0" y="656.6" width="2.0" height="55.4"><title>2026-08-17: 86.0 articles, z 0.59</title></rect>
+<rect class="bar" x="115.1" y="614.0" width="2.0" height="98.0"><title>2026-08-18: 152.0 articles, z 1.15</title></rect>
+<rect class="bar" x="118.1" y="660.4" width="2.0" height="51.6"><title>2026-08-19: 80.0 articles, z 0.87</title></rect>
+<rect class="bar" x="121.2" y="684.9" width="2.0" height="27.1"><title>2026-08-20: 42.0 articles, z 0.44</title></rect>
+<rect class="bar" x="124.2" y="653.3" width="2.0" height="58.7"><title>2026-08-21: 91.0 articles, z 1.82</title></rect>
+<rect class="bar" x="127.3" y="686.9" width="2.0" height="25.1"><title>2026-08-22: 39.0 articles, z 0.71</title></rect>
+<rect class="bar" x="130.3" y="699.1" width="2.0" height="12.9"><title>2026-08-23: 20.0 articles, z -1.17</title></rect>
+<rect class="bar" x="133.4" y="688.8" width="2.0" height="23.2"><title>2026-08-24: 36.0 articles, z -0.61</title></rect>
+<rect class="bar" x="136.4" y="703.6" width="2.0" height="8.4"><title>2026-08-25: 13.0 articles, z -2.54</title></rect>
+<rect class="bar" x="139.4" y="703.6" width="2.0" height="8.4"><title>2026-08-26: 13.0 articles, z -2.02</title></rect>
+<rect class="bar" x="142.5" y="699.1" width="2.0" height="12.9"><title>2026-08-27: 20.0 articles, z -1.04</title></rect>
+<rect class="bar" x="145.5" y="692.7" width="2.0" height="19.3"><title>2026-08-28: 30.0 articles, z -0.61</title></rect>
+<rect class="bar" x="148.6" y="708.1" width="2.0" height="3.9"><title>2026-08-29: 6.0 articles, z -1.79</title></rect>
+<rect class="bar" x="151.6" y="706.2" width="2.0" height="5.8"><title>2026-08-30: 9.0 articles, z -1.47</title></rect>
+<rect class="bar" x="154.7" y="710.1" width="2.0" height="1.9"><title>2026-08-31: 3.0 articles, z -3.2</title></rect>
+<rect class="bar" x="157.7" y="704.3" width="2.0" height="7.7"><title>2026-09-01: 12.0 articles, z -1.67</title></rect>
+<rect class="bar" x="160.8" y="698.5" width="2.0" height="13.5"><title>2026-09-02: 21.0 articles, z -0.92</title></rect>
+<rect class="bar" x="163.8" y="706.8" width="2.0" height="5.2"><title>2026-09-03: 8.0 articles, z -1.65</title></rect>
+<rect class="bar" x="166.8" y="708.8" width="2.0" height="3.2"><title>2026-09-04: 5.0 articles, z -2.24</title></rect>
+<rect class="bar" x="169.9" y="709.4" width="2.0" height="2.6"><title>2026-09-05: 4.0 articles, z -1.63</title></rect>
+<rect class="bar" x="172.9" y="706.8" width="2.0" height="5.2"><title>2026-09-06: 8.0 articles, z -1.33</title></rect>
+<rect class="bar" x="176.0" y="639.8" width="2.0" height="72.2"><title>2026-09-07: 112.0 articles, z 1.3</title></rect>
+<rect class="bar" x="179.0" y="649.5" width="2.0" height="62.5"><title>2026-09-08: 97.0 articles, z 0.72</title></rect>
+<rect class="bar" x="182.1" y="690.7" width="2.0" height="21.3"><title>2026-09-09: 33.0 articles, z -0.07</title></rect>
+<rect class="bar" x="185.1" y="697.2" width="2.0" height="14.8"><title>2026-09-10: 23.0 articles, z -0.05</title></rect>
+<rect class="bar" x="188.2" y="697.8" width="2.0" height="14.2"><title>2026-09-11: 22.0 articles, z -0.22</title></rect>
+<rect class="bar" x="191.2" y="706.2" width="2.0" height="5.8"><title>2026-09-12: 9.0 articles, z -0.54</title></rect>
+<rect class="bar" x="194.2" y="705.6" width="2.0" height="6.4"><title>2026-09-13: 10.0 articles, z -0.62</title></rect>
+<rect class="bar" x="197.3" y="684.9" width="2.0" height="27.1"><title>2026-09-14: 42.0 articles, z 0.24</title></rect>
+<rect class="bar" x="200.3" y="654.0" width="2.0" height="58.0"><title>2026-09-15: 90.0 articles, z 0.94</title></rect>
+<rect class="bar" x="203.4" y="704.3" width="2.0" height="7.7"><title>2026-09-16: 12.0 articles, z -1.02</title></rect>
+<rect class="bar" x="206.4" y="683.0" width="2.0" height="29.0"><title>2026-09-17: 45.0 articles, z 0.97</title></rect>
+<rect class="bar" x="209.5" y="695.9" width="2.0" height="16.1"><title>2026-09-18: 25.0 articles, z 0.05</title></rect>
+<rect class="bar" x="212.5" y="702.3" width="2.0" height="9.7"><title>2026-09-19: 15.0 articles, z 0.5</title></rect>
+<rect class="bar" x="215.6" y="704.3" width="2.0" height="7.7"><title>2026-09-20: 12.0 articles, z 0.11</title></rect>
+<rect class="bar" x="218.6" y="704.9" width="2.0" height="7.1"><title>2026-09-21: 11.0 articles, z -1.24</title></rect>
+<rect class="bar" x="221.6" y="708.8" width="2.0" height="3.2"><title>2026-09-22: 5.0 articles, z -2.46</title></rect>
+<rect class="bar" x="224.7" y="701.0" width="2.0" height="11.0"><title>2026-09-23: 17.0 articles, z -0.08</title></rect>
+<rect class="bar" x="227.7" y="667.5" width="2.0" height="44.5"><title>2026-09-24: 69.0 articles, z 1.54</title></rect>
+<rect class="bar" x="230.8" y="682.3" width="2.0" height="29.7"><title>2026-09-25: 46.0 articles, z 1.19</title></rect>
+<rect class="bar" x="233.8" y="705.6" width="2.0" height="6.4"><title>2026-09-26: 10.0 articles, z 0.3</title></rect>
+<rect class="bar" x="236.9" y="701.0" width="2.0" height="11.0"><title>2026-09-27: 17.0 articles, z 0.65</title></rect>
+<rect class="bar" x="239.9" y="674.6" width="2.0" height="37.4"><title>2026-09-28: 58.0 articles, z 1.22</title></rect>
+<rect class="bar" x="243.0" y="644.9" width="2.0" height="67.1"><title>2026-09-29: 104.0 articles, z 1.78</title></rect>
+<rect class="bar" x="246.0" y="693.9" width="2.0" height="18.1"><title>2026-09-30: 28.0 articles, z 0.48</title></rect>
+<rect class="bar" x="249.0" y="706.2" width="2.0" height="5.8"><title>2026-10-01: 9.0 articles, z -1.46</title></rect>
+<rect class="bar" x="252.1" y="697.8" width="2.0" height="14.2"><title>2026-10-02: 22.0 articles, z 0.18</title></rect>
+<rect class="bar" x="255.1" y="704.3" width="2.0" height="7.7"><title>2026-10-03: 12.0 articles, z 0.44</title></rect>
+<rect class="bar" x="258.2" y="701.0" width="2.0" height="11.0"><title>2026-10-04: 17.0 articles, z 0.58</title></rect>
+<rect class="bar" x="261.2" y="699.1" width="2.0" height="12.9"><title>2026-10-05: 20.0 articles, z -1.1</title></rect>
+<rect class="bar" x="264.3" y="691.4" width="2.0" height="20.6"><title>2026-10-06: 32.0 articles, z -0.63</title></rect>
+<rect class="bar" x="267.3" y="673.3" width="2.0" height="38.7"><title>2026-10-07: 60.0 articles, z 1.7</title></rect>
+<rect class="bar" x="270.4" y="690.1" width="2.0" height="21.9"><title>2026-10-08: 34.0 articles, z 0.27</title></rect>
+<rect class="bar" x="273.4" y="701.7" width="2.0" height="10.3"><title>2026-10-09: 16.0 articles, z -0.82</title></rect>
+<rect class="bar" x="276.4" y="707.5" width="2.0" height="4.5"><title>2026-10-10: 7.0 articles, z -0.68</title></rect>
+<rect class="bar" x="279.5" y="710.7" width="2.0" height="1.3"><title>2026-10-11: 2.0 articles, z -2.51</title></rect>
+<rect class="bar" x="282.5" y="698.5" width="2.0" height="13.5"><title>2026-10-12: 21.0 articles, z -0.37</title></rect>
+<rect class="bar" x="285.6" y="693.3" width="2.0" height="18.7"><title>2026-10-13: 29.0 articles, z -0.31</title></rect>
+<rect class="bar" x="288.6" y="692.7" width="2.0" height="19.3"><title>2026-10-14: 30.0 articles, z 0.31</title></rect>
+<rect class="bar" x="291.7" y="691.4" width="2.0" height="20.6"><title>2026-10-15: 32.0 articles, z 0.02</title></rect>
+<rect class="bar" x="294.7" y="704.9" width="2.0" height="7.1"><title>2026-10-16: 11.0 articles, z -1.24</title></rect>
+<rect class="bar" x="297.8" y="701.0" width="2.0" height="11.0"><title>2026-10-17: 17.0 articles, z 0.68</title></rect>
+<rect class="bar" x="300.8" y="708.8" width="2.0" height="3.2"><title>2026-10-18: 5.0 articles, z -0.88</title></rect>
+<rect class="bar" x="303.8" y="701.7" width="2.0" height="10.3"><title>2026-10-19: 16.0 articles, z -0.52</title></rect>
+<rect class="bar" x="306.9" y="688.8" width="2.0" height="23.2"><title>2026-10-20: 36.0 articles, z 0.43</title></rect>
+<rect class="bar" x="309.9" y="706.8" width="2.0" height="5.2"><title>2026-10-21: 8.0 articles, z -2.3</title></rect>
+<rect class="bar" x="313.0" y="704.9" width="2.0" height="7.1"><title>2026-10-22: 11.0 articles, z -1.57</title></rect>
+<rect class="bar" x="316.0" y="697.2" width="2.0" height="14.8"><title>2026-10-23: 23.0 articles, z 0.18</title></rect>
+<rect class="bar" x="319.1" y="695.2" width="2.0" height="16.8"><title>2026-10-24: 26.0 articles, z 1.51</title></rect>
+<rect class="bar" x="322.1" y="701.7" width="2.0" height="10.3"><title>2026-10-25: 16.0 articles, z 1.2</title></rect>
+<rect class="bar" x="325.2" y="702.3" width="2.0" height="9.7"><title>2026-10-26: 15.0 articles, z -0.89</title></rect>
+<rect class="bar" x="328.2" y="706.8" width="2.0" height="5.2"><title>2026-10-27: 8.0 articles, z -3.05</title></rect>
+<rect class="bar" x="331.2" y="703.6" width="2.0" height="8.4"><title>2026-10-28: 13.0 articles, z -1.2</title></rect>
+<rect class="bar" x="334.3" y="685.6" width="2.0" height="26.4"><title>2026-10-29: 41.0 articles, z 1.44</title></rect>
+<rect class="bar" x="337.3" y="707.5" width="2.0" height="4.5"><title>2026-10-30: 7.0 articles, z -1.57</title></rect>
+<rect class="bar" x="340.4" y="708.8" width="2.0" height="3.2"><title>2026-10-31: 5.0 articles, z -1.69</title></rect>
+<rect class="bar" x="343.4" y="707.5" width="2.0" height="4.5"><title>2026-11-01: 7.0 articles, z -0.13</title></rect>
+<rect class="bar" x="346.5" y="709.4" width="2.0" height="2.6"><title>2026-11-02: 4.0 articles, z -2.45</title></rect>
+<rect class="bar" x="349.5" y="706.2" width="2.0" height="5.8"><title>2026-11-03: 9.0 articles, z -1.51</title></rect>
+<rect class="bar" x="352.6" y="706.8" width="2.0" height="5.2"><title>2026-11-04: 8.0 articles, z -1.53</title></rect>
+<rect class="bar" x="355.6" y="703.0" width="2.0" height="9.0"><title>2026-11-05: 14.0 articles, z -1.1</title></rect>
+<rect class="bar" x="358.6" y="709.4" width="2.0" height="2.6"><title>2026-11-06: 4.0 articles, z -1.86</title></rect>
+<rect class="bar" x="361.7" y="705.6" width="2.0" height="6.4"><title>2026-11-07: 10.0 articles, z -0.2</title></rect>
+<rect class="bar" x="364.7" y="710.1" width="2.0" height="1.9"><title>2026-11-08: 3.0 articles, z -0.99</title></rect>
+<rect class="bar" x="367.8" y="708.8" width="2.0" height="3.2"><title>2026-11-09: 5.0 articles, z -1.41</title></rect>
+<rect class="bar" x="370.8" y="706.8" width="2.0" height="5.2"><title>2026-11-10: 8.0 articles, z -1.22</title></rect>
+<rect class="bar" x="373.9" y="704.3" width="2.0" height="7.7"><title>2026-11-11: 12.0 articles, z -0.09</title></rect>
+<rect class="bar" x="376.9" y="705.6" width="2.0" height="6.4"><title>2026-11-12: 10.0 articles, z -1.36</title></rect>
+<rect class="bar" x="380.0" y="710.1" width="2.0" height="1.9"><title>2026-11-13: 3.0 articles, z -1.82</title></rect>
+<rect class="bar" x="383.0" y="710.1" width="2.0" height="1.9"><title>2026-11-14: 3.0 articles, z -2.22</title></rect>
+<text class="t2" x="104" y="618" font-size="10" text-anchor="end">152</text>
+<text class="t2" x="104" y="712" font-size="10" text-anchor="end">0</text>
+<line class="grid" x1="410" x2="684" y1="712.0" y2="712.0"/>
+<text class="t2" x="406" y="715.0" font-size="10" text-anchor="end">0%</text>
+<line class="grid" x1="410" x2="684" y1="660.0" y2="660.0"/>
+<text class="t2" x="406" y="663.0" font-size="10" text-anchor="end">40%</text>
+<line class="grid" x1="410" x2="684" y1="608.0" y2="608.0"/>
+<text class="t2" x="406" y="611.0" font-size="10" text-anchor="end">80%</text>
+<polyline class="out" fill="none" stroke-width="2" stroke-linejoin="round" points="410.0,666.9 413.0,668.2 416.1,671.5 419.1,674.8 422.2,674.2 425.2,672.6 428.3,669.6 431.3,664.9 434.4,665.2 437.4,669.6 440.4,666.6 443.5,668.7 446.5,663.4 449.6,665.5 452.6,664.6 455.7,662.6 458.7,654.8 461.8,666.3 464.8,669.6 467.8,681.4 470.9,682.3 473.9,683.6 477.0,691.6 480.0,693.4 483.1,689.5 486.1,689.8 489.2,688.5 492.2,689.4 495.2,690.8 498.3,681.4 501.3,682.2 504.4,684.6 507.4,674.1 510.5,672.1 513.5,672.9 516.6,673.5 519.6,677.8 522.6,669.3 525.7,669.3 528.7,663.8 531.8,667.0 534.8,662.6 537.9,660.0 540.9,662.1 544.0,664.0 547.0,663.2 550.0,670.1 553.1,669.6 556.1,671.8 559.2,669.3 562.2,666.2 565.3,672.1 568.3,684.6 571.4,688.5 574.4,691.0 577.4,691.4 580.5,695.0 583.5,699.2 586.6,700.2 589.6,697.0 592.7,695.9 595.7,695.5 598.8,695.4 601.8,697.2 604.8,698.6 607.9,696.2 610.9,693.2 614.0,684.4 617.0,682.7 620.1,683.3 623.1,681.0 626.2,679.9 629.2,678.4 632.2,679.0 635.3,671.4 638.3,668.1 641.4,659.0 644.4,652.4 647.5,650.0 650.5,647.0 653.6,647.0 656.6,672.4 659.6,682.5 662.7,677.0 665.7,689.4 668.8,684.9 671.8,682.0 674.9,673.0 677.9,663.2 681.0,660.8 684.0,667.2"/>
+<polyline class="in" fill="none" stroke-width="2" stroke-linejoin="round" points="410.0,670.6 413.0,667.3 416.1,673.3 419.1,675.8 422.2,676.8 425.2,678.0 428.3,676.3 431.3,675.4 434.4,679.3 437.4,682.2 440.4,684.8 443.5,682.1 446.5,679.5 449.6,677.8 452.6,677.7 455.7,673.6 458.7,675.7 461.8,676.0 464.8,676.2 467.8,681.7 470.9,683.1 473.9,680.6 477.0,697.1 480.0,700.9 483.1,700.9 486.1,699.6 489.2,700.3 492.2,699.0 495.2,699.7 498.3,695.3 501.3,688.9 504.4,687.1 507.4,679.2 510.5,669.1 513.5,670.3 516.6,669.1 519.6,666.8 522.6,656.0 525.7,657.3 528.7,660.0 531.8,673.5 534.8,673.0 537.9,672.1 540.9,673.1 544.0,670.2 547.0,669.3 550.0,673.9 553.1,674.0 556.1,673.4 559.2,671.9 562.2,670.2 565.3,677.0 568.3,685.1 571.4,687.6 574.4,684.3 577.4,681.7 580.5,686.5 583.5,688.2 586.6,687.9 589.6,684.3 592.7,684.1 595.7,682.6 598.8,688.8 601.8,689.2 604.8,689.9 607.9,687.6 610.9,687.2 614.0,677.8 617.0,686.0 620.1,687.6 623.1,689.5 626.2,687.9 629.2,686.0 632.2,680.2 635.3,686.8 638.3,681.3 641.4,678.9 644.4,674.1 647.5,670.8 650.5,664.7 653.6,664.4 656.6,661.7 659.6,662.7 662.7,655.7 665.7,658.2 668.8,658.2 671.8,672.0 674.9,667.0 677.9,653.5 681.0,654.2 684.0,651.3"/>
+<line class="grid" x1="710" x2="984" y1="712.0" y2="712.0"/>
+<text class="t2" x="706" y="715.0" font-size="10" text-anchor="end">-4</text>
+<line class="grid" x1="710" x2="984" y1="660.0" y2="660.0"/>
+<text class="t2" x="706" y="663.0" font-size="10" text-anchor="end">+0</text>
+<line class="grid" x1="710" x2="984" y1="608.0" y2="608.0"/>
+<text class="t2" x="706" y="611.0" font-size="10" text-anchor="end">+4</text>
+<polyline class="out" fill="none" stroke-width="2" stroke-linejoin="round" points="710.0,643.6 713.0,643.6 716.1,642.2 719.1,637.6 722.2,637.6 725.2,638.1 728.3,639.7 731.3,641.6 734.4,640.0 737.4,629.7 740.4,634.8 743.5,632.9 746.5,637.8 749.6,636.7 752.6,635.5 755.7,642.7 758.7,653.5 761.8,641.8 764.8,641.9 767.8,630.6 770.9,633.4 773.9,634.0 777.0,621.3 780.0,621.0 783.1,622.6 786.1,621.3 789.2,621.8 792.2,621.0 795.2,620.5 798.3,627.1 801.3,626.3 804.4,625.7 807.4,636.9 810.5,640.5 813.5,638.7 816.6,636.8 819.6,635.2 822.6,641.9 825.7,637.1 828.7,641.3 831.8,637.3 834.8,641.5 837.9,643.5 840.9,641.6 844.0,641.1 847.0,643.0 850.0,635.6 853.1,635.6 856.1,635.8 859.2,639.7 862.2,643.2 865.3,639.2 868.3,630.8 871.4,627.2 874.4,625.2 877.4,624.1 880.5,621.1 883.5,616.1 886.6,615.9 889.6,615.6 892.7,618.3 895.7,619.0 898.8,619.2 901.8,617.1 904.8,617.9 907.9,619.5 910.9,625.3 914.0,634.9 917.0,638.4 920.1,631.5 923.1,631.6 926.2,634.8 929.2,635.1 932.2,633.1 935.3,639.2 938.3,641.5 941.4,657.3 944.4,667.0 947.5,665.5 950.5,670.2 953.6,666.9 956.6,638.6 959.6,626.1 962.7,629.8 965.7,614.1 968.8,626.9 971.8,627.4 974.9,634.6 977.9,644.8 981.0,645.7 984.0,637.0"/>
+<polyline class="in" fill="none" stroke-width="2" stroke-linejoin="round" points="710.0,639.6 713.0,645.9 716.1,643.9 719.1,645.7 722.2,645.3 725.2,643.5 728.3,646.3 731.3,648.5 734.4,643.6 737.4,638.6 740.4,632.8 743.5,637.3 746.5,642.2 749.6,639.7 752.6,640.1 755.7,649.2 758.7,645.8 761.8,642.9 764.8,636.3 767.8,631.2 770.9,632.8 773.9,634.2 777.0,612.1 780.0,614.2 783.1,614.7 786.1,617.0 789.2,616.5 792.2,617.1 795.2,616.9 798.3,626.8 801.3,632.8 804.4,633.6 807.4,640.8 810.5,648.7 813.5,645.4 816.6,646.5 819.6,648.6 822.6,656.1 825.7,653.7 828.7,651.3 831.8,641.8 834.8,648.1 837.9,650.0 840.9,647.1 844.0,649.5 847.0,652.2 850.0,648.3 853.1,648.1 856.1,647.2 859.2,649.1 862.2,652.5 865.3,647.2 868.3,633.6 871.4,630.2 874.4,631.3 877.4,634.5 880.5,627.2 883.5,621.8 886.6,623.0 889.6,627.6 892.7,627.4 895.7,630.9 898.8,625.7 901.8,625.0 904.8,624.6 907.9,632.7 910.9,634.8 914.0,641.4 917.0,635.0 920.1,630.5 923.1,628.9 926.2,636.1 929.2,637.2 932.2,640.8 935.3,637.5 938.3,644.6 941.4,651.3 944.4,658.0 947.5,657.2 950.5,664.0 953.6,662.7 956.6,658.9 959.6,651.6 962.7,664.6 965.7,660.9 968.8,662.4 971.8,639.2 974.9,654.7 977.9,676.8 981.0,679.4 984.0,672.9"/>
+<text class="t2" x="110.0" y="728" font-size="10">16 Aug</text>
+<text class="t2" x="158.7" y="728" font-size="10">01 Sep</text>
+<text class="t2" x="250.0" y="728" font-size="10">01 Oct</text>
+<text class="t2" x="344.4" y="728" font-size="10">01 Nov</text>
+<text class="t2" x="410.0" y="728" font-size="10">16 Aug</text>
+<text class="t2" x="458.7" y="728" font-size="10">01 Sep</text>
+<text class="t2" x="550.0" y="728" font-size="10">01 Oct</text>
+<text class="t2" x="644.4" y="728" font-size="10">01 Nov</text>
+<text class="t2" x="710.0" y="728" font-size="10">16 Aug</text>
+<text class="t2" x="758.7" y="728" font-size="10">01 Sep</text>
+<text class="t2" x="850.0" y="728" font-size="10">01 Oct</text>
+<text class="t2" x="944.4" y="728" font-size="10">01 Nov</text>
+<text class="t2" x="16" y="764" font-size="10">Source: GDELT Project Events 2.0 (gdeltproject.org), English and translation streams; scripts/relations_probe.py.</text>
+</svg>

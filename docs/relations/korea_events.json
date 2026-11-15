@@ -1,0 +1,256 @@
+{
+ "note": "Reference events for the relations-and-tone probe, 16 Aug to 14 Nov 2026 (UTC dates). Compiled 15 Nov 2026 from Watchfloor's stored stories (28 Sep-13 Nov) and web searches; sources and confidence for each are in docs/relations/2026-11-15-relations-tone.md. kind: launch, dmz, statement, exercise, diplomacy, cyber, people.",
+ "events": [
+  {
+   "day": "2026-08-12",
+   "kind": "launch",
+   "partners": [
+    "KOR",
+    "JPN"
+   ],
+   "what": "SRBM from Wonsan, over 700 km (before the window)"
+  },
+  {
+   "day": "2026-08-14",
+   "kind": "statement",
+   "partners": [
+    "USA"
+   ],
+   "what": "North Korea warns it will bolster its nuclear deterrent over a new US nuclear strategy"
+  },
+  {
+   "day": "2026-08-15",
+   "kind": "diplomacy",
+   "partners": [
+    "KOR"
+   ],
+   "what": "Lee Jae Myung proposes talks to formally end the Korean War (Liberation Day)"
+  },
+  {
+   "day": "2026-08-18",
+   "kind": "exercise",
+   "partners": [
+    "USA",
+    "KOR"
+   ],
+   "what": "Ulchi Freedom Shield begins, cut to about 5 days (start 17 or 18 Aug)"
+  },
+  {
+   "day": "2026-08-20",
+   "kind": "launch",
+   "partners": [
+    "KOR",
+    "JPN"
+   ],
+   "what": "SRBM barrage during UFS; Kim Yo Jong mocks Seoul, calls Trump ties excellent"
+  },
+  {
+   "day": "2026-09-06",
+   "kind": "statement",
+   "partners": [
+    "USA",
+    "JPN",
+    "KOR"
+   ],
+   "what": "Destroyer Kang Kon commissioned, called part of the nuclear counteraction system"
+  },
+  {
+   "day": "2026-09-07",
+   "kind": "exercise",
+   "partners": [
+    "USA",
+    "KOR",
+    "JPN"
+   ],
+   "what": "Freedom Edge 2026 begins"
+  },
+  {
+   "day": "2026-09-12",
+   "kind": "launch",
+   "partners": [
+    "KOR",
+    "JPN"
+   ],
+   "what": "Several SRBMs, about 250 km"
+  },
+  {
+   "day": "2026-09-18",
+   "kind": "statement",
+   "partners": [
+    "USA",
+    "JPN",
+    "KOR"
+   ],
+   "what": "North Korea rejects IAEA resolution; nuclear status irreversible"
+  },
+  {
+   "day": "2026-09-20",
+   "kind": "launch",
+   "partners": [
+    "KOR",
+    "JPN"
+   ],
+   "what": "Two SRBMs, one about 440 km (Japan MoD)"
+  },
+  {
+   "day": "2026-09-21",
+   "kind": "dmz",
+   "partners": [
+    "KOR"
+   ],
+   "what": "DMZ mine blasts injure 3 ROK soldiers"
+  },
+  {
+   "day": "2026-09-28",
+   "kind": "dmz",
+   "partners": [
+    "KOR"
+   ],
+   "what": "JCS: North Korean mine highly likely; mine found"
+  },
+  {
+   "day": "2026-09-30",
+   "kind": "statement",
+   "partners": [
+    "KOR"
+   ],
+   "what": "UNC finds armistice violation; North Korea denies, threatens retaliation"
+  },
+  {
+   "day": "2026-10-02",
+   "kind": "launch",
+   "partners": [
+    "KOR",
+    "JPN"
+   ],
+   "what": "Ballistic missile about 680 km (3 Oct KST); KCNA: hypersonic IRBM"
+  },
+  {
+   "day": "2026-10-10",
+   "kind": "people",
+   "partners": [
+    "PRK"
+   ],
+   "what": "Party anniversary marked modestly, no parade"
+  },
+  {
+   "day": "2026-10-12",
+   "kind": "launch",
+   "partners": [
+    "KOR",
+    "JPN"
+   ],
+   "what": "Several ballistic missiles, one over 900 km, Kim present"
+  },
+  {
+   "day": "2026-10-14",
+   "kind": "launch",
+   "partners": [
+    "KOR",
+    "JPN",
+    "USA"
+   ],
+   "what": "Submarine-launched strategic cruise missiles (KCNA)"
+  },
+  {
+   "day": "2026-10-19",
+   "kind": "statement",
+   "partners": [
+    "KOR"
+   ],
+   "what": "Kim Yo Jong: southern border very unstable; loudspeakers under review"
+  },
+  {
+   "day": "2026-10-21",
+   "kind": "statement",
+   "partners": [
+    "KOR"
+   ],
+   "what": "North Korea says it will restart border loudspeakers"
+  },
+  {
+   "day": "2026-10-24",
+   "kind": "diplomacy",
+   "partners": [
+    "CHN"
+   ],
+   "what": "Kim Jong Un day trip to Dandong, meets Wang Huning"
+  },
+  {
+   "day": "2026-10-28",
+   "kind": "cyber",
+   "partners": [
+    "USA"
+   ],
+   "what": "OFAC sanctions on North Korean IT-worker networks"
+  },
+  {
+   "day": "2026-10-29",
+   "kind": "launch",
+   "partners": [
+    "KOR",
+    "JPN"
+   ],
+   "what": "Salvo of about 10 SRBMs (28 or 29 Oct)"
+  },
+  {
+   "day": "2026-10-30",
+   "kind": "diplomacy",
+   "partners": [
+    "USA",
+    "KOR",
+    "JPN"
+   ],
+   "what": "Rubio, Cho, Motegi reaffirm denuclearization"
+  },
+  {
+   "day": "2026-11-01",
+   "kind": "cyber",
+   "partners": [
+    "USA"
+   ],
+   "what": "FBI attributes the $6.3B Binance theft to North Korea (31 Oct-2 Nov)"
+  },
+  {
+   "day": "2026-11-03",
+   "kind": "statement",
+   "partners": [
+    "USA"
+   ],
+   "what": "North Korea denies the Binance hack"
+  },
+  {
+   "day": "2026-11-04",
+   "kind": "launch",
+   "partners": [
+    "KOR",
+    "JPN"
+   ],
+   "what": "Multiple missiles from Sondok"
+  },
+  {
+   "day": "2026-11-10",
+   "kind": "statement",
+   "partners": [
+    "KOR"
+   ],
+   "what": "Kim Yo Jong rejects UN chief's call for dialogue"
+  },
+  {
+   "day": "2026-11-11",
+   "kind": "statement",
+   "partners": [
+    "KOR"
+   ],
+   "what": "Revised constitution posted: drops peaceful reunification"
+  },
+  {
+   "day": "2026-11-14",
+   "kind": "diplomacy",
+   "partners": [
+    "RUS"
+   ],
+   "what": "Jo Yong-won arrives in Moscow"
+  }
+ ]
+}
