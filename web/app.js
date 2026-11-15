@@ -109,7 +109,7 @@ function zoneTable(title, list, sum, day) {
         h("th", { class: "num hide-sm", title: "Every story v4.3's matching rules assign here" }, "All matches"),
         h("th", null, "Attention vs typical"),
         h("th", { class: "hide-sm", title: "GDELT events of assault, fighting or mass violence placed in the zone, in articles whose headline names it" }, "Violence"),
-        h("th", null, ""))),
+        h("th", null, h("span", { class: "sr-only" }, "Alarm")))),
       h("tbody", null, zoneRows(list, sum, day)))),
   ];
 }
