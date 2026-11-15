@@ -7,23 +7,86 @@ skipped unless --force. About 20 MB of downloads and 10-25 s a day.
     python -I scripts/backfill_relations.py --start 2026-07-18 --end 2026-11-14 --root data/backfill/relations
     python -I scripts/backfill_relations.py --series-only --end 2026-11-14 --root data/backfill/relations
 
---bucket NAME writes to the Cloud Storage bucket instead of --root: one write per day plus one for the series
-(Class A). That is a write to the live bucket: Tom's yes first.
+--bucket NAME reads and writes the Cloud Storage bucket instead of --root, through the storage JSON API with the
+gcloud user's token (`gcloud auth print-access-token`; never printed), so it runs on Tom's laptop without the
+google-cloud-storage package: one write per day plus one for the series (Class A), and up to 120 reads to rebuild
+the series. Objects are gzip with Content-Encoding gzip, like pipeline/sinks.py. Writes to the live bucket: Tom's
+yes first.
+
+    python -I scripts/backfill_relations.py --bucket more-context-484804 --start 2026-11-15 --end 2026-11-15 --force
+
+That example re-does 15 Nov 2026, built as partial because the ingest only began writing pair tables at 18:07 UTC
+(mc-ingest-00022-zul); run it after that day's build (after 03:20 UTC 16 Nov).
 """
 from __future__ import annotations
 
 import argparse
+import gzip
+import json
+import shutil
+import subprocess
 import sys
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline import events, relations  # noqa: E402
-from pipeline.sinks import GCSSink, LocalSink  # noqa: E402
+from pipeline.sinks import LocalSink  # noqa: E402
 
 STREAMS = ("english", "translation")
+API = "https://storage.googleapis.com"
+GZIP_MAGIC = bytes([0x1F, 0x8B])
+
+
+class TokenSink:
+    """The few sink calls the backfill needs, over the storage JSON API with the gcloud user's token."""
+
+    def __init__(self, bucket: str):
+        self.bucket = bucket
+        gcloud = shutil.which("gcloud") or shutil.which("gcloud.cmd")
+        self.token = subprocess.run([gcloud, "auth", "print-access-token"], capture_output=True,
+                                    text=True).stdout.strip() if gcloud else ""
+        if not self.token:
+            sys.exit("gcloud auth print-access-token gave nothing: run gcloud auth login")
+
+    def _obj(self, key: str) -> str:
+        return f"{API}/storage/v1/b/{self.bucket}/o/" + urllib.parse.quote(key, safe="")
+
+    def _open(self, req: urllib.request.Request):
+        req.add_header("Authorization", "Bearer " + self.token)
+        return urllib.request.urlopen(req, timeout=120)
+
+    def exists(self, key: str) -> bool:
+        try:
+            with self._open(urllib.request.Request(self._obj(key))):
+                return True
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return False
+            raise
+
+    def read_json(self, key: str) -> dict | None:
+        try:  # gzip objects come back zipped when stored with no-transform (gcloud storage cp -Z): unzip either way
+            with self._open(urllib.request.Request(self._obj(key) + "?alt=media")) as r:
+                data = r.read()
+            return json.loads((gzip.decompress(data) if data[:2] == GZIP_MAGIC else data).decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return None
+            raise
+
+    def write_json(self, key: str, obj: dict) -> None:
+        body = gzip.compress(json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+        q = urllib.parse.urlencode({"uploadType": "media", "name": key, "contentEncoding": "gzip"})
+        req = urllib.request.Request(f"{API}/upload/storage/v1/b/{self.bucket}/o?{q}", data=body, method="POST",
+                                     headers={"Content-Type": "application/json"})
+        with self._open(req):
+            pass
 
 
 def _file(stamp: str, stream: str) -> dict | None:
@@ -70,7 +133,7 @@ def main() -> int:
     a = ap.parse_args()
     if bool(a.root) == bool(a.bucket):
         ap.error("give exactly one of --root and --bucket")
-    sink = GCSSink(a.bucket) if a.bucket else LocalSink(Path(a.root))
+    sink = TokenSink(a.bucket) if a.bucket else LocalSink(Path(a.root))
     end = date.fromisoformat(a.end)
     if not a.series_only:
         if not a.start:
