@@ -251,6 +251,25 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
 - Cross-language grouping: multilingual embeddings (Vertex, billable) are the route (GDELT mentions were too noisy
   and too sparse); needs Tom's yes after a measured sample.
 
+## Relations between countries (built 15 Nov 2026 on `relations-tone`; not deployed)
+- Tom, 15 Nov 2026: casualty counts are a small part of what matters; track relations between nations and changes in
+  tone, every zone. Probe, findings and design: `docs/relations/2026-11-15-relations-tone.md` (Korea, 16 Aug-14 Nov:
+  20 of 26 dated events flagged; 18 of 20 unlisted flags were real news). Tom approved building the pair layer the
+  same day ("Yes, build it").
+- `pipeline/relations.py`: per Events file, `pair_table` counts articles (distinct source URLs) per directed actor
+  pair (CAMEO codes; the UN and NATO as UNO and NAT) by QuadClass, with Goldstein and tone per article; it rides in
+  each Events record as `pairs` (about 1.1 KB gzip a file, 0.2 MB a day, in the cycle files; 22 ms a file). The daily build, after the country
+  counts and from the same records (read once), writes `stories/YYYY/MM/DD/relations.json` (every pair) and the
+  rolling `relations/series.json` (120 days of the pairs in `catalog/relations.json`): two writes a day.
+- `GET /relations?zone=&day=&days=` computes daily and 7-day values, z against the pair's own 28 days, and flags
+  (z >= 2.5 on 5+ articles) from the series on read (about 0.1 s a pair; cached 30 min). The zone page shows it
+  under "Relations between countries". Display only: no alarm, no `/feed` items.
+- `catalog/relations.json`: Korea's pairs were measured; every other zone's are Claude's draft for Tom to edit.
+- Days built before deploy have no `pairs` in their Events records and count as partial unless backfilled:
+  `scripts/backfill_relations.py` (free GDELT download; `--bucket` writes to the live bucket, Tom's yes first;
+  `--series-only` rebuilds the series after a catalog change).
+- Not built: press tone by outlet country (GKG) and the state-and-people layer (both measured in the note).
+
 ## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
 Most stories are never read by a person, so model work waits for a reason to spend:
 - **Always on, $0:** ingest, stories, headline-term filter, counts, attention z.

@@ -1,0 +1,56 @@
+{
+ "version": "2026-11-15.1",
+ "notes": [
+  "Pairs of actors whose relations each zone page shows (pipeline/relations.py; GDELT Events actor codes: CAMEO, mostly ISO 3166 alpha-3; UNO is the United Nations and NAT is NATO, from GDELT's known-group codes).",
+  "Korea's pairs were measured in the 15 Nov 2026 probe (docs/relations/2026-11-15-relations-tone.md). Every other zone's pairs are a first draft by Claude from each zone's profile, for Tom to edit; the volumes in 'measured' are articles a day, both ways, 16 Aug-14 Nov 2026.",
+  "A pair added here appears from the next daily build; run scripts/backfill_relations.py --series-only (one read per stored day) to give it history."
+ ],
+ "names": {
+  "AFG": "Afghanistan", "ARE": "United Arab Emirates", "BFA": "Burkina Faso", "BLR": "Belarus", "CHN": "China",
+  "COD": "DR Congo", "COL": "Colombia", "CUB": "Cuba", "DZA": "Algeria", "EGY": "Egypt", "ERI": "Eritrea",
+  "ETH": "Ethiopia", "EUR": "Europe (EU)", "FIN": "Finland", "GUY": "Guyana", "IND": "India", "IRN": "Iran",
+  "ISR": "Israel", "JPN": "Japan", "KOR": "South Korea", "LBN": "Lebanon", "LTU": "Lithuania", "MLI": "Mali",
+  "MMR": "Myanmar", "NAT": "NATO", "NER": "Niger", "PAK": "Pakistan", "PHL": "Philippines", "POL": "Poland",
+  "PRK": "North Korea", "PSE": "Palestine", "RUS": "Russia", "RWA": "Rwanda", "SAU": "Saudi Arabia",
+  "SDN": "Sudan", "SOM": "Somalia", "SYR": "Syria", "THA": "Thailand", "TUR": "Turkey", "TWN": "Taiwan",
+  "UGA": "Uganda", "UKR": "Ukraine", "UNO": "United Nations", "USA": "United States", "VEN": "Venezuela",
+  "VNM": "Vietnam", "YEM": "Yemen"
+ },
+ "measured": {
+  "note": "Articles a day, both ways, 16 Aug-14 Nov 2026 (scripts/backfill_relations.py, 15 Nov 2026). Under about 3 a day is too thin to read daily; the flag needs at least 5 articles.",
+  "01_Ukraine_Conflict": {"UKR-RUS": 1045.9, "UKR-USA": 218.4, "RUS-USA": 292.8, "UKR-EUR": 145.2},
+  "07_Russia_NATO": {"RUS-NAT": 47.5, "RUS-POL": 49.6, "RUS-FIN": 27.8, "RUS-LTU": 15.0, "BLR-POL": 3.6},
+  "02_Taiwan_Strait": {"CHN-TWN": 40.8, "CHN-USA": 251.2, "CHN-JPN": 26.1, "TWN-USA": 22.0},
+  "08_South_China_Sea": {"CHN-PHL": 16.7, "CHN-VNM": 6.7, "PHL-USA": 19.0},
+  "03_Korea_Peninsula": {"PRK-KOR": 50.4, "PRK-USA": 21.1, "PRK-JPN": 6.4, "PRK-CHN": 12.8, "PRK-RUS": 26.2, "PRK-UNO": 3.4},
+  "10_Israel_Gaza_Lebanon": {"ISR-PSE": 376.9, "ISR-LBN": 62.6, "ISR-USA": 183.8, "ISR-SYR": 44.7},
+  "11_Iran_Red_Sea": {"IRN-USA": 407.5, "IRN-ISR": 130.6, "IRN-SAU": 55.1, "YEM-USA": 12.0, "YEM-ISR": 4.6},
+  "06_India_Pakistan": {"IND-PAK": 13.5, "PAK-AFG": 31.7, "IND-CHN": 16.6, "PAK-USA": 24.5},
+  "13_Sudan": {"SDN-ARE": 1.0, "SDN-EGY": 11.4, "SDN-USA": 4.4},
+  "18_Ethiopia_Eritrea": {"ETH-ERI": 12.7, "ETH-EGY": 7.2, "ETH-SOM": 2.4},
+  "19_Somalia": {"SOM-USA": 10.1, "SOM-ETH": 2.4, "SOM-TUR": 3.2},
+  "12_Sahel_West_Africa": {"MLI-RUS": 2.4, "MLI-DZA": 2.2, "NER-RUS": 1.0, "BFA-RUS": 0.6},
+  "14_DRC_Rwanda": {"COD-RWA": 3.7, "COD-UGA": 3.1, "COD-USA": 2.5},
+  "16_Myanmar": {"MMR-CHN": 2.4, "MMR-THA": 2.2, "MMR-USA": 2.4},
+  "05_Venezuela": {"VEN-USA": 61.1, "VEN-COL": 10.8, "VEN-GUY": 1.0, "VEN-RUS": 1.9},
+  "15_Cuba": {"CUB-USA": 35.9, "CUB-RUS": 4.4, "CUB-CHN": 2.5}
+ },
+ "zones": {
+  "01_Ukraine_Conflict": {"pairs": [["UKR", "RUS"], ["UKR", "USA"], ["RUS", "USA"], ["UKR", "EUR"]]},
+  "07_Russia_NATO": {"pairs": [["RUS", "NAT"], ["RUS", "POL"], ["RUS", "FIN"], ["RUS", "LTU"], ["BLR", "POL"]]},
+  "02_Taiwan_Strait": {"pairs": [["CHN", "TWN"], ["CHN", "USA"], ["CHN", "JPN"], ["TWN", "USA"]]},
+  "08_South_China_Sea": {"pairs": [["CHN", "PHL"], ["CHN", "VNM"], ["PHL", "USA"]]},
+  "03_Korea_Peninsula": {"pairs": [["PRK", "KOR"], ["PRK", "USA"], ["PRK", "JPN"], ["PRK", "CHN"], ["PRK", "RUS"], ["PRK", "UNO"]]},
+  "10_Israel_Gaza_Lebanon": {"pairs": [["ISR", "PSE"], ["ISR", "LBN"], ["ISR", "USA"], ["ISR", "SYR"]]},
+  "11_Iran_Red_Sea": {"pairs": [["IRN", "USA"], ["IRN", "ISR"], ["IRN", "SAU"], ["YEM", "USA"], ["YEM", "ISR"]]},
+  "06_India_Pakistan": {"pairs": [["IND", "PAK"], ["PAK", "AFG"], ["IND", "CHN"], ["PAK", "USA"]]},
+  "13_Sudan": {"pairs": [["SDN", "ARE"], ["SDN", "EGY"], ["SDN", "USA"]]},
+  "18_Ethiopia_Eritrea": {"pairs": [["ETH", "ERI"], ["ETH", "EGY"], ["ETH", "SOM"]]},
+  "19_Somalia": {"pairs": [["SOM", "USA"], ["SOM", "ETH"], ["SOM", "TUR"]]},
+  "12_Sahel_West_Africa": {"pairs": [["MLI", "RUS"], ["MLI", "DZA"], ["NER", "RUS"], ["BFA", "RUS"]]},
+  "14_DRC_Rwanda": {"pairs": [["COD", "RWA"], ["COD", "UGA"], ["COD", "USA"]]},
+  "16_Myanmar": {"pairs": [["MMR", "CHN"], ["MMR", "THA"], ["MMR", "USA"]]},
+  "05_Venezuela": {"pairs": [["VEN", "USA"], ["VEN", "COL"], ["VEN", "GUY"], ["VEN", "RUS"]]},
+  "15_Cuba": {"pairs": [["CUB", "USA"], ["CUB", "RUS"], ["CUB", "CHN"]]}
+ }
+}

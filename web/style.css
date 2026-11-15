@@ -91,6 +91,25 @@ tr.alarm td { background: var(--alarm-soft); }
   h1 { font-size: 21px; }
 }
 
+/* Relations between countries (15 Nov 2026) */
+.rel-pair { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.rel-pair:last-child { border-bottom: 0; }
+.rel-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-bottom: 6px; }
+.spark { display: block; width: 100%; height: 48px; margin: 4px 0 8px; }
+.spark rect.b { fill: var(--muted); opacity: .45; }
+.spark rect.p { fill: var(--muted); opacity: .2; }
+.spark rect.f { fill: var(--accent); }
+.spark rect.sel { stroke: var(--ink); stroke-width: 1.5; }
+.rel-table { width: 100%; font-size: 14px; }
+.rel-table th, .rel-table td { padding: 5px 8px; }
+h3 { font-size: 15px; margin: 16px 0 8px; }
+.show-sm { display: none; }
+@media (max-width: 640px) {
+  .show-sm { display: inline; }
+  .rel-table th, .rel-table td { padding: 5px 4px; }
+  .rel-table .badge { white-space: normal; }
+}
+
 /* Rising and map (28 Oct 2026) */
 :root { --z3: #b3261e; --z2: #e06c3a; --z1: #f2b766; --z0: #dfe6ee; --zlow: #9fc3e6; --nodata: #eef1f5; --land-line: #ffffff; --sea: #e8eef5; --event: #6a1b9a; }
 @media (prefers-color-scheme: dark) {

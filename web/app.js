@@ -399,6 +399,86 @@ function suitePanel(s, pastDay) {
   ];
 }
 
+// ---------- Relations between countries (GET /relations; pipeline/relations.py) ----------
+const SVGNS = "http://www.w3.org/2000/svg";
+function svg(tag, attrs, ...kids) {
+  const el = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs || {})) if (v !== null && v !== undefined) el.setAttribute(k, v);
+  for (const kid of kids.flat(Infinity)) if (kid !== null && kid !== undefined) el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
+  return el;
+}
+const COUNT_LABEL = { articles: "articles", verbal_conflict: "verbal-conflict articles", material_conflict: "material-conflict articles" };
+const shortDay = (d) => dayLabel(d).replace(/ \d{4}$/, "");
+const signed = (x) => (x === null || x === undefined ? "—" : `${x > 0 ? "+" : ""}${x.toFixed(1)}`);
+// A 7-day value far from its four weeks before (|z| >= 2) shows that baseline beside it.
+function baseNote(z, base, fmt) {
+  return z !== null && z !== undefined && Math.abs(z) >= 2 && base !== null && base !== undefined
+    ? h("span", { class: "badge warm", title: "Average of the 7-day values in the four weeks before this week" }, `4-wk avg ${fmt(base)}`) : null;
+}
+
+// Daily articles both ways; flagged days in amber, the chosen day outlined. Hover a bar for its numbers.
+function relSpark(p, r, day) {
+  const W = 600, H = 48, n = r.days.length;
+  const max = Math.max(1, ...p.articles);
+  const bw = W / n;
+  const flagged = new Set(p.flagged);
+  return svg("svg", { class: "spark", viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: "none", role: "img",
+    "aria-label": `Articles a day between ${p.a_name} and ${p.b_name}, highest ${max}` },
+  r.days.map((d, i) => {
+    const hgt = Math.max(1, (p.articles[i] / max) * (H - 2));
+    const cls = flagged.has(d) ? "f" : r.complete[i] ? "b" : "p";
+    const z = p.z_articles[i];
+    return svg("rect", { class: d === day ? `${cls} sel` : cls, x: (i * bw + 0.5).toFixed(1), y: (H - hgt).toFixed(1),
+      width: Math.max(1, bw - 1).toFixed(1), height: hgt.toFixed(1) },
+    svg("title", null, `${dayLabel(d)}: ${p.articles[i]} articles both ways (${p.a_name} → ${p.b_name} ${p.articles_ab[i]}, ${p.b_name} → ${p.a_name} ${p.articles_ba[i]})${z !== null && z !== undefined ? `, z ${signed(z)}` : ""}${r.complete[i] ? "" : ", incomplete day"}${flagged.has(d) ? ", flagged" : ""}`));
+  }));
+}
+
+function relDirRow(label, short, last, week) {
+  return h("tr", null,
+    h("td", null, h("span", { class: "hide-sm" }, label), h("span", { class: "show-sm", title: label }, short)),
+    h("td", null, String(week)),
+    h("td", null, pct(last.conflict_share_7d), " ", baseNote(last.z_conflict_share_7d, last.base_conflict_share_7d, pct)),
+    h("td", null, signed(last.goldstein_7d), " ", baseNote(last.z_goldstein_7d, last.base_goldstein_7d, signed)),
+    h("td", { class: "hide-sm" }, signed(last.tone_7d), " ", baseNote(last.z_tone_7d, last.base_tone_7d, signed)));
+}
+
+function relPair(p, r) {
+  const last = p.latest;
+  const week = (xs) => xs.slice(-7).reduce((t, x) => t + x, 0);
+  const recent = p.flagged[p.flagged.length - 1];
+  return h("div", { class: "rel-pair" },
+    h("div", { class: "rel-head" }, h("strong", null, `${p.a_name} – ${p.b_name}`),
+      recent ? h("span", { class: "badge warm" }, `flagged ${shortDay(recent)}`) : null,
+      h("span", { class: "muted small" }, ` ${dayLabel(r.days[0])} to ${dayLabel(r.days[r.days.length - 1])}`)),
+    relSpark(p, r, last.day),
+    h("table", { class: "rel-table" },
+      h("thead", null, h("tr", null, h("th", null, `To ${dayLabel(last.day)}`), h("th", null, "Articles, 7 days"),
+        h("th", null, "Conflict share"), h("th", null, "Goldstein"), h("th", { class: "hide-sm" }, "Tone"))),
+      h("tbody", null,
+        relDirRow(`${p.a_name} → ${p.b_name}`, `${p.a} → ${p.b}`, last.ab, week(p.articles_ab)),
+        relDirRow(`${p.b_name} → ${p.a_name}`, `${p.b} → ${p.a}`, last.ba, week(p.articles_ba)))));
+}
+
+function relationsPanel(r) {
+  if (!r.pairs.length || !r.days.length) return [h("p", { class: "muted" }, "No relations built for this zone yet.")];
+  const flags = r.flags.slice(0, 8);
+  const names = Object.fromEntries(r.pairs.flatMap((p) => [[p.a, p.a_name], [p.b, p.b_name]]));
+  const flagText = (f) => f.why.map((w) => {
+    const dir = w.direction === "both" ? `${names[f.a]} and ${names[f.b]}` : w.direction === "ab" ? `${names[f.a]} → ${names[f.b]}` : `${names[f.b]} → ${names[f.a]}`;
+    return `${dir}: ${w.n} ${COUNT_LABEL[w.count]} (z ${signed(w.z)})`;
+  }).join("; ");
+  return [
+    r.end !== r.asked ? h("p", { class: "muted small" }, `Relations are built through ${dayLabel(r.end)}.`) : null,
+    h("div", { class: "panel" }, r.pairs.map((p) => relPair(p, r))),
+    flags.length
+      ? h("div", null, h("h3", null, "Flagged days"),
+        h("ul", { class: "stories panel" }, flags.map((f) => h("li", { class: "story" },
+          h("span", { class: "story-title" }, dayLabel(f.day)), h("div", { class: "meta" }, flagText(f))))))
+      : h("p", { class: "muted small" }, "No flagged days in this window."),
+  ];
+}
+
 async function viewZone(id, params) {
   setNav("home");
   const ents = await entities();
@@ -429,6 +509,8 @@ async function viewZone(id, params) {
   }, uncoded ? `Code ${uncoded} stor${uncoded === 1 ? "y" : "ies"} with Gemini (about $${Math.max(uncoded * COST_PER_STORY, 0.001).toFixed(3)})` : "All shown stories are coded");
   // Loaded after the page so a slow program feed never holds up the stories.
   const suiteBox = h("div", null, h("p", { class: "muted small" }, "Loading reports from the other programs…"));
+  const isZone = ents.zones.some((e) => e.id === id);
+  const relBox = isZone ? h("div", null, h("p", { class: "muted small" }, "Loading relations…")) : null;
   show(
     h("p", { class: "small" }, h("a", { href: `#/?day=${days.days.includes(day) ? day : days.days[0] || ""}` }, "← All zones")),
     h("h1", null, ent.name),
@@ -449,6 +531,13 @@ async function viewZone(id, params) {
     (z.feeds || []).length
       ? h("ul", { class: "stories panel" }, z.feeds.map(feedItem))
       : h("p", { class: "muted" }, "No feed items for that day yet."),
+    isZone ? [
+      h("h2", null, "Relations between countries"),
+      h("p", { class: "muted small" }, "Articles in which GDELT coded an event between the two, counted once per article, by who acts on whom. ",
+        "Conflict share is the share carrying a verbal (accuse, demand, reject, threaten) or material conflict event; Goldstein runs from −10 (most conflictual) to +10; tone is GDELT's score of the article text. ",
+        "A day is flagged when a count is far above its own previous four weeks (z ≥ 2.5, at least 5 articles). GDELT often gets direction and partner wrong, so read each pair both ways; it carries no wire services. Display only, not a warning."),
+      relBox,
+    ] : null,
     h("h2", null, "From the suite"),
     h("p", { class: "muted small" }, "What The Intelligence Company's other programs report now for this zone's countries or this topic: travel advisories, embassy posture, airspace and navigational warnings (",
       h("a", { href: "https://cordon.theintelligence.company/", target: "_blank", rel: "noopener noreferrer" }, "Cordon"), "), GPS interference (",
@@ -459,6 +548,11 @@ async function viewZone(id, params) {
       "). Each program collects its own data; Watchfloor links to it and does not count it above."),
     suiteBox,
   );
+  if (relBox) {
+    get(`/relations?zone=${encodeURIComponent(id)}&day=${encodeURIComponent(day)}`)
+      .then((r) => relBox.replaceChildren(...relationsPanel({ ...r, asked: day }).filter(Boolean)))
+      .catch((e) => relBox.replaceChildren(h("p", { class: "muted" }, e.status === 404 ? "No relations built for this zone yet." : "Relations could not be loaded just now.")));
+  }
   get(`/suite?entity=${encodeURIComponent(id)}`)
     .then((s) => suiteBox.replaceChildren(...suitePanel(s, day !== days.today).filter(Boolean)))
     .catch(() => suiteBox.replaceChildren(h("p", { class: "note" }, "The other programs could not be reached just now. Their reports are missing here, not absent.")));

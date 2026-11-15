@@ -14,6 +14,10 @@
                                          violent events placed in a zone's countries (or one country), for the map
     GET  /feed?day=<date>                one built day in feed contract v2 (tic-feed/2, GeoJSON) for COP and other
                                          programs, from the same data as /summary and /countries (pipeline/feed_v2.py)
+    GET  /relations?zone=<id>&day=<date>&days=<14-120>&detail=1
+                                         relations between the zone's pairs of countries from GDELT Events:
+                                         articles each way, conflict share, Goldstein, tone, z against their own
+                                         normal, flagged days (pipeline/relations.py); without zone, the pairs
     GET  /suite?entity=<id>              what the suite's other programs report now for a zone or topic (Cordon,
                                          Noisefloor, Elements, Vigil, Verdict), linked to them, never counted here
                                          (pipeline/suite.py; doctrine kit tips)
@@ -299,6 +303,25 @@ def handle(method: str, path: str, params: dict, body: dict | None, sink, *, ai_
                 _CACHE.pop(f"summary:{d}", None)  # country counts land seconds after the stories
             ctry = _cached(f"countries:{d}", 3600, lambda: _countries(sink, d))
             return 200, feed_v2.build(summary, ctry, catalog=catalog)
+        if method == "GET" and path == "/relations":
+            from . import relations
+            cat = relations.catalog()
+            if not params.get("zone"):
+                return 200, {"zones": cat.get("zones", {}), "names": cat.get("names", {}),
+                             "version": cat.get("version"), "method": relations.method()}
+            eid = _entity(params.get("zone"), catalog)
+            end = _day(params.get("day"), today) if params.get("day") else None
+            try:
+                n = min(max(int(params.get("days") or 90), 14), relations.SERIES_DAYS)
+            except ValueError:
+                raise BadRequest("days must be a number")
+            series = _cached("relations_series", 1800, lambda: sink.read_json(relations.SERIES_KEY))
+            if not series:
+                return 404, {"error": "no relations built yet"}
+            detail = params.get("detail") in ("1", "true")
+            out = _cached(f"relations:{eid}:{end}:{n}:{detail}", 1800,
+                          lambda: relations.zone_view(series, eid, end, n, detail=detail))
+            return (200, out) if out else (404, {"error": "no pairs of countries named for this zone"})
         if method == "GET" and path == "/suite":
             from . import suite  # imported here so a doctrine-kit or network problem can only affect this route
             eid = _entity(params.get("entity"), catalog)

@@ -158,6 +158,12 @@ press rising without statements (press-driven). It would not score statement tex
 
 ## Proposed design (for approval)
 
+**Built 15 Nov 2026 on Tom's yes, pair layer only** (branch `relations-tone`; not merged or deployed):
+`pipeline/relations.py`, `catalog/relations.json`, `GET /relations`, the zone page's "Relations between countries"
+panel and `scripts/backfill_relations.py`, as described below with two changes: the state-and-people `within` table
+and the GKG `press` rows are not built, and the API computes z and flags from the series on read instead of storing
+them. `CLAUDE.md` has the summary.
+
 **Computed in the 15-minute cycle, from files it already downloads:**
 - `events.record()` gains `dyads`: per directed pair for that file, the article-level vector (articles; by quad;
   any conflict; Goldstein and tone sums per article; lead-paragraph articles) plus the looser state-people

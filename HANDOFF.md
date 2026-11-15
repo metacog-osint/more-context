@@ -94,11 +94,15 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
    (`459d578`) were reviewed 14 Nov in `D:\Projects\CLAUDE_HANDOVER.md`: do not merge; use the 13 indicators as a
    draft for Tom's own charters.
 4. October usage totals (Class A and BigQuery), carried from 4 Nov.
+5. Relations between countries (built 15 Nov on branch `relations-tone`, not merged or deployed): merge and push,
+   deploy mc-ingest, mc-api and the website, then upload the 120-day backfill (`scripts/backfill_relations.py
+   --bucket more-context-484804 --start 2026-07-18 --end <last built day>`, about 120 Class A writes). Tom also
+   edits the draft pairs in `catalog/relations.json`.
 
 ## Next steps, in order
 1. After 03:20 UTC 16 Nov: check that 15 Nov built with the new terms (summary.json without `rescored`, Sudan's
    filtered count against its re-scored baseline) and that Crisis Group's search has listed a piece.
-2. Review the Korea relations-and-tone prototype with Tom (session `local_e3467a19`).
+2. Relations between countries: built on `relations-tone` (see decision 5 and `CLAUDE.md`).
 3. Charter interview, one zone at a time, Iran & Red Sea first (December three-signal watch).
 4. Indicators that act on tips (step 3 of the tipping plan), after the charters.
 5. Headline service for other programs (step 4); Bluesky/Telegram lists need Tom's picks (`presstv`, `farsna`
