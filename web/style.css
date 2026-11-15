@@ -2,12 +2,14 @@
   --bg: #f6f7f9; --panel: #ffffff; --ink: #172033; --muted: #5d677a; --line: #dfe3ea;
   --accent: #b86e00; --accent-soft: #fff3df; --alarm: #b3261e; --alarm-soft: #fdecea;
   --ok: #1e6b3a; --chip: #eef1f6; --link: #1f4fa3; --top: #101a2b; --top-ink: #e9edf5;
+  --accent-ink: #8f5509; /* amber for text on light backgrounds: 5.5:1 on --accent-soft (#b86e00 read 3.6:1) */
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0d131f; --panel: #141c2b; --ink: #e6eaf2; --muted: #9aa5b8; --line: #263247;
     --accent: #f2b33d; --accent-soft: #33280f; --alarm: #ff8a80; --alarm-soft: #3a1717;
     --ok: #7fd49a; --chip: #1d2738; --link: #8fb4ff; --top: #0a0f18; --top-ink: #e9edf5;
+    --accent-ink: #f2b33d;
   }
 }
 * { box-sizing: border-box; }
@@ -38,11 +40,13 @@ h2 { font-size: 17px; margin: 28px 0 10px; }
 .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 0 0 16px; }
 select, button { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; }
 button { cursor: pointer; }
-button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
-@media (prefers-color-scheme: dark) { button.primary { color: #1a1206; } }
+/* Dark text on amber in both modes (14 Nov 2026): white on the light amber read 4.0:1, under WCAG AA's 4.5:1. */
+button.primary { background: var(--accent); border-color: var(--accent); color: #1a1206; font-weight: 600; }
 /* The shared Time dialog (tic-time.css) puts white text on --accent: 4.0:1 on light amber, 1.9:1 on dark. */
 .tic-time-dialog .tic-time-actions .tic-time-done { color: #1a1206; }
 button:disabled { opacity: .5; cursor: not-allowed; }
+/* Text for screen readers only */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
 table { width: 100%; border-collapse: collapse; }
 th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -54,7 +58,9 @@ tr.alarm td { background: var(--alarm-soft); }
 .zone-link:hover { text-decoration: underline; }
 .badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: var(--chip); color: var(--muted); white-space: nowrap; }
 .badge.hot { background: var(--alarm); color: #fff; }
-.badge.warm { background: var(--accent-soft); color: var(--accent); }
+/* Dark mode's --alarm is a light red: white on it read 2.3:1. */
+@media (prefers-color-scheme: dark) { .badge.hot { color: #1a0606; } }
+.badge.warm { background: var(--accent-soft); color: var(--accent-ink); }
 .badge.cool { background: var(--chip); color: var(--muted); }
 .note { background: var(--accent-soft); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 0 0 16px; font-size: 14px; }
 .stories { list-style: none; margin: 0; padding: 0; }
