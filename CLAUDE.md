@@ -214,8 +214,12 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   A feed can also freeze while still answering 200 or 304 (Crisis Group, 30 Oct 2026), which health never flags; the
   test is new rows per source per day from the cycle files against the source's own weekdays (feed health pass,
   14 Nov 2026, in `HANDOFF.md`).
-- A Sudan headline term (`sudan*`) also matches "South Sudan": 9 of 167 Sudan stories on 13 Nov 2026 were South
-  Sudan's, GDELT ones included, so they reach the Sudan attention count. Not fixed yet (see `HANDOFF.md`).
+- **Exclusions (15 Nov 2026, `9d42d68`):** `catalog/title_terms.json` `exclude` lists phrases blanked out of a
+  headline before an entity's terms are searched (`TermMatcher(terms, exclude)`), so "South Sudan" no longer counts
+  for Sudan while "Sudan and South Sudan sign deal" still does (21 phrases in 16 languages). Stored days 29 Jul-14 Nov
+  were re-scored with `scripts/rescore_terms.py` (term fields only, no rebuild; `--check` first, from the first
+  stored day, 29 Jul). Known misses: Arabic "جنوب السودان" also means "southern Sudan" (a 9 Oct Blue Nile story was
+  dropped), and the 20-21 Oct Abyei market strike left Sudan's counts (Abyei is not a Sudan term; Tom's call).
 - A partial day (ingest started or stopped mid-day) gets no attention z and no alarm.
 
 ## Relevance and attention
