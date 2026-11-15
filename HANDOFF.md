@@ -80,7 +80,7 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
 - **Spot check of the 251 dropped stories:** all South Sudan's, except a 9 Oct Arabic headline about a drone strike
   in Blue Nile ("النيل الأزرق جنوب السودان": Arabic "جنوب السودان" is both "South Sudan" and "southern Sudan"). The
   20-21 Oct Abyei market drone strike (153 dead; headlines: "South Sudan accuses neighbor of deadly drone strike")
-  left Sudan's counts with 8 stories and 5 violent-event URLs: whether "Abyei" becomes a Sudan term is Tom's call
+  left Sudan's counts with 8 stories and 5 violent-event URLs: Tom, 15 Nov: leave "Abyei" out of Sudan's terms
   (who carried out the strike not verified here).
 - **Written to the bucket 14:41-14:45 UTC 15 Nov** (`--write`, 29 Jul-14 Nov): 122 files (48 summary.json, 74
   countries.json), none refused; each carries `rescored: {at, terms_version: 2026-11-14.1}`. Read back: 14 Nov Sudan
@@ -88,13 +88,12 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
   Sudan on 14 Nov lists 25 stories, none naming South Sudan.
 
 ## Decisions waiting on Tom
-1. Whether "Abyei" becomes a Sudan headline term (South Sudan exclusion section).
-2. Oryx: keep dropped, or poll it anyway.
-3. Website deploy so the Sources page shows catalog 2026-11-14.1.
-4. The zone charters: still none in `catalog/indicators/`. The AI-drafted ones on `wip/2026-11-01-unreviewed`
+1. Oryx: keep dropped, or poll it anyway.
+2. Website deploy so the Sources page shows catalog 2026-11-14.1.
+3. The zone charters: still none in `catalog/indicators/`. The AI-drafted ones on `wip/2026-11-01-unreviewed`
    (`459d578`) were reviewed 14 Nov in `[local path]`: do not merge; use the 13 indicators as a
    draft for Tom's own charters.
-5. October usage totals (Class A and BigQuery), carried from 4 Nov.
+4. October usage totals (Class A and BigQuery), carried from 4 Nov.
 
 ## Next steps, in order
 1. After 03:20 UTC 16 Nov: check that 15 Nov built with the new terms (summary.json without `rescored`, Sudan's
