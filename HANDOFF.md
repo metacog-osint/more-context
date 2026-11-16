@@ -3,6 +3,22 @@
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
 ## Where things stand (16 Nov 2026, about 12:20 AM CST)
+- **Suite-review fixes (16 Nov 2026, branch `watchfloor-review-fixes` in `_worktrees\watchfloor-review-fixes`, cut
+  from `017cc35`; not committed, pushed or deployed: each needs Tom's yes).** From the 15 Nov review
+  (`[local path]`, Watchfloor). No method or threshold changed.
+  1. Serbia's second GDELT code RB (Belgrade) is counted as RI, at ingest and on read; PU, TP, TK, SC added to both
+     FIPS catalogs; `countries.json` gains `uncatalogued`; `tests/test_country_codes.py` guards the catalog.
+     Takes effect on the first build after an `mc-ingest` deploy; stored days are folded on read, so Serbia's
+     baseline is whole at once (expect Serbia's counts to roughly double from that day, not a spike: the history
+     doubles too). The map and `/feed` need `mc-api` deployed too (fips_iso.json).
+  2. A failed country build is kept in `state.stories.countries_retry` and rebuilt later (CLAUDE.md, Rising section).
+  3. The site no longer says "15 conflict zones" (meta description and About lede give no number). Website deploy.
+  4. `catalog/press_outlets.json` 2026-11-16.2: `sputnik.af` RS; `valtioneuvosto.fi`, `puolustusvoimat.fi`,
+     `raja.fi` null. Needs both functions deployed; past days keep their press rows as built.
+  5. `scripts/backfill_relations.py --bucket` refreshes its token (45 min, and on a 401), prints a day after its
+     write, and rebuilds the series to the last stored day, not `--end`.
+  Tests: 208 of 247 pass; the 39 failures are all `tests.test_match`, which reads
+  `[local path]` from disk and fails the same way on the untouched main checkout.
 - **Feed items are date-only (16 Nov 2026, branch `feed/day-precision`, not pushed or deployed).** `pipeline/feed_v2.py` now gives every
   item `data_as_of_precision: "day"` and `data_as_of` at `T00:00:00Z` (it was `T23:59:59Z`, which COP showed as
   "5:59 PM CST"), as the tic-feed/2 contract in kit 0.5.6 requires: with `day`, a 23:59:59 time is rejected. Takes
@@ -123,13 +139,14 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
 
 ## Decisions waiting on Tom
 1. Oryx: keep dropped, or poll it anyway.
-2. Press outlets: add `sputnik.af` (RS) and the Finnish government sites (null) to `catalog/press_outlets.json`
-   (needs a commit and a deploy of both functions).
+2. Press outlets: done on branch `watchfloor-review-fixes` (2026-11-16.2); commit, push and a deploy of both
+   functions wait on Tom.
 3. The zone charters: still none in `catalog/indicators/`. The AI-drafted ones on `wip/2026-11-01-unreviewed`
    (`459d578`) were reviewed 14 Nov in `[local path]`: do not merge; use the 13 indicators as a
    draft for Tom's own charters.
 4. October usage totals (Class A and BigQuery), carried from 4 Nov.
-5. Whether `backfill_relations.py --bucket` should refresh its token (runs over an hour fail with HTTP 401).
+5. `backfill_relations.py --bucket` token refresh: built on branch `watchfloor-review-fixes`; commit and push wait
+   on Tom (a script, no deploy).
 
 ## Next steps, in order
 1. Press tone is display only: Tom reads the zone pages' press tables for a month (from 16 Nov) before any flag,
@@ -141,6 +158,13 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
    Telegram channels live but ownership unconfirmed).
 6. Requests to other programs: Elements to mark FIRMS anomalies against its baseline; Vigil to tag state-linked
    actors.
+7. `/feed` when a day's `countries.json` is missing (a country build still waiting for its retry, or given up):
+   `pipeline/feed_v2.py` gives no coverage fraction, no partial flag and "0 countries rising" in the title, a
+   missing layer shown as quiet. Mark the feed partial and say "no country data" (left out of the review fixes
+   while `feed/day-precision` was changing that file).
+8. Press domain table: GDELT's 2018 table codes `sputnik-georgia.com` GG and `sputniknews.cn` CH, against the
+   catalog's rule that Sputnik sites are Russia; and codes Bosnian Serb outlets (rtrs.tv, glassrpske.com, rtvbn.com)
+   and balkaninsight.com as RB, which no press block lists. Check whether either matters for a zone block.
 
 ## History
 - 4 Nov 2026 (session "Geo-context project review"): geometry matching `6f3a63d` (doctrine kit 0.4.1); CI later

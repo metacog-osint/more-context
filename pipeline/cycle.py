@@ -28,6 +28,12 @@ NOT_YET_PUBLISHED = timedelta(hours=3)
 STATE_KEY = statestore.STATE_KEY
 MAX_ALARMS_PER_RUN = 2  # each is one Vertex request (~10 s); the rest wait for the next run
 MAX_PENDING_ALARMS = 50
+# A day whose country build failed (countries.json, violent.jsonl, then relations) is kept in
+# state["stories"]["countries_retry"] and rebuilt on a later run with no day to build, at most one day a run and
+# one try an hour; after COUNTRY_RETRIES tries it moves to "countries_failed" (scripts/backfill_events.py by hand).
+# The cap matters: a day's build reads all its cycle files (about 100 Class B reads).
+COUNTRY_RETRY_EVERY = timedelta(hours=1)
+COUNTRY_RETRIES = 6
 _FMT = "%Y%m%d%H%M%S"
 
 
@@ -165,11 +171,12 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
         first = state.get("first_data_day")
         days = daily.days_to_build((state.get("stories") or {}).get("last_day"), now,
                                    date.fromisoformat(first) if first else None)
+    retry = [] if days or not build_stories else country_retry_due(state, now)
     ai_on = ondemand.ai_enabled() if ai_on is None else ai_on
     # Save ingest progress first when slow work follows: a build or a Vertex call that dies (28 Oct 2026: out of
     # memory) must not make the next run repeat this ingest. Most runs have neither and write state once, at the end:
     # in the bucket every write is a Class A operation and leaves a copy kept for a week (soft delete).
-    if days or (ai_on and (state.get("ai") or {}).get("pending")):
+    if days or retry or (ai_on and (state.get("ai") or {}).get("pending")):
         state["last_run"] = summary
         store.write(state)
 
@@ -183,22 +190,57 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
                 sstate["last_error"] = f"{day}: {e}"[:200]
                 summary["stories_error"] = sstate["last_error"]
                 break
-            try:  # country counts never hold up the story build
-                recs, press_recs = countries.day_records_and_press(sink, day)
-                summary.setdefault("countries_built", []).append(countries.build_day(sink, day, recs))
-            except Exception as e:
-                summary["countries_error"] = f"{day}: {e}"[:200]
-                continue
-            try:  # nor do relations (pipeline/relations.py), built from the same records
-                summary.setdefault("relations_built", []).append(relations.build_day(sink, day, recs, press_recs))
-            except Exception as e:
-                summary["relations_error"] = f"{day}: {e}"[:200]
-            del recs, press_recs
+            # Country counts never hold up the story build; a failed one is retried on a later run.
+            if not build_countries(sink, day, summary):
+                note_country_failure(sstate, day, summary["countries_error"], now)
+    for day in retry:
+        sstate = state.setdefault("stories", {})
+        if build_countries(sink, day, summary):
+            sstate["countries_retry"].pop(day.isoformat(), None)
+            summary["countries_retried"] = day.isoformat()
+        else:
+            note_country_failure(sstate, day, summary["countries_error"], now)
 
     run_alarms(sink, state, summary, ai_on, code_alarm)
     state["last_run"] = summary
     store.write(state, backup=bool(days))  # Firestore state: the run that builds a day refreshes the bucket copy
     return summary
+
+
+def build_countries(sink, day: date, summary: dict) -> bool:
+    """The day's country counts (countries.py), then relations (relations.py) from the same records. False when
+    the country build failed: relations are skipped too, and the caller keeps the day for a retry."""
+    try:
+        recs, press_recs = countries.day_records_and_press(sink, day)
+        summary.setdefault("countries_built", []).append(countries.build_day(sink, day, recs))
+    except Exception as e:
+        summary["countries_error"] = f"{day}: {e}"[:200]
+        return False
+    try:  # relations never hold up the country build
+        summary.setdefault("relations_built", []).append(relations.build_day(sink, day, recs, press_recs))
+    except Exception as e:
+        summary["relations_error"] = f"{day}: {e}"[:200]
+    return True
+
+
+def note_country_failure(sstate: dict, day: date, error: str, now: datetime) -> None:
+    pending = sstate.setdefault("countries_retry", {})
+    entry = pending.setdefault(day.isoformat(), {"attempts": 0})
+    entry.update(attempts=entry["attempts"] + 1, last=health.iso(now), error=error)
+    if entry["attempts"] >= COUNTRY_RETRIES:
+        failed = sstate.setdefault("countries_failed", [])
+        failed.append({"day": day.isoformat(), **pending.pop(day.isoformat())})
+        del failed[:-20]
+
+
+def country_retry_due(state: dict, now: datetime) -> list[date]:
+    """The oldest day waiting for a country rebuild whose last try was at least COUNTRY_RETRY_EVERY ago."""
+    pending = (state.get("stories") or {}).get("countries_retry") or {}
+    for day in sorted(pending):
+        last = pending[day].get("last")
+        if not last or now - health.from_iso(last) >= COUNTRY_RETRY_EVERY:
+            return [date.fromisoformat(day)]
+    return []
 
 
 def ingest_events(state: dict, summary: dict, now: datetime, done: dict[str, list[str]], download) -> list[dict]:
