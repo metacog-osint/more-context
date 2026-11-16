@@ -91,14 +91,16 @@ def build(summary: dict, countries: dict | None, *, catalog: dict | None = None,
     fips = fips or _load("catalog/fips_iso.json")["codes"]
     now = now or datetime.now(timezone.utc)
     day = summary["day"]
-    as_of = f"{day}T23:59:59Z"
+    # Whole-UTC-day items: the source gives no time, so say "day" and put data_as_of at midnight UTC (kit 0.5.6
+    # contract); consumers then show a date, never a clock time such as "5:59 PM".
+    as_of = f"{day}T00:00:00Z"
     published = summary.get("built_at") or _utc(now)
     files = (countries or {}).get("files")
     coverage = round(min(1.0, files / FILES_PER_DAY), 3) if files else None
     partial = bool(summary.get("partial") or (countries or {}).get("partial"))
     ents = summary.get("entities") or {}
     ncf_rules = _ncf_rules()
-    base = {**COMMON, "data_as_of": as_of, "published_at": published}
+    base = {**COMMON, "data_as_of": as_of, "data_as_of_precision": "day", "published_at": published}
     if coverage is not None:
         base["coverage_fraction"] = coverage
     if partial:

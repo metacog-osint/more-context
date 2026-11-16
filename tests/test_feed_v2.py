@@ -50,6 +50,16 @@ class Build(unittest.TestCase):
             self.assertEqual(errs, [], f["properties"]["id"])
         self.assertEqual((fc["contract"], fc["program"], fc["generated_at"]), ("tic-feed/2", "watchfloor", "2026-10-22T04:00:00Z"))
 
+    def test_items_are_date_only(self):
+        """A whole UTC day carries data_as_of_precision "day" and midnight UTC, so no page shows "5:59 PM" (16 Nov 2026)."""
+        fc = feed_v2.build(summary(), countries(), now=NOW)
+        self.assertTrue(fc["features"])
+        for f in fc["features"]:
+            p = f["properties"]
+            self.assertEqual((p["data_as_of_precision"], p["data_as_of"]), ("day", f"{DAY}T00:00:00Z"), p["id"])
+        kinds = {f["properties"]["id"].split(":")[2] for f in fc["features"]}
+        self.assertTrue({"zone", "topic", "country", "summary"} <= kinds, kinds)
+
     def test_zone_tiers_follow_the_alarm_rules(self):
         items = by_id(feed_v2.build(summary(), countries(), now=NOW))
         cuba, korea, sudan = (items[f"zone:{z}"]["properties"] for z in ("15_Cuba", "03_Korea_Peninsula", "13_Sudan"))
