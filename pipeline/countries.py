@@ -31,7 +31,7 @@ from pathlib import Path
 from statistics import median
 
 from . import measures
-from .events import METRICS, ROW_PREFIX
+from .events import METRICS, ROW_PREFIX, canon
 from .press import ROW_PREFIX as PRESS_PREFIX
 from .relevance import TermMatcher
 from .stories import title_from_url
@@ -47,6 +47,9 @@ ELEVATED_RATIO = 2.0
 REF_DAYS, MIN_REF_DAYS = 90, 60
 MAX_LISTED = 15
 SAMPLES_KEPT = 6
+# GDELT codes that are not countries (GDELT's FIPS.country.txt: oceans, undersea features, undesignated
+# sovereignty, no man's land): never listed, and not reported as missing from the catalog.
+NOT_COUNTRIES = frozenset({"OS", "UF", "UU", "NM"})
 
 
 @lru_cache(maxsize=1)
@@ -86,7 +89,7 @@ def zone_violence(recs: list[dict], matcher: TermMatcher | None = None) -> dict[
     for r in recs:
         for v in r.get("violent", []):
             for zid, (ccs, adm1) in scopes.items():
-                if v["cc"] in ccs or v.get("adm1") in adm1:
+                if canon(v["cc"]) in ccs or v.get("adm1") in adm1:
                     ev[zid].add(v["id"])
                     urls[zid].add(v["url"])
     out = {}
@@ -148,10 +151,12 @@ def day_records(sink, day: date) -> list[dict]:
 
 
 def totals(recs: list[dict]) -> dict[str, dict[str, int]]:
+    """Per country, the day's counts summed over its files. Records stored before the RB fold keep RB apart; it is
+    added to RI here (an article placed under both codes in one such file counts twice; new records count it once)."""
     out: dict[str, dict[str, int]] = {}
     for r in recs:
         for cc, vals in r["countries"].items():
-            t = out.setdefault(cc, dict.fromkeys(METRICS, 0))
+            t = out.setdefault(canon(cc), dict.fromkeys(METRICS, 0))
             for m, v in zip(METRICS, vals):
                 t[m] += v
     return out
@@ -178,7 +183,8 @@ def history(sink, day: date, days: int = REF_DAYS) -> tuple[dict[str, dict[str, 
         complete.append(d)
         for cc, c in s["countries"].items():
             for m in SCORED:
-                out[m].setdefault(cc, {})[d] = c.get(m, 0)
+                h = out[m].setdefault(canon(cc), {})  # days stored before the fold hold RB apart: add it to RI
+                h[d] = h.get(d, 0) + c.get(m, 0)
         for zid, zv in (s.get("zones") or {}).items():
             out["zone_named"].setdefault(zid, {})[d] = zv.get("named", 0)
     return out, complete
@@ -196,6 +202,14 @@ def score(hist: dict[date, int], complete: list[date], day: date, count: int) ->
         med = median(ref)
         out.update(median90=med, ratio90=round(count / med, 2) if med > 0 else None)
     return out
+
+
+def uncatalogued(tot: dict[str, dict[str, int]]) -> dict[str, int]:
+    """Codes with enough articles to be listed but no name in catalog/fips_countries.json, so never listed, fed or
+    mapped (Serbia's RB until 16 Nov 2026). Written to countries.json so a gap shows in the data."""
+    known = names()
+    return {cc: t["urls"] for cc, t in sorted(tot.items())
+            if known and cc not in known and cc not in NOT_COUNTRIES and t["urls"] >= min(MIN_ARTICLES.values())}
 
 
 def _listed(scored: dict[str, dict], metric: str) -> tuple[list[str], list[str]]:
@@ -242,15 +256,17 @@ def build_day(sink, day: date, recs: list[dict] | None = None) -> dict:
     samples: dict[str, list[str]] = {}
     for r in recs:
         for cc, urls in r.get("samples", {}).items():
+            cc = canon(cc)
             if cc in shown:
                 s = samples.setdefault(cc, [])
                 s.extend(u for u in urls if u not in s and len(s) < SAMPLES_KEPT)
     violent, seen = [], set()
     for r in recs:
         for v in r.get("violent", []):
-            if (v["cc"] in zc or v["cc"] in shown) and v["id"] not in seen:
+            cc = canon(v["cc"])
+            if (cc in zc or cc in shown) and v["id"] not in seen:
                 seen.add(v["id"])
-                violent.append({**v, "stream": r["stream"], "file": r["stamp"]})
+                violent.append({**v, "cc": cc, "stream": r["stream"], "file": r["stamp"]})
     zones = zone_violence(recs)
     if not partial:
         for zid, zv in zones.items():
@@ -258,7 +274,7 @@ def build_day(sink, day: date, recs: list[dict] | None = None) -> dict:
             zh = hist["zone_named"].get(zid, {})
             zv["named_score"] = score(zh, [d for d in complete if d in zh], day, zv["named"])
     out = {"day": day.isoformat(), "partial": partial, "files": len(recs), "scored": list(SCORED),
-           "lists": lists, "countries": scored, "samples": samples, "zones": zones}
+           "lists": lists, "countries": scored, "samples": samples, "zones": zones, "uncatalogued": uncatalogued(tot)}
     sink.write_json(f"stories/{day:%Y/%m/%d}/countries.json", out)
     sink.write_lines(f"stories/{day:%Y/%m/%d}/violent.jsonl", violent)
     return {"day": out["day"], "partial": partial, "files": len(recs),

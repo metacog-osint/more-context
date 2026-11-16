@@ -113,7 +113,7 @@ class StateWritesTests(unittest.TestCase):
             sink.keys_written = []
             build = datetime(2026, 10, 29, 3, 20, tzinfo=timezone.utc)
             with mock.patch.object(daily, "build_day", lambda s, day: {"day": day.isoformat(), "alarms": {}}), \
-                    mock.patch("pipeline.countries.build_day", lambda s, day: {"day": day.isoformat()}):
+                    mock.patch("pipeline.countries.build_day", lambda s, day, recs=None: {"day": day.isoformat()}),                     mock.patch("pipeline.relations.build_day", lambda s, day, r, p: {"day": day.isoformat()}):
                 cycle.run_cycle(sink, now=build, streams=(), ai_on=False, poll=feed, store=store)
             self.assertEqual(sink.keys_written, ["cycles/2026/10/29/032000.jsonl", cycle.STATE_KEY])
             self.assertEqual(sink.read_json(cycle.STATE_KEY)["stories"]["last_day"], "2026-10-28")

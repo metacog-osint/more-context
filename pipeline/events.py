@@ -40,6 +40,16 @@ SAMPLES_PER_COUNTRY = 2
 METRICS = ("ev", "urls", "root", "place", "violent")
 # How an Events row's line starts in a cycle file, so a reader can skip the article rows unparsed.
 ROW_PREFIX = '{"kind": "events"'
+# GDELT codes one country under two FIPS codes: Serbia is RI, but Belgrade is placed as "Belgrade, Serbia
+# (general)" with ADM1 RB00 under RB, a code missing from GDELT's own country list (checked 16 Nov 2026: RB
+# rivalled RI, 400 against 444 articles on 28 Oct). RB is counted as RI here and again on read
+# (`countries.totals`, `countries.history`), so records and days stored before the fold count too.
+FOLD = {"RB": "RI"}
+
+
+def canon(cc: str) -> str:
+    """The FIPS code a country is counted under."""
+    return FOLD.get(cc, cc)
 
 
 def as_row(rec: dict) -> dict:
@@ -95,7 +105,7 @@ def record(rows: list[list[str]], stamp: str, stream: str) -> dict:
     violent = []
     seen_violent = set()
     for r in rows:
-        cc = r[GCC]
+        cc = canon(r[GCC])
         if not cc or r[DAY] < oldest:
             continue
         url = r[URL]

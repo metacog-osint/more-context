@@ -50,6 +50,10 @@ class OutletTests(unittest.TestCase):
         self.assertEqual(press.outlet_country("storm.mg", t), "TW")
         self.assertIsNone(press.outlet_country("nknews.org", t))  # deliberately unassigned
         self.assertEqual(press.outlet_country("www.koreaherald.com", t), "KS")  # from the trimmed 2018 table
+        self.assertEqual(press.outlet_country("sputnik.af", t), "RS")  # 2026-11-16.2
+        for gov in ("valtioneuvosto.fi", "puolustusvoimat.fi", "raja.fi"):  # Finnish government pages, not press
+            self.assertIn(gov, t)
+            self.assertIsNone(press.outlet_country(gov, t))
 
     def test_every_override_and_block_code_is_a_fips_country(self):
         names = press.fips_names()
