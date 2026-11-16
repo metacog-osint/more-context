@@ -2,7 +2,16 @@
 
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
-## Where things stand (15 Nov 2026, about 9 AM CST; South Sudan exclusion live)
+## Where things stand (15 Nov 2026, about 4:30 PM CST)
+- **Relation pairs reviewed and live.** Tom went through every zone's pairs on 15 Nov; `catalog/relations.json`
+  2026-11-15.2 (87 pairs) is `64c1c6f` on `main`, pushed; `mc-ingest-00023-xat` and `mc-api-00020-qec` deployed
+  20:38-20:40 UTC from a clean archive, env vars checked; the 20:50 UTC run was clean (288 rows). `/relations`
+  serves the new catalog; the new pairs have no history until the 15 Nov redo (next steps), which also rebuilds the
+  series. Tom approved that bucket write on 15 Nov ("yes to all four").
+- **Press tone by outlet country: planned, not built.** Checks, Tom's outlet picks and the plan:
+  `docs/relations/2026-11-15-press-outlets.md`.
+- **Crisis Group:** its site search works (HTTP 200; the old ETag/Last-Modified do not trigger 304) but Google News
+  lists nothing from crisisgroup.org after 13 Nov 14:32 UTC (checked about 20:50 UTC 15 Nov, a weekend).
 - **South Sudan exclusion: live.** `9d42d68` pushed to `main` on Tom's "Yes, all three" (15 Nov); `mc-ingest-00021-ruw`
   and `mc-api-00018-zon` deployed 14:37 UTC 15 Nov from a clean `git archive` of that commit (another session shared
   the folder), env vars checked separate on both. Stored days 29 Jul-14 Nov re-scored in the bucket (section below).
@@ -94,15 +103,19 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
    (`459d578`) were reviewed 14 Nov in `D:\Projects\CLAUDE_HANDOVER.md`: do not merge; use the 13 indicators as a
    draft for Tom's own charters.
 4. October usage totals (Class A and BigQuery), carried from 4 Nov.
-5. Relations between countries: live since 15 Nov (see `CLAUDE.md`). Tom edits the draft pairs in
-   `catalog/relations.json` (every zone but Korea; thin pairs are marked by their measured volume).
+5. Press tone: the build (`docs/relations/2026-11-15-press-outlets.md`), and whether the South China Sea's
+   press block includes each country's press on itself.
 
 ## Next steps, in order
 1. After 03:20 UTC 16 Nov: check that 15 Nov built with the new terms (summary.json without `rescored`, Sudan's
-   filtered count against its re-scored baseline) and that Crisis Group's search has listed a piece.
-2. After 03:20 UTC 16 Nov: redo 15 Nov's relations (built as partial; pair tables began at 18:20 UTC):
-   `python -I scripts/backfill_relations.py --bucket more-context-484804 --start 2026-11-15 --end 2026-11-15
-   --force`, then check `GET /relations?zone=03_Korea_Peninsula` ends on 15 Nov with it complete.
+   filtered count against its re-scored baseline), that the run's summary has `relations_built` and no
+   `relations_error`, and that Crisis Group's search has listed a piece.
+2. After 03:20 UTC 16 Nov: redo 15 Nov's relations (built as partial; pair tables began at 18:20 UTC; approved by
+   Tom 15 Nov): `python -I scripts/backfill_relations.py --bucket more-context-484804 --start 2026-11-15 --end
+   2026-11-15 --force` (also rebuilds the series with the 2026-11-15.2 pairs), then check `GET
+   /relations?zone=03_Korea_Peninsula` ends on 15 Nov with it complete and a new pair (e.g. `07_Russia_NATO`
+   RUS-DEU) has 120 days of history. The API caches 30 minutes.
+2a. Build the press-tone layer (`docs/relations/2026-11-15-press-outlets.md`).
 3. Charter interview, one zone at a time, Iran & Red Sea first (December three-signal watch).
 4. Indicators that act on tips (step 3 of the tipping plan), after the charters.
 5. Headline service for other programs (step 4); Bluesky/Telegram lists need Tom's picks (`presstv`, `farsna`
