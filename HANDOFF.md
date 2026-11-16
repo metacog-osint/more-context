@@ -3,6 +3,13 @@
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
 ## Where things stand (16 Nov 2026, about 12:20 AM CST)
+- **Feed items are date-only (16 Nov 2026, branch `feed/day-precision`, not pushed or deployed).** `pipeline/feed_v2.py` now gives every
+  item `data_as_of_precision: "day"` and `data_as_of` at `T00:00:00Z` (it was `T23:59:59Z`, which COP showed as
+  "5:59 PM CST"), as the tic-feed/2 contract in kit 0.5.6 requires: with `day`, a 23:59:59 time is rejected. Takes
+  effect on `/feed` after an `mc-api` deploy (Tom's yes). **Side effect on COP:** its freshness is the newest item's
+  `data_as_of` and Watchfloor's windows are 36 h late / 72 h stale, so a day built at 03:15 UTC D+1 now reads about 27 h
+  old and turns "late" at D+1 12:00 UTC until the next build (about 15 h a day). Settle that in COP before the deploy
+  (see the note to the session that asked). The vendored kit (0.4.1) doesn't know the field; it is not rejected.
 - **Relation pairs reviewed and live, with full history.** Tom went through every zone's pairs on 15 Nov;
   `catalog/relations.json` 2026-11-15.2 (87 pairs) is `9a08b4e` on `main` (`64c1c6f` before another session rewrote
   main at 16:31 CST 15 Nov). The 15 Nov redo ran 04:22-04:24 UTC 16 Nov (Tom's yes, 15 Nov): 192 of 192 files,
