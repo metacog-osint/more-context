@@ -56,6 +56,37 @@ hour, both streams, x4; `data/relations/press_all_zones.json`, script `press_all
 - **Backfill:** a full GKG day is 1.3 GB and about 5 minutes on Tom's connection: 28 days (enough for the z) about
   36 GB and 2.5 hours.
 
+## Built 16 Nov 2026 (branch `press-tone`, worktree `[local path]`; not committed or deployed)
+- **Tom, 16 Nov:** the South China Sea block also reads each country's press on itself: Philippine outlets on the
+  Philippines, Vietnamese on Vietnam and Chinese on China ("Yes, add self-coverage").
+- `pipeline/press.py`: per GKG file a `FileTable` (fed by the cycle's existing GKG loop, after the blocklist, matched
+  or not) counts, for each subject country, `O>S` = [articles mentioning S, their tone sum, articles where S is the
+  single most-mentioned country, their tone sum]. Subjects: every zone's countries plus the self-coverage ones (38).
+  One `kind: "press"` row per file in the run's cycle file, with the file's unknown-outlet count and its 10 most
+  common unknown domains (the daily `press` section keeps the top 50, so new outlets can be added).
+  `countries.day_records_and_press` reads Events and press rows in one pass; `relations.build_day` writes `press`
+  into `relations.json` and the zones' rows into `relations/series.json` (no new writes).
+- **Catalog:** `catalog/relations.json` 2026-11-16.1 gives 13 zones a `press` block (`about`, `outlets` = Tom's picks,
+  `home` = the zone's own countries, automatic, `self`); Russia-NATO's subjects leave out Russia. `catalog/press_domains.tsv`:
+  the 2018 table trimmed to 11,397 domains (13 Nov full day plus 6-12 Nov one file an hour; the week added 1,281 that
+  13 Nov missed), 205 KB, 1.6 MB in memory. `catalog/press_outlets.json`: the "Suede" drop and 58 overrides. 258 rows in all (Russia-NATO 126, mostly NATO states' press on
+  each other, which the page lists as too thin unless it reaches a weekly read; Israel 40; others 3-20).
+- **New checks (16 Nov):** the 2018 table puts **aljazeera.com in the US and aljazeera.net in Israel** (now Qatar).
+  **US outlets "on Sweden" are the same "Suede" fault:** 'Suede' was the most common Sweden name (320 mentions) in the
+  242 sampled US-coded articles mainly about Sweden, 6-12 Nov, mostly from Latin American outlets the table codes US.
+  **About 8% of US-coded articles in the translation stream are misplaced** (13 Nov, one file an hour: 1,230 of
+  15,202 US-coded articles are translations; the largest are motorward.com, an Arabic car site, euronews.com,
+  deperu.com, nacion.com and teletica.com of Costa Rica, elvocero.com of Puerto Rico); the largest are overridden.
+  Yonhap (yna.co.kr) is in the 2018 table but did not appear in GKG in either sample.
+- **Cost (laptop, live files of 14 Nov):** the press table adds at most 0.14 s to a file's 0.2-0.8 s parse; a press
+  row is 1-3 KB gzip, about 0.4 MB a day in the cycle files (the bucket gains about 17 MiB a day now).
+- **Read side:** `GET /relations?zone=` gains `press`: per row the cadence (daily at a median of 8+ main-subject
+  articles a day over 28 complete days, weekly at a median 7-day total of 14+, else "too thin"), daily articles and
+  tone, and the 7-day tone (10+ articles) with its z and four-week baseline mean, as for the pairs. The zone page
+  shows "How other countries' press covers <zone>" under the pairs, one table per subject country.
+- `scripts/backfill_relations.py --press` writes a day's `press` section from all its GKG files and keeps the stored
+  pairs; a pairs re-run keeps a stored `press` section.
+
 ## Build plan (approved to plan, not to build)
 1. `parse_row` (or the cycle's GKG loop) keeps a per-country mention count from field 10; the cycle adds one
    `kind: "press"` row per GKG file (outlet FIPS > zone FIPS: n_any, tone_any, n_main, tone_main).

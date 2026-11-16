@@ -32,6 +32,7 @@ from statistics import median
 
 from . import measures
 from .events import METRICS, ROW_PREFIX
+from .press import ROW_PREFIX as PRESS_PREFIX
 from .relevance import TermMatcher
 from .stories import title_from_url
 
@@ -111,10 +112,27 @@ def _clock(key: str) -> str:
     return "".join(c for c in Path(key).stem if c.isdigit())[-6:]
 
 
-def _records_in(sink, key: str) -> list[dict]:
+def _records_in(sink, key: str, press: bool = False) -> list[dict]:
     if key.startswith("cycles/"):
-        return [r for r in sink.read_lines(key, ROW_PREFIX) if r.get("kind") == "events"]
+        kinds = ("events", "press") if press else ("events",)
+        prefix = (ROW_PREFIX, PRESS_PREFIX) if press else ROW_PREFIX
+        return [r for r in sink.read_lines(key, prefix) if r.get("kind") in kinds]
     return (sink.read_json(key) or {}).get("files", [])
+
+
+def day_records_and_press(sink, day: date) -> tuple[list[dict], list[dict]]:
+    """The day's Events records and its GKG press rows (pipeline/press.py), first copy of each file, read in one
+    pass over the same objects."""
+    want = f"{day:%Y%m%d}"
+    recs, press, seen = [], [], set()
+    for k in _keys_for(sink, day):
+        for r in _records_in(sink, k, press=True):
+            kind = r.get("kind", "events")
+            key = (kind, r["stamp"], r["stream"])
+            if r["stamp"][:8] == want and key not in seen:
+                seen.add(key)
+                (press if kind == "press" else recs).append(r)
+    return recs, press
 
 
 def day_records(sink, day: date) -> list[dict]:

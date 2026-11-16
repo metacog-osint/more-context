@@ -267,7 +267,7 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   under "Relations between countries". Display only: no alarm, no `/feed` items.
 - `catalog/relations.json` 2026-11-15.2: Tom reviewed every zone's pairs against measured volume on 15 Nov (87 pairs;
   thin ones kept on purpose where he wanted the relation on record). `EUR` is GDELT's code for Europe as a whole; the
-  EU's own code `EEC` is folded into it. Live from `64c1c6f` (`mc-ingest-00023-xat`, `mc-api-00020-qec`, deployed
+  EU's own code `EEC` is folded into it. Live from `9a08b4e` (`64c1c6f` before a history rewrite on 15 Nov; `mc-ingest-00023-xat`, `mc-api-00020-qec`, deployed
   20:38-20:40 UTC 15 Nov from a clean archive, env vars checked). The API and the daily build take the pairs from the
   deployed catalog, so a pair change needs a deploy of both functions as well as the series rebuild.
 - Days built before deploy have no `pairs` in their Events records and count as partial unless backfilled:
@@ -276,8 +276,14 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   change). 18 Jul-14 Nov were backfilled into the bucket on 15 Nov (120 days, all complete). 15 Nov itself builds as
   partial (pair tables only from 18:20 UTC): redo it after 03:20 UTC 16 Nov with `--start 2026-11-15 --end
   2026-11-15 --force`, which also rebuilds the series.
-- Next, approved to plan (not built): press tone by outlet country from the GKG. Checks, Tom's outlet picks per zone
-  and the build plan: `docs/relations/2026-11-15-press-outlets.md`. The state-and-people layer comes after it.
+- **Press tone by outlet country** (`pipeline/press.py`, built 16 Nov 2026 on branch `press-tone`): each GKG file
+  read gives one `kind: "press"` row (articles and tone sums per outlet country > subject country, from V2 enhanced
+  locations and GDELT's 2018 domain table, trimmed to `catalog/press_domains.tsv`, fixed by
+  `catalog/press_outlets.json`); the daily build sums them into the `press` part of `relations.json` and the series,
+  and `/relations` serves them as `press`. Zone blocks (Tom's picks) are `press` in `catalog/relations.json`.
+  Checks, picks and what was built: `docs/relations/2026-11-15-press-outlets.md`. Display only. History:
+  `scripts/backfill_relations.py --press` (full GKG days, about 1.3 GB each; Tom's yes for bucket writes). The
+  state-and-people layer comes after it.
 
 ## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
 Most stories are never read by a person, so model work waits for a reason to spend:

@@ -14,6 +14,8 @@ Daily (`build_day`, after the country counts): the day's records are summed into
 `stories/YYYY/MM/DD/relations.json` (every pair seen), and the pairs named in `catalog/relations.json` go into the
 rolling `relations/series.json` (SERIES_DAYS days, one object), which is all the API reads. A day missing a tenth of
 its files, or whose records mostly predate pair tables, is partial: kept, never scored and never a baseline.
+Since 16 Nov 2026 the same files carry `press` (pipeline/press.py: GKG articles and tone by outlet country, summed
+from the cycle's kind=press rows); the series keeps the zones' press rows beside their pairs.
 
 On read (`zone_view`), per pair and direction: daily articles, verbal and material conflict articles, conflict
 share, mean Goldstein and tone; z of the daily counts against the series' own previous 28 complete days
@@ -35,7 +37,7 @@ from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
 
-from . import measures
+from . import measures, press as press_mod
 
 CATALOG = Path(__file__).resolve().parent.parent / "catalog" / "relations.json"
 VEC = ("urls", "u1", "u2", "u3", "u4", "uconf", "gold", "tone", "uroot")
@@ -147,35 +149,49 @@ def is_partial(recs: list[dict]) -> bool:
     return short or with_pairs < MIN_FILE_SHARE * max(1, len(recs))
 
 
-def day_table(day: date, recs: list[dict]) -> dict:
+def day_table(day: date, recs: list[dict], press_recs: list[dict] | None = None) -> dict:
+    """The day's pairs from its Events records and, given its GKG press rows (even none), its `press` section."""
     total: dict[str, list] = {}
     for r in recs:
         add(total, r.get("pairs") or {})
     for v in total.values():
         v[6], v[7] = round(v[6], 2), round(v[7], 2)
-    return {"day": day.isoformat(), "partial": is_partial(recs), "files": len(recs),
-            "files_with_pairs": sum(1 for r in recs if "pairs" in r), "vec": list(VEC),
-            "pairs": dict(sorted(total.items()))}
+    out = {"day": day.isoformat(), "partial": is_partial(recs), "files": len(recs),
+           "files_with_pairs": sum(1 for r in recs if "pairs" in r), "vec": list(VEC),
+           "pairs": dict(sorted(total.items()))}
+    if press_recs is not None:
+        out["press"] = press_mod.day_table(press_recs)
+    return out
 
 
-def build_day(sink, day: date, recs: list[dict] | None = None) -> dict:
-    """Write the day's relations.json and put its configured pairs into the rolling series."""
+def build_day(sink, day: date, recs: list[dict] | None = None, press_recs: list[dict] | None = None) -> dict:
+    """Write the day's relations.json and put its configured pairs and press rows into the rolling series."""
     if recs is None:
         from . import countries  # imported here: countries -> events -> relations
-        recs = countries.day_records(sink, day)
-    rec = day_table(day, recs)
+        recs, press_recs = countries.day_records_and_press(sink, day)
+    rec = day_table(day, recs, press_recs)
     sink.write_json(f"stories/{day:%Y/%m/%d}/relations.json", rec)
     update_series(sink, [rec])
-    return {"day": rec["day"], "partial": rec["partial"], "pairs": len(rec["pairs"])}
+    out = {"day": rec["day"], "partial": rec["partial"], "pairs": len(rec["pairs"])}
+    if "press" in rec:
+        out["press"] = {"files": rec["press"]["files"], "partial": rec["press"]["partial"],
+                        "rows": len(rec["press"]["t"])}
+    return out
 
 
-def update_series(sink, recs: list[dict], keys: set[str] | None = None, series: dict | None = None) -> dict:
+def update_series(sink, recs: list[dict], keys: set[str] | None = None, series: dict | None = None,
+                  press_keys: set[str] | None = None) -> dict:
     """Merge day tables into relations/series.json (read once, written once), keeping the newest SERIES_DAYS."""
     keys = keys if keys is not None else series_keys()
+    pkeys = press_keys if press_keys is not None else press_mod.series_keys()
     s = series if series is not None else (sink.read_json(SERIES_KEY) or {})
     days = dict(s.get("days") or {})
     for rec in recs:
         days[rec["day"]] = {"partial": rec["partial"], "pairs": {k: v for k, v in rec["pairs"].items() if k in keys}}
+        if "press" in rec:
+            p = rec["press"]
+            days[rec["day"]]["press"] = {"partial": p["partial"],
+                                         "t": {k: v for k, v in p["t"].items() if k in pkeys}}
     keep = sorted(days)[-SERIES_DAYS:]
     out = {"vec": list(VEC), "built": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
            "catalog_version": catalog().get("version"), "days": {d: days[d] for d in keep}}
@@ -360,7 +376,7 @@ def zone_view(series: dict, zone_id: str, end: date | None = None, days: int = 9
     flags.sort(key=lambda f: f["day"], reverse=True)
     return {"zone": zone_id, "end": end.isoformat(), "days": [d.isoformat() for d in shown],
             "complete": [d in complete for d in shown], "pairs": pairs_out, "flags": flags, "method": method(),
-            "catalog_version": cat.get("version")}
+            "press": press_mod.zone_view(series, zone_id, end, days, cat), "catalog_version": cat.get("version")}
 
 
 def method() -> dict:
