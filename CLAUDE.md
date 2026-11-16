@@ -268,21 +268,25 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
 - `catalog/relations.json` 2026-11-15.2: Tom reviewed every zone's pairs against measured volume on 15 Nov (87 pairs;
   thin ones kept on purpose where he wanted the relation on record). `EUR` is GDELT's code for Europe as a whole; the
   EU's own code `EEC` is folded into it. Live from `9a08b4e` (`64c1c6f` before a history rewrite on 15 Nov; `mc-ingest-00023-xat`, `mc-api-00020-qec`, deployed
-  20:38-20:40 UTC 15 Nov from a clean archive, env vars checked). The API and the daily build take the pairs from the
+  20:38-20:40 UTC 15 Nov from a clean archive, env vars checked); unchanged in `e6c617c` (live 16 Nov, below). The API and the daily build take the pairs from the
   deployed catalog, so a pair change needs a deploy of both functions as well as the series rebuild.
 - Days built before deploy have no `pairs` in their Events records and count as partial unless backfilled:
   `scripts/backfill_relations.py` (free GDELT download; `--bucket` reads and writes the live bucket with the gcloud
   user's token, no storage library needed, Tom's yes first; `--series-only` rebuilds the series after a catalog
-  change). 18 Jul-14 Nov were backfilled into the bucket on 15 Nov (120 days, all complete). 15 Nov itself builds as
-  partial (pair tables only from 18:20 UTC): redo it after 03:20 UTC 16 Nov with `--start 2026-11-15 --end
-  2026-11-15 --force`, which also rebuilds the series.
-- **Press tone by outlet country** (`pipeline/press.py`, built 16 Nov 2026 on branch `press-tone`): each GKG file
+  change). 18 Jul-14 Nov were backfilled into the bucket on 15 Nov (120 days, all complete). 15 Nov was redone
+  complete at 04:22 UTC 16 Nov (`--force`), which also rebuilt the series. `--bucket` fetches one gcloud token at
+  the start and it expires after an hour (HTTP 401; the day's line prints before its write, so check the last day):
+  keep runs to about 10 press days. Every run rebuilds the series to its `--end`: after a run of earlier days,
+  run `--series-only --end <last built day>` (a 5 Nov re-run cut the live series to 5 Nov for 80 s on 16 Nov).
+- **Press tone by outlet country** (`pipeline/press.py`, `e6c617c`; live since 01:50 UTC 16 Nov 2026 as
+  `mc-ingest-00024-baf` and `mc-api-00021-bat`, deployed 01:49-01:52 UTC from a clean archive, env vars checked;
+  website deployed 04:28 UTC; history backfilled 19 Oct-15 Nov): each GKG file
   read gives one `kind: "press"` row (articles and tone sums per outlet country > subject country, from V2 enhanced
   locations and GDELT's 2018 domain table, trimmed to `catalog/press_domains.tsv`, fixed by
   `catalog/press_outlets.json`); the daily build sums them into the `press` part of `relations.json` and the series,
   and `/relations` serves them as `press`. Zone blocks (Tom's picks) are `press` in `catalog/relations.json`.
   Checks, picks and what was built: `docs/relations/2026-11-15-press-outlets.md`. Display only. History:
-  `scripts/backfill_relations.py --press` (full GKG days, about 1.3 GB each; Tom's yes for bucket writes). The
+  `scripts/backfill_relations.py --press` (full GKG days, about 1.3 GB and 2-4 minutes each; Tom's yes for bucket writes). The
   state-and-people layer comes after it.
 
 ## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
