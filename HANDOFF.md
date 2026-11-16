@@ -9,9 +9,11 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
   2,403 pairs, complete; the series has 120 days (19 Jul-15 Nov), none partial, and RUS-DEU has all 120.
 - **Press tone by outlet country: live, with 28 days of history.** `e6c617c` (CI passed), each step on Tom's yes:
   `mc-ingest-00024-baf` and `mc-api-00021-bat` deployed 01:49-01:52 UTC 16 Nov from a clean archive, env vars checked
-  (`MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); the 01:50 UTC run wrote the first press rows. Website deployed
-  04:28 UTC 16 Nov from the same archive (`build_web.py`, then `firebase deploy`); live `app.js` matches the commit
-  apart from CRLF. `--press` backfill 19 Oct-15 Nov in the bucket (04:27-06:15 UTC 16 Nov), every day 192 of 192
+  (`MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); the 01:50 UTC run wrote the first press rows. Website: the 04:29 UTC
+  deploy from `e6c617c` rolled back another session's house bar v2.0 (`e17a4c5`, deployed 04:07 UTC) and its CSP;
+  redeployed 06:57 UTC 16 Nov from a clean archive of `2cca056` on Tom's yes. Live `app.js`, `index.html`,
+  `tic-nav.js`/`.css` and the CSP match that commit; Korea's press tables and the v2.0 Programs menu checked.
+  Before a website deploy, fetch `origin/main` and check the latest hosting release. `--press` backfill 19 Oct-15 Nov in the bucket (04:27-06:15 UTC 16 Nov), every day 192 of 192
   files, complete; 57,000-105,000 articles a day, 1.3-3.6% from outlets with no country (21 Oct 8.2%: a burst of
   Finnish government pages, `valtioneuvosto.fi` 3,787, `puolustusvoimat.fi` 1,079, `raja.fi` 377). **The bucket
   token expires after an hour:** `backfill_relations.py --bucket` fetches one token at the start, and a day's line is
