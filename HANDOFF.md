@@ -3,23 +3,28 @@
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
 ## Where things stand (16 Nov 2026, about 12:20 AM CST)
-- **Suite-review fixes (16 Nov 2026, branch `watchfloor-review-fixes` in `_worktrees\watchfloor-review-fixes`, cut
-  from `017cc35`; not committed, pushed or deployed: each needs Tom's yes).** From the 15 Nov review
+- **Suite-review fixes: live (16 Nov 2026).** `f42898b`, merged to `main` as `8dbdcf2` through PR #1 (CI passed),
+  each step on Tom's yes. `mc-ingest-00025-xox` (15:33 UTC) and `mc-api-00023-req` (15:35 UTC) deployed from a clean
+  archive of `8dbdcf2`, env vars checked separate (`MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); the 15:35 UTC run
+  wrote 437 rows with no errors. Website deployed 15:36 UTC from the same archive after checking the last release
+  (06:57 UTC, equal to `2cca056`); live files equal `8dbdcf2`, CSP and noindex kept. The same deploy put `017cc35`
+  (feed day precision, below) live on `/feed`. Serbia's fold first shows in the 16 Nov build (about 03:20 UTC 17 Nov);
+  days built earlier keep RB apart in their stored files. From the 15 Nov review
   (`[local path]`, Watchfloor). No method or threshold changed.
   1. Serbia's second GDELT code RB (Belgrade) is counted as RI, at ingest and on read; PU, TP, TK, SC added to both
      FIPS catalogs; `countries.json` gains `uncatalogued`; `tests/test_country_codes.py` guards the catalog.
      Takes effect on the first build after an `mc-ingest` deploy; stored days are folded on read, so Serbia's
      baseline is whole at once (expect Serbia's counts to roughly double from that day, not a spike: the history
-     doubles too). The map and `/feed` need `mc-api` deployed too (fips_iso.json).
+     doubles too).
   2. A failed country build is kept in `state.stories.countries_retry` and rebuilt later (CLAUDE.md, Rising section).
-  3. The site no longer says "15 conflict zones" (meta description and About lede give no number). Website deploy.
+  3. The site no longer says "15 conflict zones" (meta description and About lede give no number).
   4. `catalog/press_outlets.json` 2026-11-16.2: `sputnik.af` RS; `valtioneuvosto.fi`, `puolustusvoimat.fi`,
-     `raja.fi` null. Needs both functions deployed; past days keep their press rows as built.
+     `raja.fi` null. Past days keep their press rows as built.
   5. `scripts/backfill_relations.py --bucket` refreshes its token (45 min, and on a 401), prints a day after its
      write, and rebuilds the series to the last stored day, not `--end`.
   Tests: 208 of 247 pass; the 39 failures are all `tests.test_match`, which reads
   `[local path]` from disk and fails the same way on the untouched main checkout.
-- **Feed items are date-only (16 Nov 2026, branch `feed/day-precision`, not pushed or deployed).** `pipeline/feed_v2.py` now gives every
+- **Feed items are date-only (16 Nov 2026, `017cc35`; live on `/feed` since `mc-api-00023-req`, 15:35 UTC 16 Nov).** `pipeline/feed_v2.py` now gives every
   item `data_as_of_precision: "day"` and `data_as_of` at `T00:00:00Z` (it was `T23:59:59Z`, which COP showed as
   "5:59 PM CST"), as the tic-feed/2 contract in kit 0.5.6 requires: with `day`, a 23:59:59 time is rejected. Takes
   effect on `/feed` after an `mc-api` deploy (Tom's yes). **Side effect on COP:** its freshness is the newest item's
@@ -139,14 +144,12 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
 
 ## Decisions waiting on Tom
 1. Oryx: keep dropped, or poll it anyway.
-2. Press outlets: done on branch `watchfloor-review-fixes` (2026-11-16.2); commit, push and a deploy of both
-   functions wait on Tom.
+2. Press outlets: done and live (2026-11-16.2, 16 Nov).
 3. The zone charters: still none in `catalog/indicators/`. The AI-drafted ones on `wip/2026-11-01-unreviewed`
    (`459d578`) were reviewed 14 Nov in `[local path]`: do not merge; use the 13 indicators as a
    draft for Tom's own charters.
 4. October usage totals (Class A and BigQuery), carried from 4 Nov.
-5. `backfill_relations.py --bucket` token refresh: built on branch `watchfloor-review-fixes`; commit and push wait
-   on Tom (a script, no deploy).
+5. `backfill_relations.py --bucket` token refresh: done, on `main` (16 Nov).
 
 ## Next steps, in order
 1. Press tone is display only: Tom reads the zone pages' press tables for a month (from 16 Nov) before any flag,
