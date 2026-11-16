@@ -1,7 +1,7 @@
 # Press tone by outlet country: checks and Tom's outlet picks (15 Nov 2026)
 
 The next layer after the country pairs (`docs/relations/2026-11-15-relations-tone.md`, layer 3). Tom approved
-planning the build on 15 Nov 2026 and picked outlets zone by zone the same evening. **Not built.** Data files
+planning the build on 15 Nov 2026 and picked outlets zone by zone the same evening. **Live 16 Nov 2026** (`e6c617c`; section below). Data files
 named here are in the git-ignored `data/relations/`.
 
 ## What each zone measures
@@ -56,7 +56,7 @@ hour, both streams, x4; `data/relations/press_all_zones.json`, script `press_all
 - **Backfill:** a full GKG day is 1.3 GB and about 5 minutes on Tom's connection: 28 days (enough for the z) about
   36 GB and 2.5 hours.
 
-## Built 16 Nov 2026 (branch `press-tone`, worktree `D:\Projects\_worktrees\watchfloor-press`; not committed or deployed)
+## Built and live 16 Nov 2026 (`e6c617c`; functions 01:49-01:52 UTC, website 04:28 UTC, history 19 Oct-15 Nov backfilled 04:27-06:15 UTC)
 - **Tom, 16 Nov:** the South China Sea block also reads each country's press on itself: Philippine outlets on the
   Philippines, Vietnamese on Vietnam and Chinese on China ("Yes, add self-coverage").
 - `pipeline/press.py`: per GKG file a `FileTable` (fed by the cycle's existing GKG loop, after the blocklist, matched

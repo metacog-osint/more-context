@@ -2,16 +2,32 @@
 
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
-## Where things stand (15 Nov 2026, about 4:30 PM CST)
-- **Relation pairs reviewed and live.** Tom went through every zone's pairs on 15 Nov; `catalog/relations.json`
-  2026-11-15.2 (87 pairs) is `9a08b4e` on `main` (`64c1c6f` before another session rewrote main at 16:31 CST 15 Nov), pushed; `mc-ingest-00023-xat` and `mc-api-00020-qec` deployed
-  20:38-20:40 UTC from a clean archive, env vars checked; the 20:50 UTC run was clean (288 rows). `/relations`
-  serves the new catalog; the new pairs have no history until the 15 Nov redo (next steps), which also rebuilds the
-  series. Tom approved that bucket write on 15 Nov ("yes to all four").
-- **Press tone by outlet country: planned, not built.** Checks, Tom's outlet picks and the plan:
-  `docs/relations/2026-11-15-press-outlets.md`.
-- **Crisis Group:** its site search works (HTTP 200; the old ETag/Last-Modified do not trigger 304) but Google News
-  lists nothing from crisisgroup.org after 13 Nov 14:32 UTC (checked about 20:50 UTC 15 Nov, a weekend).
+## Where things stand (16 Nov 2026, about 12:20 AM CST)
+- **Relation pairs reviewed and live, with full history.** Tom went through every zone's pairs on 15 Nov;
+  `catalog/relations.json` 2026-11-15.2 (87 pairs) is `9a08b4e` on `main` (`64c1c6f` before another session rewrote
+  main at 16:31 CST 15 Nov). The 15 Nov redo ran 04:22-04:24 UTC 16 Nov (Tom's yes, 15 Nov): 192 of 192 files,
+  2,403 pairs, complete; the series has 120 days (19 Jul-15 Nov), none partial, and RUS-DEU has all 120.
+- **Press tone by outlet country: live, with 28 days of history.** `e6c617c` (CI passed), each step on Tom's yes:
+  `mc-ingest-00024-baf` and `mc-api-00021-bat` deployed 01:49-01:52 UTC 16 Nov from a clean archive, env vars checked
+  (`MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); the 01:50 UTC run wrote the first press rows. Website deployed
+  04:28 UTC 16 Nov from the same archive (`build_web.py`, then `firebase deploy`); live `app.js` matches the commit
+  apart from CRLF. `--press` backfill 19 Oct-15 Nov in the bucket (04:27-06:15 UTC 16 Nov), every day 192 of 192
+  files, complete; 57,000-105,000 articles a day, 1.3-3.6% from outlets with no country (21 Oct 8.2%: a burst of
+  Finnish government pages, `valtioneuvosto.fi` 3,787, `puolustusvoimat.fi` 1,079, `raja.fi` 377). **The bucket
+  token expires after an hour:** `backfill_relations.py --bucket` fetches one token at the start, and a day's line is
+  printed before its write, so the first run's 401 at 05:29 UTC lost 5 Nov. Re-running 5 Nov alone rebuilt the series to
+  end on 5 Nov (the script rebuilds it to `--end`), live for about 80 s until `--series-only --end 2026-11-15` put
+  it back at 06:14 UTC (120 days, 17,821 pair-days, press on all 28 days). Keep `--bucket` runs under an hour (about
+  10 press days), and finish any run of earlier days with `--series-only --end <last built day>`. With 28 days the
+  7-day tone z appears (Korea 9 of 12 rows, Ukraine 10 of 10, Russia-NATO 64 of 126); on a 15-window baseline some
+  run large (UK press on Ukraine z 10.2, 7-day tone -0.53 against -3.76; cause not checked). 16 Nov builds partial for press (rows from
+  01:50 UTC). Unassigned outlets to consider in `catalog/press_outlets.json`: `sputnik.af` (RS), and the three
+  Finnish government sites (null). Notes: `docs/relations/2026-11-15-press-outlets.md`.
+- **15 Nov built with the South Sudan exclusion** (03:21 UTC 16 Nov; no `rescored` stamp, not partial): Sudan 104
+  stories, 44 after the headline-term filter, attention z 0.65 (expected 36.4 over 28 re-scored days), no alarm.
+  `relations.json` and the series written 03:22 UTC (the build's `relations_built`).
+- **Crisis Group:** its site search runs (state `last_ok` 04:05 UTC 16 Nov, 0 items) but Google News still lists
+  nothing from crisisgroup.org after 13 Nov 14:32 UTC (`when:3d` checked about 04:20 UTC 16 Nov, a Sunday night).
 - **South Sudan exclusion: live.** `9d42d68` pushed to `main` on Tom's "Yes, all three" (15 Nov); `mc-ingest-00021-ruw`
   and `mc-api-00018-zon` deployed 14:37 UTC 15 Nov from a clean `git archive` of that commit (another session shared
   the folder), env vars checked separate on both. Stored days 29 Jul-14 Nov re-scored in the bucket (section below).
@@ -98,24 +114,18 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
 
 ## Decisions waiting on Tom
 1. Oryx: keep dropped, or poll it anyway.
-2. Website deploy so the Sources page shows catalog 2026-11-14.1.
+2. Press outlets: add `sputnik.af` (RS) and the Finnish government sites (null) to `catalog/press_outlets.json`
+   (needs a commit and a deploy of both functions).
 3. The zone charters: still none in `catalog/indicators/`. The AI-drafted ones on `wip/2026-11-01-unreviewed`
    (`459d578`) were reviewed 14 Nov in `D:\Projects\CLAUDE_HANDOVER.md`: do not merge; use the 13 indicators as a
    draft for Tom's own charters.
 4. October usage totals (Class A and BigQuery), carried from 4 Nov.
-5. Press tone: the build (`docs/relations/2026-11-15-press-outlets.md`), and whether the South China Sea's
-   press block includes each country's press on itself.
+5. Whether `backfill_relations.py --bucket` should refresh its token (runs over an hour fail with HTTP 401).
 
 ## Next steps, in order
-1. After 03:20 UTC 16 Nov: check that 15 Nov built with the new terms (summary.json without `rescored`, Sudan's
-   filtered count against its re-scored baseline), that the run's summary has `relations_built` and no
-   `relations_error`, and that Crisis Group's search has listed a piece.
-2. After 03:20 UTC 16 Nov: redo 15 Nov's relations (built as partial; pair tables began at 18:20 UTC; approved by
-   Tom 15 Nov): `python -I scripts/backfill_relations.py --bucket more-context-484804 --start 2026-11-15 --end
-   2026-11-15 --force` (also rebuilds the series with the 2026-11-15.2 pairs), then check `GET
-   /relations?zone=03_Korea_Peninsula` ends on 15 Nov with it complete and a new pair (e.g. `07_Russia_NATO`
-   RUS-DEU) has 120 days of history. The API caches 30 minutes.
-2a. Build the press-tone layer (`docs/relations/2026-11-15-press-outlets.md`).
+1. Press tone is display only: Tom reads the zone pages' press tables for a month (from 16 Nov) before any flag,
+   alarm or `/feed` item. The `watchfloor-relations` worktree (git-ignored GDELT backfill) may now go, on Tom's yes.
+2. Crisis Group: if Google News still lists nothing from crisisgroup.org by about 18 Nov, look for another route.
 3. Charter interview, one zone at a time, Iran & Red Sea first (December three-signal watch).
 4. Indicators that act on tips (step 3 of the tipping plan), after the charters.
 5. Headline service for other programs (step 4); Bluesky/Telegram lists need Tom's picks (`presstv`, `farsna`
