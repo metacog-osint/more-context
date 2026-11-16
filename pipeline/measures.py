@@ -1,8 +1,10 @@
 """Measures computed from the daily story build. No model calls; all free.
 
 - attention_anomaly: how unusual today's story count is against the entity's own last 28 complete days,
-  adjusted for day of week. Counts are log-transformed (news volume is skewed), so z is in log units:
-  z = 2 means about two typical day-to-day swings above the expected level for that weekday.
+  adjusted for day of week. Counts are log-transformed (news volume is skewed). Since the z calibration (Tom's pick,
+  16 Nov 2026; docs/method/2026-11-16-z-calibration.md) z is normal-equivalent (pipeline/zstats.py, option B):
+  residual SD on its real degrees of freedom, the weekday mean's own error, Student t. Before it, z ran about 1.3x
+  too large (z >= 2.5 on about 3% of event-free days, against 0.62%).
 - (removed 27 Oct 2026) casualty_share, the share of articles where GDELT extracted a KILL/WOUND count. It
   could not tell whose deaths, where or when: 20-26 Oct, Taiwan Strait ran 6-12% and raised two alarms, and a
   sanctions topic hit 50% from a story about Sudan. Planned replacement: violent events located inside the zone.
@@ -15,14 +17,17 @@ import math
 from datetime import date, timedelta
 from statistics import mean, pstdev
 
+from . import zstats
+
 BASELINE_DAYS = 28
 MIN_BASELINE_DAYS = 14
-SD_FLOOR = 0.15  # log units; stops a very steady baseline from turning small changes into huge z
+SD_FLOOR = zstats.SD_FLOOR  # log units; stops a very steady baseline from turning small changes into huge z
 SHARE_SD_FLOOR = 0.02  # for shares (0-1)
 # Alarm = a free signal that buys model coding for that entity-day (pipeline/ondemand.py). It is a spending
 # trigger, not a warning level; Watch / Warning / Crisis come from the charters.
 ALARM_Z = 2.0
 ALARM_MIN_STORIES = 5
+Z_METHOD = "pred-1"  # option B; countries use "robust-1" (option C, pipeline/countries.py)
 
 
 def attention_anomaly(history: dict[date, float], day: date, count: float,
@@ -36,23 +41,24 @@ def attention_anomaly(history: dict[date, float], day: date, count: float,
     base = {d: c for d, c in history.items() if start <= d < day and c is not None}
     if len(base) < min_days:
         return None
-    y = {d: math.log1p(c) for d, c in base.items()}
-    level = mean(y.values())
-    by_wd: dict[int, list[float]] = {}
-    for d, v in y.items():
-        by_wd.setdefault(d.weekday(), []).append(v)
-    adjust = {wd: mean(vs) - level for wd, vs in by_wd.items() if len(vs) >= 2}
-    weekday_adjusted = day.weekday() in adjust
-    resid = [v - level - adjust.get(d.weekday(), 0.0) for d, v in y.items()]
-    sd = max(pstdev(resid), SD_FLOOR)
-    expected = level + adjust.get(day.weekday(), 0.0)
-    z = (math.log1p(count) - expected) / sd
+    ds = sorted(base)
+    r = zstats.predictive_z([math.log1p(base[d]) for d in ds], [d.weekday() for d in ds], math.log1p(count),
+                            day.weekday())
+    return scored(r["z"], r["expected"], count, len(base), r["weekday_adjusted"])
+
+
+def scored(z: float, expected_log: float, count: float, baseline_days: int, weekday_adjusted: bool) -> dict:
+    """The stored score: z, expected count, the rule's ratio (count / expected, for RISING_RATIO), the title's
+    floored ratio (pipeline/zstats.floored_ratio) and the method."""
+    expected = math.expm1(expected_log)
     return {
         "z": round(z, 2),
-        "expected": round(math.expm1(expected), 1),
-        "ratio": round(count / math.expm1(expected), 2) if math.expm1(expected) > 0 else None,
-        "baseline_days": len(base),
+        "expected": round(expected, 1),
+        "ratio": round(count / expected, 2) if expected > 0 else None,
+        **zstats.floored_ratio(count, expected),
+        "baseline_days": baseline_days,
         "weekday_adjusted": weekday_adjusted,
+        "z_method": Z_METHOD,
     }
 
 

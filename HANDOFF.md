@@ -2,7 +2,16 @@
 
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
-## Where things stand (16 Nov 2026, about 12:20 AM CST)
+## Where things stand (16 Nov 2026, about 10:30 AM CST)
+- **z calibration: decided and built, not committed or deployed (16 Nov 2026).** Tom picked the recommended option
+  on all four problems in `docs/method/2026-11-16-z-calibration.md` (option C for countries, B for zones, zone violence
+  and pair counts; ratio floor max(expected, 90-day median, 3); zone-country `/feed` items neutral, no hypothesis;
+  T2 for press tone and the pairs' 7-day values). Built on branch `method/z-calibration` in
+  `D:\Projects\_worktrees\watchfloor-z-calibration`: `pipeline/zstats.py`, `measures.py`, `countries.py`,
+  `relations.py`, `press.py`, `feed_v2.py` (`watchfloor-feed-1.1`), `web/app.js`, `tests/test_zstats.py`; the doc's
+  last section lists what was built and where it departs from the proposal. The same branch carries next steps 7
+  and 8 (below). 219 of 258 tests pass; the 39 failures are `tests.test_match` as on main. Not built: the rescore of
+  stored days' scores. Prototype scripts in `scripts/zcal/` (uncommitted); their data copies are in `%TEMP%\zcal` on C:.
 - **Suite-review fixes: live (16 Nov 2026).** `f42898b`, merged to `main` as `8dbdcf2` through PR #1 (CI passed),
   each step on Tom's yes. `mc-ingest-00025-xox` (15:33 UTC) and `mc-api-00023-req` (15:35 UTC) deployed from a clean
   archive of `8dbdcf2`, env vars checked separate (`MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); the 15:35 UTC run
@@ -150,10 +159,13 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
    draft for Tom's own charters.
 4. October usage totals (Class A and BigQuery), carried from 4 Nov.
 5. `backfill_relations.py --bucket` token refresh: done, on `main` (16 Nov).
+6. z calibration: options picked 16 Nov (above). Waiting: commit, push and PR of `method/z-calibration`; deploy of
+   both functions and the website; then a rescore of stored days (`--check`, a dry run on a copy, Tom's yes for
+   `--write`). Each on its own yes.
 
 ## Next steps, in order
 1. Press tone is display only: Tom reads the zone pages' press tables for a month (from 16 Nov) before any flag,
-   alarm or `/feed` item. The `watchfloor-relations` worktree (git-ignored GDELT backfill) may now go, on Tom's yes.
+   alarm or `/feed` item. (The `watchfloor-relations` worktree was deleted 16 Nov.)
 2. Crisis Group: if Google News still lists nothing from crisisgroup.org by about 18 Nov, look for another route.
 3. Charter interview, one zone at a time, Iran & Red Sea first (December three-signal watch).
 4. Indicators that act on tips (step 3 of the tipping plan), after the charters.
@@ -161,13 +173,12 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
    Telegram channels live but ownership unconfirmed).
 6. Requests to other programs: Elements to mark FIRMS anomalies against its baseline; Vigil to tag state-linked
    actors.
-7. `/feed` when a day's `countries.json` is missing (a country build still waiting for its retry, or given up):
-   `pipeline/feed_v2.py` gives no coverage fraction, no partial flag and "0 countries rising" in the title, a
-   missing layer shown as quiet. Mark the feed partial and say "no country data" (left out of the review fixes
-   while `feed/day-precision` was changing that file).
-8. Press domain table: GDELT's 2018 table codes `sputnik-georgia.com` GG and `sputniknews.cn` CH, against the
-   catalog's rule that Sputnik sites are Russia; and codes Bosnian Serb outlets (rtrs.tv, glassrpske.com, rtvbn.com)
-   and balkaninsight.com as RB, which no press block lists. Check whether either matters for a zone block.
+7. Built on `method/z-calibration` (16 Nov): `/feed` for a day with no `countries.json` is marked `partial_day` and
+   its summary says "no country data" instead of "0 countries rising"; zone attention alarms still stand.
+8. Checked 16 Nov: `sputniknews.cn` (CH) mattered, since China is an outlet in seven zone blocks; it and
+   `sputnik-georgia.com` (GG) are now Russia in `catalog/press_outlets.json` 2026-11-16.3 (on the branch; past days
+   keep their rows as built). RB (rtrs.tv, glassrpske.com, rtvbn.com, balkaninsight.com) is in no block, so left as is.
+9. After the z calibration has been live a month: drop "calibrated" from `/feed` titles and website tooltips.
 
 ## History
 - 4 Nov 2026 (session "Geo-context project review"): geometry matching `6f3a63d` (doctrine kit 0.4.1); CI later

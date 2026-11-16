@@ -7,8 +7,11 @@ Horn of Africa zone). Every country is counted, not just the zones, from the per
 Two counts per country-day, both distinct articles with at least one event located in the country:
 - attention (`urls`): any event;
 - violence (`violent`): an assault, fight or mass-violence event (CAMEO 18-20).
-Each is scored against the country's own previous 28 complete days (log z, weekday-adjusted, as for zones) and
-against the median of its previous 90 complete days. The 90-day reference keeps a long crisis visible after its
+Each is scored against the country's own previous 28 complete days and against the median of its previous 90
+complete days. Since the z calibration (Tom's pick, 16 Nov 2026; docs/method/2026-11-16-z-calibration.md) the 28-day
+z is option C (pipeline/zstats.robust_z): one pooled weekday shape for all countries that day, median centre, MAD
+scale with a Poisson floor, Student t; z >= 2.5 on 0.3-0.4% of event-free country-days, against about 3% before.
+Zone violence keeps option B (the zone's own weekday means: zone-named counts do not share GDELT's weekend dip). The 90-day reference keeps a long crisis visible after its
 peak has entered the 28-day baseline (Ethiopia & Eritrea, October 2026).
 
 - Rising: z >= RISING_Z, at least MIN_ARTICLES that day, and at least RISING_RATIO times the 28-day expectation.
@@ -30,7 +33,7 @@ from functools import lru_cache
 from pathlib import Path
 from statistics import median
 
-from . import measures
+from . import measures, zstats
 from .events import METRICS, ROW_PREFIX, canon
 from .press import ROW_PREFIX as PRESS_PREFIX
 from .relevance import TermMatcher
@@ -46,6 +49,7 @@ MIN_ARTICLES = {"urls": 40, "violent": 15}
 ELEVATED_RATIO = 2.0
 REF_DAYS, MIN_REF_DAYS = 90, 60
 MAX_LISTED = 15
+Z_METHOD = "robust-1"  # option C (zstats.robust_z)
 SAMPLES_KEPT = 6
 # GDELT codes that are not countries (GDELT's FIPS.country.txt: oceans, undersea features, undesignated
 # sovereignty, no man's land): never listed, and not reported as missing from the catalog.
@@ -190,17 +194,37 @@ def history(sink, day: date, days: int = REF_DAYS) -> tuple[dict[str, dict[str, 
     return out, complete
 
 
-def score(hist: dict[date, int], complete: list[date], day: date, count: int) -> dict:
-    """28-day z (measures.attention_anomaly) and the ratio to the 90-day median, over complete days only."""
-    out: dict = {}
+def baseline(hist: dict[date, int], complete: list[date], day: date) -> dict[date, int]:
+    """The 28-day baseline: every complete day in the window, zero where the country had no articles."""
     start28 = day - timedelta(days=measures.BASELINE_DAYS)
-    att = measures.attention_anomaly({d: hist.get(d, 0) for d in complete if d >= start28}, day, count)
+    return {d: hist.get(d, 0) for d in complete if start28 <= d < day}
+
+
+def profile(hist: dict[str, dict[date, int]], complete: list[date], day: date) -> dict[int, float]:
+    """The day's pooled weekday shape for one metric, from every country's 28-day baseline."""
+    return zstats.pooled_profile([baseline(h, complete, day) for h in hist.values()])
+
+
+def score(hist: dict[date, int], complete: list[date], day: date, count: int,
+          prof: dict[int, float] | None = None) -> dict:
+    """28-day z and the ratio to the 90-day median, over complete days only. With `prof` (a country) the z is
+    option C against that pooled weekday shape; without it (a zone) option B, measures.attention_anomaly."""
+    out: dict = {}
+    if prof is None:
+        att = measures.attention_anomaly(baseline(hist, complete, day), day, count)
+    else:
+        base = baseline(hist, complete, day)
+        r = zstats.robust_z(base, day, count, prof)
+        att = r and {**measures.scored(r["z"], r["expected"], count, len(base), True), "z_method": Z_METHOD}
     if att:
-        out.update(z=att["z"], expected=att["expected"], ratio=att["ratio"])
+        out.update({k: att[k] for k in ("z", "expected", "ratio", "z_method")})
     ref = [hist.get(d, 0) for d in complete if d >= day - timedelta(days=REF_DAYS)]
+    med = None
     if len(ref) >= MIN_REF_DAYS:
         med = median(ref)
         out.update(median90=med, ratio90=round(count / med, 2) if med > 0 else None)
+    if att:
+        out.update(zstats.floored_ratio(count, att["expected"], med))
     return out
 
 
@@ -221,7 +245,10 @@ def _listed(scored: dict[str, dict], metric: str) -> tuple[list[str], list[str]]
         # GDELT also uses codes that are not countries ("OS", oceans); only named countries are listed.
         if n < MIN_ARTICLES[metric] or (known and cc not in known):
             continue
-        if (s.get("z") or 0) >= RISING_Z and (s.get("ratio") or 0) >= RISING_RATIO:
+        # Option C's median centre is 0 for a country with mostly zero days, so `ratio` is None there; with at least
+        # MIN_ARTICLES that day the ratio test is passed by any expectation of 1 or less.
+        ratio_ok = (s.get("ratio") or 0) >= RISING_RATIO or (s.get("expected") is not None and s["expected"] <= 1)
+        if (s.get("z") or 0) >= RISING_Z and ratio_ok:
             rising.append(cc)
         elif (s.get("ratio90") or 0) >= ELEVATED_RATIO:
             elevated.append(cc)
@@ -238,6 +265,7 @@ def build_day(sink, day: date, recs: list[dict] | None = None) -> dict:
     tot = totals(recs)
     hist, complete = history(sink, day) if not partial else ({m: {} for m in (*SCORED, "zone_named")}, [])
     zc, nm = zone_countries(), names()
+    profs = {m: profile(hist[m], complete, day) for m in SCORED} if not partial else {}
     scored = {}
     for cc, t in tot.items():
         c = {"name": nm.get(cc, cc), **t}
@@ -245,7 +273,7 @@ def build_day(sink, day: date, recs: list[dict] | None = None) -> dict:
             c["zones"] = zc[cc]
         if not partial:
             for m in SCORED:
-                c[f"{m}_score"] = score(hist[m].get(cc, {}), complete, day, t[m])
+                c[f"{m}_score"] = score(hist[m].get(cc, {}), complete, day, t[m], profs[m])
         scored[cc] = c
     lists = {}
     if not partial:
