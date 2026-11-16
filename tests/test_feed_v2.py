@@ -79,10 +79,14 @@ class Build(unittest.TestCase):
     def test_countries_in_zones_link_to_the_zone_and_others_go_to_review(self):
         items = by_id(feed_v2.build(summary(), countries(), now=NOW))
         ks = items["country:KS:violence"]["properties"]
-        self.assertEqual((ks["warning_problem_id"], ks["indicator_id"], ks["countries"]), ("WF-WP-Z03", "WF-IND-4", ["KR"]))
+        self.assertEqual((ks["warning_problem_id"], ks["countries"]), ("WF-WP-Z03", ["KR"]))
+        # The country count is not filtered to the zone: no hypothesis, no direction (Tom, 16 Nov 2026).
+        for k in ("hypothesis_id", "direction", "indicator_id", "indicator_state"):
+            self.assertNotIn(k, ks)
         self.assertNotIn("country:KS:violence:elevated", items)  # rising wins; one violence item per country
         et = items["country:ET:violence"]["properties"]
-        self.assertEqual((et["indicator_id"], et["baseline_ref"]["id"]), ("WF-IND-3", "wf-90d-median"))
+        self.assertEqual((et["warning_problem_id"], et["baseline_ref"]["id"]), ("WF-WP-Z18", "wf-90d-median"))
+        self.assertNotIn("hypothesis_id", et)
         br = items["country:BR:violence"]["properties"]
         self.assertTrue(br["review_queue"])
         self.assertNotIn("indicator_id", br)
@@ -97,6 +101,30 @@ class Build(unittest.TestCase):
         zones = [f["properties"] for f in fc["features"] if ":zone:" in f["properties"]["id"]]
         self.assertTrue(all(p["tier"] == "routine" and p["partial_day"] for p in zones))
         self.assertIn("partial day", fc["features"][0]["properties"]["title"])
+
+    def test_titles_floor_the_ratio_and_name_the_calibrated_z(self):
+        c = countries()
+        c["countries"]["KS"]["violent"] = 15
+        c["countries"]["KS"]["violent_score"] = {"z": 2.7, "ratio": 79.3, "ratio_shown": 5.0, "floored": True,
+                                                 "z_method": "robust-1"}
+        c["countries"]["BR"]["violent_score"] = {"z": 3.1, "ratio": 4.2, "ratio_shown": 3.5, "floored": False,
+                                                 "z_method": "robust-1"}
+        items = by_id(feed_v2.build(summary(), c, now=NOW))
+        self.assertIn("violent-event articles at 15, usually 3 or fewer (calibrated z 2.7), on the Rising list",
+                      items["country:KS:violence"]["properties"]["title"])
+        self.assertIn("3.5x normal (calibrated z 3.1)", items["country:BR:violence"]["properties"]["title"])
+        # a score built before the calibration keeps its own ratio and plain "z"
+        self.assertIn("2.0x normal (z 2.6)", items["country:CD:attention"]["properties"]["title"])
+
+    def test_missing_country_data_is_partial_not_quiet(self):
+        fc = feed_v2.build(summary(), None, now=NOW)
+        head = fc["features"][0]["properties"]
+        self.assertIn("no country data", head["title"])
+        self.assertNotIn("countries rising", head["title"])
+        self.assertTrue(head["partial_day"])
+        self.assertEqual(fc["dropped"], [])
+        cuba = by_id(fc)["zone:15_Cuba"]["properties"]
+        self.assertEqual(cuba["tier"], "anomaly")  # the stories' attention alarm still stands
 
     def test_summary_item_counts(self):
         head = feed_v2.build(summary(), countries(), now=NOW)["features"][0]["properties"]

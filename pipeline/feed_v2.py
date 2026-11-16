@@ -5,6 +5,16 @@ storage writes. Every item is a measurement (kind observation): a daily summary,
 zone) and per topic (no place; a link to its page), and one per country on the violence Rising or Elevated list or the
 attention Rising list. Warnings, which are judged, wait for the zone charters (doctrine/indicators.json).
 
+Since the z calibration (Tom's picks, 16 Nov 2026; docs/method/2026-11-16-z-calibration.md):
+- a score carrying `z_method` is a calibrated z, and titles say "calibrated z" for the first month;
+- titles give count / max(expected, 90-day median, 3), and when the floor of 3 binds they give the count instead
+  ("15 articles, usually 3 or fewer"), so a near-zero baseline no longer reads "79.3x normal";
+- a zone country on a country list is a neutral observation under the zone's warning problem, not support for its
+  H1: the country count has no headline filter (44% of its articles name the zone, 12 Aug-15 Nov). Counting only
+  zone-named articles waits for the charters;
+- a day whose countries.json is missing (a country build waiting for its retry, or given up) is marked partial and
+  its summary says "no country data", never "0 countries rising".
+
 Each item is checked by the doctrine kit's contract linter (doctrine/kit); one that fails is left out and listed in
 the header's `dropped`, so a bad item never breaks the feed.
 """
@@ -20,7 +30,7 @@ sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, contract, registers, vocab  # noqa: E402
 
 SITE = "https://watchfloor.theintelligence.company"
-METHOD = "watchfloor-feed-1.0"
+METHOD = "watchfloor-feed-1.1"
 FILES_PER_DAY = 192                     # GDELT Events: 96 fifteen-minute files a day in each of two streams
 ALARM_Z, MIN_ARTICLES = 2.0, 5         # zone violence anomaly, matching the attention alarm (z >= 2, >= 5 stories)
 LANGUAGE_KEY = "https://github.com/metacog-osint/noise-floor/blob/main/doctrine/kit/docs/language-key.md"
@@ -60,12 +70,17 @@ def _wp(eid: str) -> str:
     return f"WF-WP-{'Z' + head if head.isdigit() else head}"
 
 
-def _times(x: dict | None) -> str:
-    """'2.9x normal (z 3.4)' from a score, or 'no score' before 14 days of history."""
+def _times(x: dict | None, count: int | None = None) -> str:
+    """'2.9x normal (calibrated z 3.4)' from a score; 'at 15, usually 3 or fewer (calibrated z 2.7)' when the ratio's
+    floor binds; 'no score yet' before 14 days of history. Scores built before the calibration keep the old wording."""
     if not x or x.get("z") is None:
         return "no score yet"
-    ratio = f"{x['ratio']:.1f}x normal" if x.get("ratio") is not None else "normal not known"
-    return f"{ratio} (z {x['z']:.1f})"
+    zlab = "calibrated z" if x.get("z_method") else "z"
+    if x.get("floored") and count is not None:
+        return f"at {count}, usually 3 or fewer ({zlab} {x['z']:.1f})"
+    r = x.get("ratio_shown", x.get("ratio"))
+    ratio = f"{r:.1f}x normal" if r is not None else "normal not known"
+    return f"{ratio} ({zlab} {x['z']:.1f})"
 
 
 def _ncf_rules() -> dict:
@@ -97,13 +112,14 @@ def build(summary: dict, countries: dict | None, *, catalog: dict | None = None,
     published = summary.get("built_at") or _utc(now)
     files = (countries or {}).get("files")
     coverage = round(min(1.0, files / FILES_PER_DAY), 3) if files else None
+    no_countries = countries is None
     partial = bool(summary.get("partial") or (countries or {}).get("partial"))
     ents = summary.get("entities") or {}
     ncf_rules = _ncf_rules()
     base = {**COMMON, "data_as_of": as_of, "data_as_of_precision": "day", "published_at": published}
     if coverage is not None:
         base["coverage_fraction"] = coverage
-    if partial:
+    if partial or no_countries:
         base["partial_day"] = True
     iso = lambda cc: (fips.get(cc) or {}).get("iso")  # noqa: E731
     zone_of = {cc: z["id"] for z in catalog["zones"] for cc in z.get("countries", [])}
@@ -118,9 +134,9 @@ def build(summary: dict, countries: dict | None, *, catalog: dict | None = None,
                        and (vio.get("named") or 0) >= MIN_ARTICLES) and not partial
         wp = _wp(z["id"])
         page = f"{SITE}/#/zone/{z['id']}?day={day}"
-        title = f"{z['name']}: news attention {_times(att)}"
+        title = f"{z['name']}: news attention {_times(att, e.get('filtered_stories'))}"
         if kind == "zone":
-            title += f"; violent-event articles {_times(vscore)}"
+            title += f"; violent-event articles {_times(vscore, vio.get('named'))}"
         props = {**base, "id": f"watchfloor:{day}:{kind}:{z['id']}", "title": title,
                  "tier": "anomaly" if (att_hit or vio_hit) else "routine",
                  "warning_problem_id": wp, "requirement_ids": ["WF-PIR-1"] + (["WF-PIR-2"] if kind == "zone" else []),
@@ -159,26 +175,24 @@ def build(summary: dict, countries: dict | None, *, catalog: dict | None = None,
         score = row.get(f"{'violent' if measure == 'violence' else 'urls'}_score") or {}
         zone = zone_of.get(cc)
         name = info.get("name") or row.get("name") or cc
+        articles = row.get("violent" if measure == "violence" else "urls")
         if measure == "violence":
-            ind = "WF-IND-4" if listed == "rising" else "WF-IND-3"
-            what = (f"violent-event articles {_times(score)}, on the Rising list" if listed == "rising" else
+            what = (f"violent-event articles {_times(score, articles)}, on the Rising list" if listed == "rising" else
                     f"violent-event articles {score.get('ratio90') or 0:.1f}x its 90-day median, on the Elevated list")
         else:
-            ind, what = "WF-IND-5", f"news attention {_times(score)}, on the Rising list"
+            what = f"news attention {_times(score, articles)}, on the Rising list"
         props = {**base, "id": f"watchfloor:{day}:country:{cc}:{measure}", "title": f"{name}: {what}",
                  "tier": "anomaly", "baseline_ref": BASE_28 if listed == "rising" else BASE_90,
                  "precision_class": "country", "countries": [info["iso"]],
                  "ie_aspect": ["physical"] if measure == "violence" else ["informational"],
                  "pmesii_pt": ["military"] if measure == "violence" else ["information"], "ascope": ["events"],
                  "sources": _sources(EVENTS, accessed=published),
-                 "measures": {"articles": row.get("violent" if measure == "violence" else "urls"), "score": score,
-                              "list": listed},
+                 "measures": {"articles": articles, "score": score, "list": listed},
                  "link": f"{SITE}/#/map?day={day}"}
         if zone:
-            props.update({"warning_problem_id": _wp(zone), "requirement_ids": ["WF-PIR-2"], "indicator_id": ind,
-                          "hypothesis_id": f"{_wp(zone)}-H1",
-                          "direction": "supports" if measure == "violence" else "neutral",
-                          "indicator_state": "present"})
+            # No hypothesis (Tom, 16 Nov 2026): the country count is not filtered to the zone. The kit allows no
+            # indicator_id without a hypothesis_id, so the indicator link goes too; the warning problem stays.
+            props.update({"warning_problem_id": _wp(zone), "requirement_ids": ["WF-PIR-2"]})
         else:
             props.update({"requirement_ids": ["WF-PIR-3"], "review_queue": True})
         geom = _point(info.get("point"))
@@ -204,7 +218,7 @@ def build(summary: dict, countries: dict | None, *, catalog: dict | None = None,
     head = {**base, "id": f"watchfloor:{day}:summary", "tier": "routine", "precision_class": "none",
             "title": (f"Watchfloor, {_plain(day)}: {n_att} of {n_entities} zones and topics above normal attention; "
                       f"{n_vio} of {len(catalog['zones'])} zones with violence above normal; "
-                      f"{len(vio_rising)} countries rising on violence"
+                      + ("no country data" if no_countries else f"{len(vio_rising)} countries rising on violence")
                       + (" (partial day: no alarms)" if partial else "")),
             "requirement_ids": ["WF-PIR-1", "WF-PIR-2", "WF-PIR-3"], "ie_aspect": ["informational", "physical"],
             "pmesii_pt": ["military", "political", "information"], "ascope": ["events"], "countries": [],

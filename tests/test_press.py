@@ -51,6 +51,9 @@ class OutletTests(unittest.TestCase):
         self.assertIsNone(press.outlet_country("nknews.org", t))  # deliberately unassigned
         self.assertEqual(press.outlet_country("www.koreaherald.com", t), "KS")  # from the trimmed 2018 table
         self.assertEqual(press.outlet_country("sputnik.af", t), "RS")  # 2026-11-16.2
+        # 2026-11-16.3: GDELT's 2018 table codes these Sputnik sites Georgia and China; state media keep their sponsor
+        self.assertEqual(press.outlet_country("sputnik-georgia.com", t), "RS")
+        self.assertEqual(press.outlet_country("sputniknews.cn", t), "RS")
         for gov in ("valtioneuvosto.fi", "puolustusvoimat.fi", "raja.fi"):  # Finnish government pages, not press
             self.assertIn(gov, t)
             self.assertIsNone(press.outlet_country(gov, t))
