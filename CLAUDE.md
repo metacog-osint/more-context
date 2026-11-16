@@ -265,14 +265,19 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
 - `GET /relations?zone=&day=&days=` computes daily and 7-day values, z against the pair's own 28 days, and flags
   (z >= 2.5 on 5+ articles) from the series on read (about 0.1 s a pair; cached 30 min). The zone page shows it
   under "Relations between countries". Display only: no alarm, no `/feed` items.
-- `catalog/relations.json`: Korea's pairs were measured; every other zone's are Claude's draft for Tom to edit.
+- `catalog/relations.json` 2026-11-15.2: Tom reviewed every zone's pairs against measured volume on 15 Nov (87 pairs;
+  thin ones kept on purpose where he wanted the relation on record). `EUR` is GDELT's code for Europe as a whole; the
+  EU's own code `EEC` is folded into it. Live from `64c1c6f` (`mc-ingest-00023-xat`, `mc-api-00020-qec`, deployed
+  20:38-20:40 UTC 15 Nov from a clean archive, env vars checked). The API and the daily build take the pairs from the
+  deployed catalog, so a pair change needs a deploy of both functions as well as the series rebuild.
 - Days built before deploy have no `pairs` in their Events records and count as partial unless backfilled:
   `scripts/backfill_relations.py` (free GDELT download; `--bucket` reads and writes the live bucket with the gcloud
   user's token, no storage library needed, Tom's yes first; `--series-only` rebuilds the series after a catalog
   change). 18 Jul-14 Nov were backfilled into the bucket on 15 Nov (120 days, all complete). 15 Nov itself builds as
   partial (pair tables only from 18:20 UTC): redo it after 03:20 UTC 16 Nov with `--start 2026-11-15 --end
   2026-11-15 --force`, which also rebuilds the series.
-- Not built: press tone by outlet country (GKG) and the state-and-people layer (both measured in the note).
+- Next, approved to plan (not built): press tone by outlet country from the GKG. Checks, Tom's outlet picks per zone
+  and the build plan: `docs/relations/2026-11-15-press-outlets.md`. The state-and-people layer comes after it.
 
 ## AI spend: on demand, capped (Tom's decision, 26 Oct 2026)
 Most stories are never read by a person, so model work waits for a reason to spend:
