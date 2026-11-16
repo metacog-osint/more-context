@@ -100,6 +100,8 @@ tr.alarm td { background: var(--alarm-soft); }
 .spark rect.p { fill: var(--muted); opacity: .2; }
 .spark rect.f { fill: var(--accent); }
 .spark rect.sel { stroke: var(--ink); stroke-width: 1.5; }
+.spark.mini { width: 160px; max-width: 100%; height: 22px; margin: 0; }
+.spark-cell { width: 168px; }
 .rel-table { width: 100%; font-size: 14px; }
 .rel-table th, .rel-table td { padding: 5px 8px; }
 h3 { font-size: 15px; margin: 16px 0 8px; }

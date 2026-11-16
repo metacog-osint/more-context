@@ -188,23 +188,25 @@ class CycleHookTests(unittest.TestCase):
             sink.write_json(cycle.STATE_KEY, {"first_data_day": "2026-11-12", "stories": {"last_day": "2026-11-12"}})
             reads, got = [], {}
             recs = [{"stamp": "20261113000000", "stream": "english", "countries": {}, "pairs": {}}]
+            press_recs = [{"kind": "press", "stamp": "20261113000000", "stream": "english", "t": {}}]
 
             def fake_records(s, day):
                 reads.append(day)
-                return recs
+                return recs, press_recs
 
-            def fake_relations(s, day, r):
-                got["recs"] = r
+            def fake_relations(s, day, r, p):
+                got["recs"], got["press"] = r, p
                 raise RuntimeError("relations broke")
 
             now = datetime(2026, 11, 14, 5, 0, tzinfo=timezone.utc)
             with mock.patch.object(daily, "build_day", lambda s, d: {"day": d.isoformat()}), \
-                    mock.patch.object(countries, "day_records", fake_records), \
+                    mock.patch.object(countries, "day_records_and_press", fake_records), \
                     mock.patch.object(countries, "build_day", lambda s, d, r=None: {"day": d.isoformat()}), \
                     mock.patch.object(relations, "build_day", fake_relations):
                 summary = cycle.run_cycle(sink, now=now, streams=(), poll_rss=False, ai_on=False)
             self.assertEqual(reads, [date(2026, 11, 13)])
             self.assertIs(got["recs"], recs)
+            self.assertIs(got["press"], press_recs)
             self.assertIn("relations broke", summary["relations_error"])
             self.assertEqual(sink.read_json(cycle.STATE_KEY)["stories"]["last_day"], "2026-11-13")
 

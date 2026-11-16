@@ -6,7 +6,8 @@ Firestore document with that object as fallback and daily backup (statestore.py,
 For each GKG slot read, the matching GDELT Events files are read too (events.py; ~100 KB each) and kept as one
 compact record per file, a kind=events row in the same cycle file (in `events/YYYY/MM/DD/HHMMSS.json` before
 30 Oct 2026: one write a run saved); the daily build turns them into country counts and, since 15 Nov 2026, the
-relations between countries (relations.py).
+relations between countries (relations.py). Each GKG file read also gives one kind=press row (press.py: articles and
+tone by outlet country), which the same build sums into the relations files.
 GDELT rows carry their zone/topic labels and, when the outlet is catalogued, its source group.
 """
 from __future__ import annotations
@@ -14,7 +15,7 @@ from __future__ import annotations
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 
-from . import blocklist, countries, daily, events, feeds, gdelt, health, ondemand, relations, statestore
+from . import blocklist, countries, daily, events, feeds, gdelt, health, ondemand, press, relations, statestore
 from .budget import BudgetExceeded
 from .match import Matcher
 from .sources import lookup_domain
@@ -53,11 +54,16 @@ def stamps_after(last: str | None, latest: str, cap: int = MAX_FILES_PER_STREAM)
     return out[-cap:]
 
 
-def gdelt_rows(stamp: str, stream: str, data: bytes, matcher: Matcher) -> list[dict]:
+def gdelt_rows(stamp: str, stream: str, data: bytes, matcher: Matcher,
+               press_table: press.FileTable | None = None) -> list[dict]:
+    """The file's matched article rows. With `press_table`, every article not blocked (matched or not) is also
+    counted into it (pipeline/press.py)."""
     rows = []
     for art in gdelt.parse_zip(data, stream):
         if blocklist.gdelt_reason(art.domain, art.url):  # catalog/blocklist.json: non-news, press releases, copies
             continue
+        if press_table is not None:
+            press_table.add(art.domain, art.tone, art.v2_locations)
         labels = matcher.labels(art)
         if not labels:
             continue
@@ -86,6 +92,7 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
     gstate = state.setdefault("gdelt", {})
     matcher = Matcher()
     rows: list[dict] = []
+    press_rows: list[dict] = []
     summary: dict = {"run_at": health.iso(now), "gdelt": {}, "rss": {}}
 
     for stream in streams:
@@ -118,7 +125,9 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
                 else:
                     missing.append(stamp)
                 continue
-            got = gdelt_rows(stamp, stream, data, matcher)
+            ptab = press.FileTable()
+            got = gdelt_rows(stamp, stream, data, matcher, ptab)
+            press_rows.append(ptab.row(stamp, stream))
             rows += got
             scanned_rows += len(got)
             ok += 1
@@ -144,10 +153,11 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
                           "searches_refused": feeds.searches_refused(probe)}
         state["feed_health"] = {"at": health.iso(now), "sources": probe}
 
-    if rows or event_recs:
+    if rows or event_recs or press_rows:
         key = f"cycles/{now:%Y/%m/%d}/{now:%H%M%S}.jsonl"
-        sink.write_lines(key, rows + [events.as_row(r) for r in event_recs])
-        summary["written"] = {"key": key, "rows": len(rows), "events_files": len(event_recs)}
+        sink.write_lines(key, rows + [events.as_row(r) for r in event_recs] + press_rows)
+        summary["written"] = {"key": key, "rows": len(rows), "events_files": len(event_recs),
+                              "press_files": len(press_rows)}
         state.setdefault("first_data_day", f"{now:%Y-%m-%d}")
 
     days = []
@@ -174,16 +184,16 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
                 summary["stories_error"] = sstate["last_error"]
                 break
             try:  # country counts never hold up the story build
-                recs = countries.day_records(sink, day)
+                recs, press_recs = countries.day_records_and_press(sink, day)
                 summary.setdefault("countries_built", []).append(countries.build_day(sink, day, recs))
             except Exception as e:
                 summary["countries_error"] = f"{day}: {e}"[:200]
                 continue
             try:  # nor do relations (pipeline/relations.py), built from the same records
-                summary.setdefault("relations_built", []).append(relations.build_day(sink, day, recs))
+                summary.setdefault("relations_built", []).append(relations.build_day(sink, day, recs, press_recs))
             except Exception as e:
                 summary["relations_error"] = f"{day}: {e}"[:200]
-            del recs
+            del recs, press_recs
 
     run_alarms(sink, state, summary, ai_on, code_alarm)
     state["last_run"] = summary

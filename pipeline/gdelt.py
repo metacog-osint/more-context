@@ -44,9 +44,11 @@ class Article:
     stream: str
     killed: int | None = None  # largest KILL count GDELT extracted from the text (V1 Counts), else None
     wounded: int | None = None  # largest WOUND count, else None
+    v2_locations: str = ""  # V2 enhanced locations (field 10), for the press table only; never written to rows
 
     def to_dict(self) -> dict:
         d = self.__dict__.copy()
+        d.pop("v2_locations", None)
         d["published"] = self.published.strftime("%Y-%m-%dT%H:%M:%SZ")
         return d
 
@@ -158,4 +160,5 @@ def parse_row(fields: list[str], stream: str) -> Article | None:
         stream=stream,
         killed=killed,
         wounded=wounded,
+        v2_locations=fields[10],
     )

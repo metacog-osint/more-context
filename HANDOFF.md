@@ -4,7 +4,7 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
 
 ## Where things stand (15 Nov 2026, about 4:30 PM CST)
 - **Relation pairs reviewed and live.** Tom went through every zone's pairs on 15 Nov; `catalog/relations.json`
-  2026-11-15.2 (87 pairs) is `64c1c6f` on `main`, pushed; `mc-ingest-00023-xat` and `mc-api-00020-qec` deployed
+  2026-11-15.2 (87 pairs) is `9a08b4e` on `main` (`64c1c6f` before another session rewrote main at 16:31 CST 15 Nov), pushed; `mc-ingest-00023-xat` and `mc-api-00020-qec` deployed
   20:38-20:40 UTC from a clean archive, env vars checked; the 20:50 UTC run was clean (288 rows). `/relations`
   serves the new catalog; the new pairs have no history until the 15 Nov redo (next steps), which also rebuilds the
   series. Tom approved that bucket write on 15 Nov ("yes to all four").

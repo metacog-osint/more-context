@@ -75,7 +75,11 @@ class CycleTests(unittest.TestCase):
             sink, s = self.run_cycle(d, {"20261026160000": zipped(UKRAINE, UNMATCHED)})
             key = s["written"]["key"]
             rows = [l for l in (sink.root / key).read_text(encoding="utf-8").split("\n") if l.strip()]
+            press_rows = [l for l in rows if l.startswith('{"kind": "press"')]
+            rows = [l for l in rows if l not in press_rows]
             self.assertEqual(len(rows), 1)
+            self.assertEqual(len(press_rows), 1)  # one press row per GKG file read (pipeline/press.py)
+            self.assertEqual(s["written"]["press_files"], 1)
             self.assertIn('"group": "chinese_state"', rows[0])
             self.assertIn('"labels": ["01_Ukraine_Conflict"]', rows[0])
 

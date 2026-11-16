@@ -479,6 +479,67 @@ function relationsPanel(r) {
   ];
 }
 
+// ---------- Press tone by outlet country (the `press` part of GET /relations; pipeline/press.py) ----------
+const tone2 = (x) => (x === null || x === undefined ? "—" : `${x > 0 ? "+" : ""}${x.toFixed(2)}`);
+const CADENCE = { daily: "daily", weekly: "weekly" };
+
+// Main-subject articles a day; incomplete days pale. Hover a bar for its numbers.
+function pressSpark(row, p) {
+  const W = 160, H = 22, n = p.days.length;
+  const max = Math.max(1, ...row.articles);
+  const bw = W / n;
+  return svg("svg", { class: "spark mini", viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: "none", role: "img",
+    "aria-label": `Articles a day by ${row.outlet_name} outlets mainly about ${row.about_name}, highest ${max}` },
+  p.days.map((d, i) => {
+    const hgt = Math.max(1, (row.articles[i] / max) * (H - 2));
+    const t = row.tone[i];
+    return svg("rect", { class: p.complete[i] ? "b" : "p", x: (i * bw).toFixed(1), y: (H - hgt).toFixed(1),
+      width: Math.max(0.6, bw - 0.4).toFixed(1), height: hgt.toFixed(1) },
+    svg("title", null, `${dayLabel(d)}: ${row.articles[i]} articles${t !== null && t !== undefined ? `, tone ${tone2(t)}` : ""}${p.complete[i] ? "" : ", incomplete day"}`));
+  }));
+}
+
+function pressRowLabel(r) {
+  return r.role === "self" ? `${r.outlet_name} (its own press)` : r.outlet_name;
+}
+
+function pressGroup(p, cc, name) {
+  const rows = p.rows.filter((r) => r.about === cc);
+  const read = rows.filter((r) => r.cadence !== "thin").sort((a, b) => b.median_day - a.median_day);
+  const thin = rows.filter((r) => r.cadence === "thin").sort((a, b) => b.median_week - a.median_week);
+  if (!read.length && !thin.length) return null;
+  return h("div", { class: "rel-pair" },
+    h("div", { class: "rel-head" }, h("strong", null, read.some((r) => r.role === "self") && read.length === 1 ? `${name} on itself` : `On ${name}`)),
+    read.length
+      ? h("table", { class: "rel-table" },
+        h("thead", null, h("tr", null, h("th", null, "Outlets in"), h("th", null, "A day"), h("th", null, "Tone, 7 days"),
+          h("th", { class: "hide-sm" }, "Read"), h("th", { class: "hide-sm" }, "Articles a day"))),
+        h("tbody", null, read.map((r) => h("tr", null,
+          h("td", null, pressRowLabel(r)),
+          r.cadence === "daily"
+            ? h("td", { title: "Median articles a day over the last 28 complete days" }, String(Math.round(r.median_day)))
+            : h("td", { title: "Median 7-day total over the last 28 complete days, divided by 7" }, (r.median_week / 7).toFixed(1)),
+          h("td", null, tone2(r.tone_7d), " ", baseNote(r.z_tone_7d, r.base_tone_7d, tone2)),
+          h("td", { class: "hide-sm" }, CADENCE[r.cadence]),
+          h("td", { class: "hide-sm spark-cell" }, pressSpark(r, p))))))
+      : null,
+    thin.length
+      ? h("p", { class: "muted small" }, "Too few to read: ",
+        thin.map((r) => `${pressRowLabel(r)} (${(r.median_week / 7).toFixed(1)} a day)`).join(", "), ".")
+      : null);
+}
+
+function pressPanel(p) {
+  if (!p) return [h("p", { class: "muted" }, "No press rows for this zone: no outside outlet country reaches 8 articles a day on it.")];
+  if (!p.days.length) return [h("p", { class: "muted" }, "No press tone built for this zone yet.")];
+  const groups = [...p.about.map((a) => [a.cc, a.name])];
+  for (const r of p.rows) if (!groups.some(([cc]) => cc === r.about)) groups.push([r.about, r.about_name]);
+  return [
+    h("p", { class: "muted small" }, `${dayLabel(p.days[0])} to ${dayLabel(p.end)}. Tone is the latest 7 complete days; a "4-wk avg" badge marks a week far from that outlet country's own four weeks before.`),
+    h("div", { class: "panel" }, groups.map(([cc, name]) => pressGroup(p, cc, name))),
+  ];
+}
+
 async function viewZone(id, params) {
   setNav("home");
   const ents = await entities();
@@ -511,6 +572,7 @@ async function viewZone(id, params) {
   const suiteBox = h("div", null, h("p", { class: "muted small" }, "Loading reports from the other programs…"));
   const isZone = ents.zones.some((e) => e.id === id);
   const relBox = isZone ? h("div", null, h("p", { class: "muted small" }, "Loading relations…")) : null;
+  const pressBox = isZone ? h("div", null, h("p", { class: "muted small" }, "Loading press tone…")) : null;
   show(
     h("p", { class: "small" }, h("a", { href: `#/?day=${days.days.includes(day) ? day : days.days[0] || ""}` }, "← All zones")),
     h("h1", null, ent.name),
@@ -537,6 +599,11 @@ async function viewZone(id, params) {
         "Conflict share is the share carrying a verbal (accuse, demand, reject, threaten) or material conflict event; Goldstein runs from −10 (most conflictual) to +10; tone is GDELT's score of the article text. ",
         "A day is flagged when a count is far above its own previous four weeks (z ≥ 2.5, at least 5 articles). GDELT often gets direction and partner wrong, so read each pair both ways; it carries no wire services. Display only, not a warning."),
       relBox,
+      h("h2", null, `How other countries' press covers ${ent.name}`),
+      h("p", { class: "muted small" }, "GDELT articles whose most-mentioned country is one of this zone's, by the country of the outlet (GDELT's 2018 outlet table, with fixes). ",
+        "Tone is GDELT's dictionary score of the article text. It runs differently by language and outlet, so read each outlet country only against its own past, never one country against another. ",
+        "Rows under 8 articles a day are read by the week; GDELT carries no wire services and samples non-English press. Display only, not a warning."),
+      pressBox,
     ] : null,
     h("h2", null, "From the suite"),
     h("p", { class: "muted small" }, "What The Intelligence Company's other programs report now for this zone's countries or this topic: travel advisories, embassy posture, airspace and navigational warnings (",
@@ -550,8 +617,14 @@ async function viewZone(id, params) {
   );
   if (relBox) {
     get(`/relations?zone=${encodeURIComponent(id)}&day=${encodeURIComponent(day)}`)
-      .then((r) => relBox.replaceChildren(...relationsPanel({ ...r, asked: day }).filter(Boolean)))
-      .catch((e) => relBox.replaceChildren(h("p", { class: "muted" }, e.status === 404 ? "No relations built for this zone yet." : "Relations could not be loaded just now.")));
+      .then((r) => {
+        relBox.replaceChildren(...relationsPanel({ ...r, asked: day }).filter(Boolean));
+        pressBox.replaceChildren(...pressPanel(r.press).filter(Boolean));
+      })
+      .catch((e) => {
+        relBox.replaceChildren(h("p", { class: "muted" }, e.status === 404 ? "No relations built for this zone yet." : "Relations could not be loaded just now."));
+        pressBox.replaceChildren(h("p", { class: "muted" }, e.status === 404 ? "No press tone built for this zone yet." : "Press tone could not be loaded just now."));
+      });
   }
   get(`/suite?entity=${encodeURIComponent(id)}`)
     .then((s) => suiteBox.replaceChildren(...suitePanel(s, day !== days.today).filter(Boolean)))
