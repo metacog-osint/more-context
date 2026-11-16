@@ -2,8 +2,16 @@
 
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
-## Where things stand (16 Nov 2026, about 10:30 AM CST)
-- **z calibration: decided and built, not committed or deployed (16 Nov 2026).** Tom picked the recommended option
+## Where things stand (16 Nov 2026, about 12:10 PM CST)
+- **z calibration: live (16 Nov 2026).** Each step on Tom's yes: `ea3a2cb` merged to `main` as `0c5d8db` through
+  PR #2 (CI passed). `mc-ingest-00026-fur` (17:35 UTC) and `mc-api-00024-tob` (17:36 UTC) deployed from a clean
+  archive of `0c5d8db` on C:, env vars checked separate (`MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); `/feed`
+  serves `watchfloor-feed-1.1` (15 Nov: 46 items, none dropped; zone-country items carry no hypothesis). Website
+  deployed 18:02 UTC from the same archive after checking the last release (17:28 UTC; its shared files equalled
+  `0c5d8db`): all 12 files under `web/` equal the commit, CSP and noindex kept. `63f1fbc` (another session's house
+  bar v2.1) is on `main` but was not in that deploy. The 16 Nov build (about 03:15 UTC 17 Nov) is the first scored
+  with the calibrated z; days built earlier keep the old z and the plain "z" wording until the rescore.
+- **z calibration: decided and built (16 Nov 2026).** Tom picked the recommended option
   on all four problems in `docs/method/2026-11-16-z-calibration.md` (option C for countries, B for zones, zone violence
   and pair counts; ratio floor max(expected, 90-day median, 3); zone-country `/feed` items neutral, no hypothesis;
   T2 for press tone and the pairs' 7-day values). Built on branch `method/z-calibration` in
@@ -11,7 +19,7 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
   `relations.py`, `press.py`, `feed_v2.py` (`watchfloor-feed-1.1`), `web/app.js`, `tests/test_zstats.py`; the doc's
   last section lists what was built and where it departs from the proposal. The same branch carries next steps 7
   and 8 (below). 219 of 258 tests pass; the 39 failures are `tests.test_match` as on main. Not built: the rescore of
-  stored days' scores. Prototype scripts in `scripts/zcal/` (uncommitted); their data copies are in `%TEMP%\zcal` on C:.
+  stored days' scores. Prototype scripts in `scripts/zcal/`; their data copies are in `%TEMP%\zcal` on C:.
 - **Suite-review fixes: live (16 Nov 2026).** `f42898b`, merged to `main` as `8dbdcf2` through PR #1 (CI passed),
   each step on Tom's yes. `mc-ingest-00025-xox` (15:33 UTC) and `mc-api-00023-req` (15:35 UTC) deployed from a clean
   archive of `8dbdcf2`, env vars checked separate (`MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); the 15:35 UTC run
@@ -159,9 +167,9 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
    draft for Tom's own charters.
 4. October usage totals (Class A and BigQuery), carried from 4 Nov.
 5. `backfill_relations.py --bucket` token refresh: done, on `main` (16 Nov).
-6. z calibration: options picked 16 Nov (above). Waiting: commit, push and PR of `method/z-calibration`; deploy of
-   both functions and the website; then a rescore of stored days (`--check`, a dry run on a copy, Tom's yes for
-   `--write`). Each on its own yes.
+6. z calibration: live 16 Nov (above). Waiting: a rescore of stored days (script not written; `--check`, a dry run
+   on a copy, Tom's yes for `--write`), and whether to remove the merged worktrees (watchfloor-press,
+   watchfloor-review-fixes, watchfloor-day-precision, watchfloor-tt14, watchfloor-contrast, watchfloor-z-calibration).
 
 ## Next steps, in order
 1. Press tone is display only: Tom reads the zone pages' press tables for a month (from 16 Nov) before any flag,
