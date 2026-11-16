@@ -20,7 +20,7 @@ from the cycle's kind=press rows); the series keeps the zones' press rows beside
 On read (`zone_view`), per pair and direction: daily articles, verbal and material conflict articles, conflict
 share, mean Goldstein and tone; z of the daily counts against the series' own previous 28 complete days
 (`measures.attention_anomaly`, log and weekday-adjusted, as for zone attention); 7-day conflict share, Goldstein
-and tone with z against the four weeks before. A pair-day is flagged when a count's z >= FLAG_Z on at least
+and tone, article-weighted, with z against the 21 days before the week (zstats.weighted_window_z, T2, 16 Nov 2026). A pair-day is flagged when a count's z >= FLAG_Z on at least
 FLAG_MIN articles (probe: 20 of 26 dated Korean events caught, 18 of 20 unlisted flags real news). Display only:
 no alarm, no feed item, until Tom sets thresholds after a month of reading.
 
@@ -32,12 +32,12 @@ from __future__ import annotations
 
 import json
 import math
-from bisect import bisect_left, bisect_right
+from bisect import bisect_left
 from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
 
-from . import measures, press as press_mod
+from . import measures, press as press_mod, zstats
 
 CATALOG = Path(__file__).resolve().parent.parent / "catalog" / "relations.json"
 VEC = ("urls", "u1", "u2", "u3", "u4", "uconf", "gold", "tone", "uroot")
@@ -51,7 +51,8 @@ SERIES_DAYS = 120
 FILES_PER_STREAM, MIN_FILE_SHARE = 96, 0.9
 FLAG_Z, FLAG_MIN = 2.5, 5
 WINDOW, WINDOW_BASE = 7, 28
-FLOORS = {"conflict_share_7d": 0.03, "goldstein_7d": 0.3, "tone_7d": 0.3}
+FLOORS = {"conflict_share_7d": 0.03, "goldstein_7d": 0.3, "tone_7d": 0.3}  # on the daily value's SD
+WINDOW_IDX = {"conflict_share_7d": 5, "goldstein_7d": 6, "tone_7d": 7}    # their sums in VEC
 
 
 # ---------------------------------------------------------------- per file
@@ -239,20 +240,10 @@ def _pstdev(xs: list[float]) -> float:
 
 
 def _z_logs(y: list[float], w: list[int], y0: float, wd0: int) -> float | None:
-    """The z of measures.attention_anomaly from log counts `y` on weekdays `w` (the baseline days) and today's log
-    count `y0` on weekday `wd0`."""
-    n = len(y)
-    if n < measures.MIN_BASELINE_DAYS:
-        return None
-    level = math.fsum(y) / n
-    sums, cnt = [0.0] * 7, [0] * 7
-    for v, k in zip(y, w):
-        sums[k] += v
-        cnt[k] += 1
-    adj = [sums[k] / cnt[k] - level if cnt[k] >= 2 else 0.0 for k in range(7)]
-    resid = [v - level - adj[k] for v, k in zip(y, w)]
-    sd = max(_pstdev(resid), measures.SD_FLOOR)
-    return round((y0 - level - adj[wd0]) / sd, 2)
+    """The z of measures.attention_anomaly (option B, zstats.predictive_z) from log counts `y` on weekdays `w` (the
+    baseline days) and today's log count `y0` on weekday `wd0`."""
+    r = zstats.predictive_z(y, w, y0, wd0)
+    return None if r is None else round(r["z"], 2)
 
 
 def anomaly_z(history: dict[date, float], day: date, count: float) -> float | None:
@@ -265,20 +256,18 @@ def anomaly_z(history: dict[date, float], day: date, count: float) -> float | No
                    day.weekday())
 
 
-def _window_z(dates: list[date], vals: list[float], x: float | None, day: date,
+def _window_z(daily: dict[date, list], complete: set[date], day: date, idx: int,
               floor: float) -> tuple[float, float] | None:
-    """(z, baseline mean) of the 7-day value `x` ending `day` against the 7-day values ending 7-34 days before
-    (none overlaps this week); `dates` sorted, `vals` alongside. Those baseline windows overlap each other, so their
-    spread understates week-to-week change and the z runs large: the page shows the baseline mean, not the z."""
-    if x is None:
+    """(z, baseline mean) of the 7-day value ending `day` (vector index `idx` over articles, VEC[0]) against the 21
+    days before the week, article-weighted, T2 (zstats.weighted_window_z; Tom's pick, 16 Nov 2026). The old z
+    compared overlapping 7-day windows and ran large (|z| >= 2.5 on 12.6% of pair-days)."""
+    week = [day - timedelta(days=k) for k in range(WINDOW)]
+    if not all(d in complete for d in week):
         return None
-    lo = bisect_left(dates, day - timedelta(days=WINDOW + WINDOW_BASE - 1))
-    hi = bisect_right(dates, day - timedelta(days=WINDOW))
-    base = vals[lo:hi]
-    if len(base) < WINDOW_BASE // 2:
-        return None
-    m = _mean(base)
-    return round((x - m) / max(_pstdev(base), floor), 2), round(m, 3)
+    base = [day - timedelta(days=k) for k in range(WINDOW + zstats.TONE_BASE_DAYS - 1, WINDOW - 1, -1)]
+    pick = lambda d: (daily[d][0], daily[d][idx]) if d in complete and daily.get(d) else (0, 0.0)  # noqa: E731
+    r = zstats.weighted_window_z([pick(d) for d in week], [pick(d) for d in base], floor)
+    return None if r is None else (round(r["z"], 2), round(r["base"], 3))
 
 
 def direction_rows(daily: dict[date, list], complete: set[date], dates: list[date],
@@ -293,10 +282,6 @@ def direction_rows(daily: dict[date, list], complete: set[date], dates: list[dat
         if all(w in complete for w in win):
             w = _derive(_sum([daily[x] for x in win]))
             w7[d] = {"conflict_share_7d": w["conflict_share"], "goldstein_7d": w["goldstein"], "tone_7d": w["tone"]}
-    wins = {}
-    for m in FLOORS:
-        ds = [d for d in sorted(w7) if w7[d][m] is not None]
-        wins[m] = (ds, [w7[d][m] for d in ds])
     logs = {m: [math.log1p(x) for x in vs] for m, vs in counts.items()}
     wds = [d.weekday() for d in comp]
     out = {}
@@ -309,8 +294,8 @@ def direction_rows(daily: dict[date, list], complete: set[date], dates: list[dat
                 row[f"z_{m}"] = _z_logs(ys[lo:hi], wds[lo:hi], ys[hi], wds[hi])
         if d in w7:
             row.update(w7[d])
-            for m in FLOORS:
-                zb = _window_z(*wins[m], w7[d][m], d, FLOORS[m])
+            for m, idx in WINDOW_IDX.items():
+                zb = _window_z(daily, complete, d, idx, FLOORS[m])
                 row[f"z_{m}"], row[f"base_{m}"] = zb if zb else (None, None)
         out[d] = row
     return out

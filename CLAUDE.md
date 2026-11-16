@@ -254,7 +254,16 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   on, but the day goes into `state.stories.countries_retry` and is rebuilt (countries, violent events, then
   relations) on a later run that has no day to build: one day a run, one try an hour, six tries, then
   `countries_failed` (rebuild by hand with `scripts/backfill_events.py`). Until then `/feed` for that day has no
-  country items and no partial flag (`pipeline/feed_v2.py`; left for later, see `HANDOFF.md`).
+  country items; on the z-calibration branch it is marked `partial_day` and says "no country data".
+- **z calibration (Tom's picks, 16 Nov 2026; `docs/method/2026-11-16-z-calibration.md`; branch
+  `method/z-calibration`, not yet live):** every z is normal-equivalent (`pipeline/zstats.py`). Countries: option C
+  (`robust-1`: pooled weekday shape for all countries that day, median centre, MAD scale with a Poisson floor, Student
+  t). Zones, zone violence and pair counts: option B (`pred-1`: own weekday means, residual SD on its degrees of
+  freedom, predictive term, t). Press tone and the pairs' 7-day values: T2 (article-weighted week against the 21 days
+  before, daily-tone SD with autocorrelation inflation, t). Scores carry `z_method`; titles and badges use
+  `ratio_shown` = count / max(expected, 90-day median, 3) and say "usually 3 or fewer" when `floored`. Thresholds
+  are unchanged (Rising z 2.5, alarm z 2.0). Before it, the live z ran about 1.3x large (z >= 2.5 on about 3% of
+  event-free country-days). Zone-country `/feed` items are neutral, with no hypothesis, until the charters.
 - Zone violence replaces the casualty share: violent events placed inside the zone (`countries`, or `violence`
   for Russia-NATO: NATO states + Kaliningrad RS23) in articles whose headline names the zone, z against 28 days.
   Display only, not an alarm reason (yet). The map's event layer (`/violent?zone=`) shows the same events the
@@ -299,7 +308,8 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   read gives one `kind: "press"` row (articles and tone sums per outlet country > subject country, from V2 enhanced
   locations and GDELT's 2018 domain table, trimmed to `catalog/press_domains.tsv`, fixed by
   `catalog/press_outlets.json`; 2026-11-16.2 adds `sputnik.af` as Russia and the Finnish government sites
-  `valtioneuvosto.fi`, `puolustusvoimat.fi`, `raja.fi` as null); the daily build sums them into the `press` part of `relations.json` and the series,
+  `valtioneuvosto.fi`, `puolustusvoimat.fi`, `raja.fi` as null; 2026-11-16.3, on the z-calibration branch, codes
+  `sputniknews.cn` and `sputnik-georgia.com` as Russia); the daily build sums them into the `press` part of `relations.json` and the series,
   and `/relations` serves them as `press`. Zone blocks (Tom's picks) are `press` in `catalog/relations.json`.
   Checks, picks and what was built: `docs/relations/2026-11-15-press-outlets.md`. Display only. History:
   `scripts/backfill_relations.py --press` (full GKG days, about 1.3 GB and 2-4 minutes each; Tom's yes for bucket writes). The

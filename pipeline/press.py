@@ -12,18 +12,19 @@ the `press` section of `stories/YYYY/MM/DD/relations.json` and puts the zones' r
 (pipeline/relations.py), so no new writes.
 
 On read (`zone_view`): per row (outlet country > subject country), daily main-subject articles, the 7-day mean tone
-and its z against the 7-day values of the four weeks before (as for the pairs; those windows overlap, so the z runs
-large and the page shows the baseline mean). Each outlet country is read only against its own past: tone is a
+and its z against the 21 days before the week, article-weighted (T2, pipeline/zstats.py, 16 Nov 2026; the earlier
+z compared overlapping 7-day windows and ran large: UK press on Ukraine read 10.2 on 15 Nov, 3.0 under T2). Each outlet country is read only against its own past: tone is a
 dictionary score that differs by language and outlet mix. Display only: no flags, alarms or feed items until Tom
 has read it for a month.
 """
 from __future__ import annotations
 
 import json
-from bisect import bisect_left, bisect_right
 from datetime import date, timedelta
 from functools import lru_cache
 from pathlib import Path
+
+from . import zstats
 
 CATALOG_DIR = Path(__file__).resolve().parent.parent / "catalog"
 DOMAINS = CATALOG_DIR / "press_domains.tsv"
@@ -35,7 +36,8 @@ DAILY_MIN = 8  # median main-subject articles a day to read a row daily (the pla
 WEEKLY_MIN = 14  # median 7-day total to read a row weekly; below that it is listed as too thin
 TONE_MIN_7D = 10  # a 7-day tone needs at least this many articles
 WINDOW, WINDOW_BASE = 7, 28
-TONE_FLOOR = 0.3
+TONE_FLOOR = 0.3  # on the SD of daily tone
+Z_MIN_WEEK_THIN = 30  # a weekly or thin row shows its 7-day z only from this many articles in the week
 UNKNOWN_TOP_FILE, UNKNOWN_TOP_DAY = 10, 50  # unknown-outlet domains kept per file and per day
 
 
@@ -240,29 +242,27 @@ def _week(daily: dict[date, list], d: date, complete: set[date]) -> tuple[int, f
 def row_view(daily: dict[date, list], complete: set[date], dates: list[date], shown: list[date]) -> dict:
     """Daily main-subject articles and tone over `shown`, the 7-day tone at the last shown day with its z and
     baseline mean, and the row's cadence (daily, weekly or thin) from its last 28 complete days."""
-    from .relations import _mean, _pstdev
     end = shown[-1]
     recent = [d for d in dates if d in complete and end - timedelta(days=WINDOW_BASE) < d <= end]
     med_day = _median([daily[d][2] for d in recent])
     weeks = [w[0] for d in recent if (w := _week(daily, d, complete))]
     med_week = _median(weeks)
     cadence = "daily" if recent and med_day >= DAILY_MIN else "weekly" if weeks and med_week >= WEEKLY_MIN else "thin"
-    w7: dict[date, float] = {}
-    for d in dates:
-        w = _week(daily, d, complete)
-        if w and w[0] >= TONE_MIN_7D:
-            w7[d] = w[1] / w[0]
-    wd = sorted(w7)
     tone_7d = z = base = None
     last = _week(daily, end, complete)
-    if end in w7:
-        tone_7d = round(w7[end], 2)
-        lo = bisect_left(wd, end - timedelta(days=WINDOW + WINDOW_BASE - 1))
-        hi = bisect_right(wd, end - timedelta(days=WINDOW))
-        b = [w7[x] for x in wd[lo:hi]]
-        if len(b) >= WINDOW_BASE // 2:
-            base = round(_mean(b), 2)
-            z = round((w7[end] - _mean(b)) / max(_pstdev(b), TONE_FLOOR), 2)
+    if last and last[0] >= TONE_MIN_7D:
+        tone_7d = round(last[1] / last[0], 2)
+        # T2 (zstats.weighted_window_z; Tom's pick, 16 Nov 2026): article-weighted week against the 21 days before
+        # it, daily-tone SD with autocorrelation inflation, Student t. A weekly or thin row shows its z only on a
+        # week of Z_MIN_WEEK_THIN articles or more (its daily tones are too few to judge a smaller week).
+        pick = lambda d: (daily[d][2], daily[d][3]) if d in complete and d in daily else (0, 0.0)  # noqa: E731
+        week = [end - timedelta(days=k) for k in range(WINDOW)]
+        before = [end - timedelta(days=k) for k in range(WINDOW + zstats.TONE_BASE_DAYS - 1, WINDOW - 1, -1)]
+        r = zstats.weighted_window_z([pick(d) for d in week], [pick(d) for d in before], TONE_FLOOR)
+        if r:
+            base = round(r["base"], 2)
+            if cadence == "daily" or last[0] >= Z_MIN_WEEK_THIN:
+                z = round(r["z"], 2)
     return {"cadence": cadence, "median_day": round(med_day, 1), "median_week": round(med_week, 1),
             "articles": [daily[d][2] for d in shown],
             "tone": [round(daily[d][3] / daily[d][2], 2) if daily[d][2] else None for d in shown],
