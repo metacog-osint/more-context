@@ -657,7 +657,7 @@ function viewAbout() {
   const li = (...t) => h("li", null, ...t);
   show(h("div", { class: "prose" },
     h("h1", null, "About Watchfloor"),
-    h("p", { class: "lede" }, "Watchfloor turns publicly available news into a daily picture of 15 conflict zones and 5 strategic topics, built to answer two questions: did something change, and how is each side telling it?"),
+    h("p", { class: "lede" }, "Watchfloor turns publicly available news into a daily picture of the conflict zones and strategic topics on its watch list, built to answer two questions: did something change, and how is each side telling it?"),
     h("h2", null, "How it works"),
     h("ul", null,
       li("Every 15 minutes it reads GDELT's article files (English and machine-translated), its main source."),

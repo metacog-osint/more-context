@@ -1,5 +1,5 @@
 {
- "version": "2026-11-16.1",
+ "version": "2026-11-16.2",
  "notes": [
   "Fixes to catalog/press_domains.tsv (GDELT's 2018 domain table) for the press-tone layer (pipeline/press.py). A domain maps to a FIPS country code, or to null: counted as an unknown outlet, never assigned.",
   "State media abroad keep their sponsoring state, as the 2018 table does for sputniknews.com and rt.com: RT and Sputnik regional sites are Russia, Press TV's UK site is Iran.",
@@ -26,7 +26,7 @@
   "bigmir.net": "UP", "unn.ua": "UP",
   "andhrajyothy.com": "IN",
   "tass.com": "RS", "actualidad-rt.com": "RS", "rtarabic.com": "RS", "sputnikglobe.com": "RS",
-  "sputnikportal.rs": "RS", "anlatilaninotesi.com.tr": "RS", "noticiaslatam.lat": "RS",
+  "sputnikportal.rs": "RS", "anlatilaninotesi.com.tr": "RS", "noticiaslatam.lat": "RS", "sputnik.af": "RS",
   "presstv.co.uk": "IR",
   "mignews.com": "IS",
   "dnews.gr": "GR", "emakedonia.gr": "GR",
@@ -41,7 +41,8 @@
   "dol.com.br": "BR",
   "pan.am": "AM",
   "canal26.com": "AR", "diarioelargentino.com": "AR",
-  "top-channel.tv": "AL"
+  "top-channel.tv": "AL",
+  "valtioneuvosto.fi": null, "puolustusvoimat.fi": null, "raja.fi": null
  },
  "overrides_why": {
   "aljazeera": "The 2018 table puts aljazeera.com in the US and aljazeera.net in Israel; Al Jazeera is Qatari (Qatar showed about 1.4 articles a day before this fix).",
@@ -51,6 +52,8 @@
   "euronews.com": "European broadcaster (Lyon and Brussels newsrooms, many languages); coded US in the 2018 table; left unassigned.",
   "motorward.com": "Arabic car site coded US; the largest US-coded translation-stream domain on 13 Nov 2026 (450 articles); left unassigned.",
   "Latin America": "Costa Rican, Dominican, Puerto Rican (FIPS RQ), Peruvian, Venezuelan, Salvadoran and Ecuadorian outlets coded US in the 2018 table (13 Nov 2026 translation stream).",
+  "sputnik.af": "Sputnik's Afghanistan site; not in catalog/press_domains.tsv, so it counted as an outlet with no country; Russia like the other Sputnik sites (16 Nov 2026).",
+  "valtioneuvosto.fi, puolustusvoimat.fi, raja.fi": "Finnish Government, Defence Forces and Border Guard pages: government publications, not press, so left unassigned (16 Nov 2026). A burst of them made 21 Oct 2026 8.2% no-country articles (3,787, 1,079 and 377).",
   "unknowns": "The largest outlets with no country in the 2018 table, 6-12 Nov 2026 sample (unn.ua, dnews.gr, ici.fr, inews24.com and others); unclear ones were left out."
  }
 }

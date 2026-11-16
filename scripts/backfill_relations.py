@@ -11,7 +11,12 @@ skipped unless --force. About 20 MB of downloads and 10-25 s a day.
 gcloud user's token (`gcloud auth print-access-token`; never printed), so it runs on Tom's laptop without the
 google-cloud-storage package: one write per day plus one for the series (Class A), and up to 120 reads to rebuild
 the series. Objects are gzip with Content-Encoding gzip, like pipeline/sinks.py. Writes to the live bucket: Tom's
-yes first.
+yes first. The token lasts an hour: it is fetched again after TOKEN_MAX_AGE, and once more on an HTTP 401, so a long
+run no longer stops part way (16 Nov 2026: a 401 at 05:29 UTC lost 5 Nov). A day's line prints after its write.
+
+The series is always rebuilt to the last stored day (the later of --end, the live series' last day and any stored
+relations.json after it), never cut back to --end: on 16 Nov 2026 a re-run of 5 Nov alone ended the live series on
+5 Nov for 80 s. --end bounds only the days the run (re)builds.
 
     python -I scripts/backfill_relations.py --bucket more-context-484804 --start 2026-11-15 --end 2026-11-15 --force
 
@@ -49,16 +54,27 @@ from pipeline.sinks import LocalSink  # noqa: E402
 STREAMS = ("english", "translation")
 API = "https://storage.googleapis.com"
 GZIP_MAGIC = bytes([0x1F, 0x8B])
+TOKEN_MAX_AGE = 45 * 60  # seconds; gcloud's access tokens last an hour
+
+
+def gcloud_token() -> str:
+    gcloud = shutil.which("gcloud") or shutil.which("gcloud.cmd")
+    return subprocess.run([gcloud, "auth", "print-access-token"], capture_output=True,
+                          text=True).stdout.strip() if gcloud else ""
 
 
 class TokenSink:
-    """The few sink calls the backfill needs, over the storage JSON API with the gcloud user's token."""
+    """The few sink calls the backfill needs, over the storage JSON API with the gcloud user's token (never
+    printed), fetched again before it expires and on a 401."""
 
-    def __init__(self, bucket: str):
+    def __init__(self, bucket: str, fetch_token=gcloud_token, urlopen=urllib.request.urlopen, clock=time.monotonic):
         self.bucket = bucket
-        gcloud = shutil.which("gcloud") or shutil.which("gcloud.cmd")
-        self.token = subprocess.run([gcloud, "auth", "print-access-token"], capture_output=True,
-                                    text=True).stdout.strip() if gcloud else ""
+        self._fetch, self._urlopen, self._clock = fetch_token, urlopen, clock
+        self._refresh()
+
+    def _refresh(self) -> None:
+        self.token = self._fetch()
+        self.token_at = self._clock()
         if not self.token:
             sys.exit("gcloud auth print-access-token gave nothing: run gcloud auth login")
 
@@ -66,8 +82,18 @@ class TokenSink:
         return f"{API}/storage/v1/b/{self.bucket}/o/" + urllib.parse.quote(key, safe="")
 
     def _open(self, req: urllib.request.Request):
+        if self._clock() - self.token_at >= TOKEN_MAX_AGE:
+            self._refresh()
         req.add_header("Authorization", "Bearer " + self.token)
-        return urllib.request.urlopen(req, timeout=120)
+        try:
+            return self._urlopen(req, timeout=120)
+        except urllib.error.HTTPError as e:
+            if e.code != 401:
+                raise
+            e.close()
+        self._refresh()  # expired or revoked early: one more try with a new token
+        req.add_header("Authorization", "Bearer " + self.token)
+        return self._urlopen(req, timeout=120)
 
     def exists(self, key: str) -> bool:
         try:
@@ -151,6 +177,16 @@ def merge_press(d: date, old: dict | None, press_recs: list[dict]) -> dict:
     return rec
 
 
+def series_end(sink, end: date, today: date) -> date:
+    """The last stored day: the later of `end` and the live series' last day, then any stored relations.json after
+    it up to `today` (a day built since the series was written)."""
+    days = (sink.read_json(relations.SERIES_KEY) or {}).get("days") or {}
+    last = max([end] + [date.fromisoformat(d) for d in days])
+    while last < today and sink.exists(f"stories/{last + timedelta(days=1):%Y/%m/%d}/relations.json"):
+        last += timedelta(days=1)
+    return last
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--start")
@@ -190,20 +226,22 @@ def main() -> int:
                     recs, failed = day_recs(ex, d, until, _press_file)
                     rec = merge_press(d, old, recs)
                     p = rec["press"]
-                    print(f"{d}: press {p['files']} files, {failed} failed, {len(p['t'])} rows, {p['articles']} "
-                          f"articles ({p['unknown']} unknown outlet), {'partial' if p['partial'] else 'complete'}, "
-                          f"{time.time() - t0:.0f} s", flush=True)
+                    line = (f"{d}: press {p['files']} files, {failed} failed, {len(p['t'])} rows, {p['articles']} "
+                            f"articles ({p['unknown']} unknown outlet), {'partial' if p['partial'] else 'complete'}")
                 else:
                     recs, failed = day_recs(ex, d, until)
                     rec = relations.day_table(d, recs)
                     if old and "press" in old:  # a pairs re-run keeps the day's press section
                         rec["press"] = old["press"]
-                    print(f"{d}: {rec['files']} files, {failed} failed, {len(rec['pairs'])} pairs, "
-                          f"{'partial' if rec['partial'] else 'complete'}, {time.time() - t0:.0f} s", flush=True)
+                    line = (f"{d}: {rec['files']} files, {failed} failed, {len(rec['pairs'])} pairs, "
+                            f"{'partial' if rec['partial'] else 'complete'}")
                 sink.write_json(key, rec)
+                print(f"{line}, {time.time() - t0:.0f} s, written", flush=True)  # only once the write succeeded
                 d += timedelta(days=1)
-    s = relations.rebuild_series(sink, end)
-    print(f"series: {len(s['days'])} days, {sum(len(v['pairs']) for v in s['days'].values())} pair-days", flush=True)
+    last = series_end(sink, end, datetime.now(timezone.utc).date())
+    s = relations.rebuild_series(sink, last)
+    print(f"series to {last}: {len(s['days'])} days, {sum(len(v['pairs']) for v in s['days'].values())} pair-days",
+          flush=True)
     return 0
 
 

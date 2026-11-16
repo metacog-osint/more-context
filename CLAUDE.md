@@ -241,6 +241,20 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   (violence: 15). Elevated: >= 2x the 90-day median. Country names: `catalog/fips_countries.json` (FIPS 10-4, as
   GDELT; "RI" is Serbia, "CG" DR Congo, "NG" Niger, "NI" Nigeria). Codes for non-countries ("OS", oceans) are
   never listed. Violence leads the page; attention is noisier (GDELT geocodes names).
+- **Serbia has two GDELT codes (fixed 16 Nov 2026, branch `watchfloor-review-fixes`):** Belgrade is placed as
+  "Belgrade, Serbia (general)", ADM1 RB00, under `RB`, a code missing from GDELT's own FIPS list and from the catalog,
+  so 40-50% of Serbia's articles were scored but never listed, fed or mapped (28 Oct: RI 444, RB 400). `events.FOLD`
+  counts RB as RI when a record is made, and `countries.totals` / `history` fold again on read, so stored records
+  and days count too. Guinea-Bissau (PU), Sao Tome (TP), Turks and Caicos (TK) and St Kitts (SC) were added (names
+  from GDELT's `FIPS.country.txt`; ISO and label points by `scripts/build_fips_iso.py`). `countries.json` now
+  carries `uncatalogued` (codes with 15+ articles and no name), and `tests/test_country_codes.py` fails when a busy
+  code in `tests/gdelt_codes.json` (28 Oct counts and GDELT's list) has no catalog entry. GDELT's press domain table
+  also uses RB, for Bosnian Serb outlets (rtrs.tv, glassrpske.com): not folded, press outlets are a separate table.
+- **A failed country build is retried (16 Nov 2026, same branch):** the day's story build still moves `last_day`
+  on, but the day goes into `state.stories.countries_retry` and is rebuilt (countries, violent events, then
+  relations) on a later run that has no day to build: one day a run, one try an hour, six tries, then
+  `countries_failed` (rebuild by hand with `scripts/backfill_events.py`). Until then `/feed` for that day has no
+  country items and no partial flag (`pipeline/feed_v2.py`; left for later, see `HANDOFF.md`).
 - Zone violence replaces the casualty share: violent events placed inside the zone (`countries`, or `violence`
   for Russia-NATO: NATO states + Kaliningrad RS23) in articles whose headline names the zone, z against 28 days.
   Display only, not an alarm reason (yet). The map's event layer (`/violent?zone=`) shows the same events the
@@ -274,16 +288,18 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   `scripts/backfill_relations.py` (free GDELT download; `--bucket` reads and writes the live bucket with the gcloud
   user's token, no storage library needed, Tom's yes first; `--series-only` rebuilds the series after a catalog
   change). 18 Jul-14 Nov were backfilled into the bucket on 15 Nov (120 days, all complete). 15 Nov was redone
-  complete at 04:22 UTC 16 Nov (`--force`), which also rebuilt the series. `--bucket` fetches one gcloud token at
-  the start and it expires after an hour (HTTP 401; the day's line prints before its write, so check the last day):
-  keep runs to about 10 press days. Every run rebuilds the series to its `--end`: after a run of earlier days,
-  run `--series-only --end <last built day>` (a 5 Nov re-run cut the live series to 5 Nov for 80 s on 16 Nov).
+  complete at 04:22 UTC 16 Nov (`--force`), which also rebuilt the series. Since branch `watchfloor-review-fixes`
+  (16 Nov 2026; until it is merged, the old rules hold: one token an hour, series to `--end`): `--bucket` fetches the
+  gcloud token again after 45 minutes and once more on an HTTP 401, a day's line prints only after its write, and
+  the series is rebuilt to the last stored day (the later of `--end`, the live series' last day and any stored day
+  after it), so re-running an earlier day no longer cuts the live series short (a 5 Nov re-run did, for 80 s).
 - **Press tone by outlet country** (`pipeline/press.py`, `e6c617c`; live since 01:50 UTC 16 Nov 2026 as
   `mc-ingest-00024-baf` and `mc-api-00021-bat`, deployed 01:49-01:52 UTC from a clean archive, env vars checked;
   website deployed 04:28 UTC; history backfilled 19 Oct-15 Nov): each GKG file
   read gives one `kind: "press"` row (articles and tone sums per outlet country > subject country, from V2 enhanced
   locations and GDELT's 2018 domain table, trimmed to `catalog/press_domains.tsv`, fixed by
-  `catalog/press_outlets.json`); the daily build sums them into the `press` part of `relations.json` and the series,
+  `catalog/press_outlets.json`; 2026-11-16.2 adds `sputnik.af` as Russia and the Finnish government sites
+  `valtioneuvosto.fi`, `puolustusvoimat.fi`, `raja.fi` as null); the daily build sums them into the `press` part of `relations.json` and the series,
   and `/relations` serves them as `press`. Zone blocks (Tom's picks) are `press` in `catalog/relations.json`.
   Checks, picks and what was built: `docs/relations/2026-11-15-press-outlets.md`. Display only. History:
   `scripts/backfill_relations.py --press` (full GKG days, about 1.3 GB and 2-4 minutes each; Tom's yes for bucket writes). The
