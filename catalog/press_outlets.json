@@ -1,5 +1,5 @@
 {
- "version": "2026-11-16.2",
+ "version": "2026-11-16.3",
  "notes": [
   "Fixes to catalog/press_domains.tsv (GDELT's 2018 domain table) for the press-tone layer (pipeline/press.py). A domain maps to a FIPS country code, or to null: counted as an unknown outlet, never assigned.",
   "State media abroad keep their sponsoring state, as the 2018 table does for sputniknews.com and rt.com: RT and Sputnik regional sites are Russia, Press TV's UK site is Iran.",
@@ -27,6 +27,7 @@
   "andhrajyothy.com": "IN",
   "tass.com": "RS", "actualidad-rt.com": "RS", "rtarabic.com": "RS", "sputnikglobe.com": "RS",
   "sputnikportal.rs": "RS", "anlatilaninotesi.com.tr": "RS", "noticiaslatam.lat": "RS", "sputnik.af": "RS",
+  "sputnik-georgia.com": "RS", "sputniknews.cn": "RS",
   "presstv.co.uk": "IR",
   "mignews.com": "IS",
   "dnews.gr": "GR", "emakedonia.gr": "GR",

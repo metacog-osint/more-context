@@ -67,21 +67,31 @@ function fail(e) {
 }
 
 // ---------- Zones (home) ----------
+// Since the z calibration (16 Nov 2026) a score carries z_method and ratio_shown: count / max(expected, 90-day
+// median, 3); `floored` means the floor of 3 bound, so the count is shown against "usually 3 or fewer".
+function zLabel(s) { return s && s.z_method ? "calibrated z" : "z"; }
+function ratioText(s, count) {
+  if (s.floored) return count !== undefined && count !== null ? `${count} (usually ≤3)` : "usually ≤3";
+  const r = s.ratio_shown ?? s.ratio;
+  return r === null || r === undefined ? "?" : `${r}×`;
+}
+
 function attentionBadge(att, partial) {
   if (partial) return h("span", { class: "badge cool", title: "Ingest covered only part of this UTC day, so it is not compared with full days" }, "partial day");
   if (!att) return h("span", { class: "badge cool", title: "Needs 14 complete days of history" }, "baseline building");
   const cls = att.z >= 2 ? "hot" : att.z >= 1 ? "warm" : "cool";
-  const ratio = att.ratio === null || att.ratio === undefined ? "" : `${att.ratio}× `;
-  return h("span", { class: `badge ${cls}`, title: `z ${att.z} against ${att.baseline_days} days, expected ${att.expected}` }, `${ratio}(z ${att.z})`);
+  const r = att.ratio_shown ?? att.ratio;
+  const ratio = r === null || r === undefined ? "" : `${r}× `;
+  return h("span", { class: `badge ${cls}`, title: `${zLabel(att)} ${att.z} against ${att.baseline_days} days, expected ${att.expected}` }, `${ratio}(z ${att.z})`);
 }
 
 function violenceCell(e, partial) {
   const v = e && e.violence;
   if (!v) return h("span", { class: "muted small" }, "—");
   const s = v.named_score;
-  if (partial || !s || s.z === undefined || s.ratio === null || s.ratio === undefined) return h("span", { class: "muted small", title: "Articles reporting violence placed in the zone whose headline names it" }, `${v.named}`);
+  if (partial || !s || s.z === undefined || (s.ratio_shown ?? s.ratio) === null || (s.ratio_shown ?? s.ratio) === undefined) return h("span", { class: "muted small", title: "Articles reporting violence placed in the zone whose headline names it" }, `${v.named}`);
   const cls = s.z >= 2 ? "hot" : s.z >= 1 ? "warm" : "cool";
-  return h("span", { class: `badge ${cls}`, title: `${v.named} articles reporting violence placed in the zone whose headline names it (of ${v.articles}); z ${s.z} against the last 28 days, expected ${s.expected}` }, `${v.named} · ${s.ratio ?? "?"}×`);
+  return h("span", { class: `badge ${cls}`, title: `${v.named} articles reporting violence placed in the zone whose headline names it (of ${v.articles}); ${zLabel(s)} ${s.z} against the last 28 days, expected ${s.expected}` }, `${v.named} · ${ratioText(s)}`);
 }
 
 function zoneRows(list, sum, day) {
@@ -155,13 +165,13 @@ function zoneLinks(c, ents, day) {
   });
 }
 
-function scoreBadge(s, kind) {
+function scoreBadge(s, kind, count) {
   if (!s || s.z === undefined) return h("span", { class: "badge cool", title: "Needs 14 complete days of history" }, "—");
   if (kind === "elevated") {
     return h("span", { class: "badge warm", title: `${s.ratio90}× the median of the last 90 days (${s.median90})` }, `${s.ratio90}× 90-day`);
   }
   const cls = s.z >= 3 ? "hot" : s.z >= 2 ? "warm" : "cool";
-  return h("span", { class: `badge ${cls}`, title: `z ${s.z} against the last 28 days (expected ${s.expected})` }, `${s.ratio ?? "?"}× (z ${s.z})`);
+  return h("span", { class: `badge ${cls}`, title: `${zLabel(s)} ${s.z} against the last 28 days (expected ${s.expected})` }, `${ratioText(s, count)} (z ${s.z})`);
 }
 
 function countryRows(ccs, data, metric, kind, ents) {
@@ -413,7 +423,7 @@ const signed = (x) => (x === null || x === undefined ? "—" : `${x > 0 ? "+" : 
 // A 7-day value far from its four weeks before (|z| >= 2) shows that baseline beside it.
 function baseNote(z, base, fmt) {
   return z !== null && z !== undefined && Math.abs(z) >= 2 && base !== null && base !== undefined
-    ? h("span", { class: "badge warm", title: "Average of the 7-day values in the four weeks before this week" }, `4-wk avg ${fmt(base)}`) : null;
+    ? h("span", { class: "badge warm", title: "Article-weighted average of the 21 days before this week" }, `3-wk avg ${fmt(base)}`) : null;
 }
 
 // Daily articles both ways; flagged days in amber, the chosen day outlined. Hover a bar for its numbers.
