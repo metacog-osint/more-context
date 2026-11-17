@@ -2,7 +2,7 @@
 
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
-## Where things stand (16 Nov 2026, about 9:35 PM CST)
+## Where things stand (16 Nov 2026, about 11:05 PM CST)
 - **First calibrated build: 16 Nov, checked (built 03:20 UTC 17 Nov).** Run summary in `mc_state/ingest`:
   `countries_built` and `relations_built` for 16 Nov (191 Events files, 3,384 pairs, press 181 files and 3,147 rows),
   no `relations_error`, no `countries_retry` or `countries_failed`; one alarm (DRC-Rwanda, attention z 4.35).
@@ -33,9 +33,15 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
   from the South Sudan rescore is among the dropped). Serbia gains attention listings on 27 Aug, 27-28 Oct and 1 Nov
   and violence on 1 Nov (folded counts), and loses 8 Sep attention and 27 Oct violence. Listings the rescore adds have
   no sample headlines or map events (samples and violent.jsonl stay as built).
-- **"calibrated" dropped (17 Nov, on a branch, not deployed):** every stored day now carries the calibrated z, so
-  the label no longer marks a before and after. `/feed` titles say plain "z" (`watchfloor-feed-1.2`) and website
-  tooltips say "z"; scores keep `z_method`. Needs an `mc-api` deploy and a website deploy (Tom's yes).
+- **"calibrated" dropped: live (17 Nov 2026).** Every stored day now carries the calibrated z, so the label no longer
+  marks a before and after. `/feed` titles say plain "z" (`watchfloor-feed-1.2`) and website tooltips say "z"; scores
+  keep `z_method`. Each step on Tom's yes: `c92e8cb` merged as `7059586` (PR #4, CI passed); `mc-api-00025-doz`
+  deployed 04:58 UTC from a clean archive of `7059586` on C:, env vars checked separate (`MC_BUCKET`, `MC_AI=on`,
+  `MC_STATE=firestore`); `/feed` for 16 Nov: 40 items, none dropped, all `watchfloor-feed-1.2`, no "calibrated".
+  Website deployed 05:00 UTC from the same archive after `scripts/build_web.py` (which writes the git-ignored
+  `web/build.json`; a deploy without it would delete the "Updated" date) and after checking the last release (18:03
+  UTC 16 Nov, `63f1fbc`, an ancestor of `7059586`): all 8 site files equal `7059586`, CSP and noindex kept.
+  `mc-ingest` is unchanged (`mc-ingest-00026-fur`); it does not serve titles.
 - **Crisis Group: no second automated route (checked 17 Nov, 03:27-04:45 UTC).** Google News `site:crisisgroup.org`
   lists nothing after 13 Nov 14:32 UTC (`when:3d` 0, `when:7d` 6), and a web search of crisisgroup.org found nothing
   newer either (11-13 Nov items), so 14-16 Nov may be a publishing lull, not a Google gap (not verified). Routes
@@ -229,7 +235,7 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
    `sputnik-georgia.com` (GG) are now Russia in `catalog/press_outlets.json` 2026-11-16.3 (on the branch; past days
    keep their rows as built). RB (rtrs.tv, glassrpske.com, rtvbn.com, balkaninsight.com) is in no block, so left as is.
 9. Done 17 Nov, ahead of the month (Tom asked; the rescore put every day on the calibrated scale): "calibrated"
-   dropped from `/feed` titles and website tooltips. Live after the `mc-api` and website deploys.
+   dropped from `/feed` titles and website tooltips. Live since 04:58-05:00 UTC 17 Nov (above).
 
 ## History
 - 4 Nov 2026 (session "Geo-context project review"): geometry matching `6f3a63d` (doctrine kit 0.4.1); CI later
