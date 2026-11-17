@@ -68,8 +68,9 @@ function fail(e) {
 
 // ---------- Zones (home) ----------
 // Since the z calibration (16 Nov 2026) a score carries z_method and ratio_shown: count / max(expected, 90-day
-// median, 3); `floored` means the floor of 3 bound, so the count is shown against "usually 3 or fewer".
-function zLabel(s) { return s && s.z_method ? "calibrated z" : "z"; }
+// median, 3); `floored` means the floor of 3 bound, so the count is shown against "usually 3 or fewer". Every stored
+// day was re-scored on 17 Nov 2026, so tooltips say plain "z" (they said "calibrated z" from 16 to 17 Nov).
+function zLabel() { return "z"; }
 function ratioText(s, count) {
   if (s.floored) return count !== undefined && count !== null ? `${count} (usually ≤3)` : "usually ≤3";
   const r = s.ratio_shown ?? s.ratio;

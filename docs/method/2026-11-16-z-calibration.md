@@ -317,3 +317,11 @@ and the review's other Watchfloor findings (Serbia RB, the country-build retry, 
 Not built yet: the rescore of stored `countries.json` and `summary.json` scores (proposal step 3). Until it runs,
 days built before the deploy keep the old z, and titles and badges for them keep the plain "z".
 
+## After (17 Nov 2026)
+
+- Stored days 29 Jul-15 Nov re-scored and written to the bucket by `scripts/rescore_z.py` (04:12-04:18 UTC, Tom's
+  yes): 145 files; `--check` with the old estimator and `--verify-new` on the 16 Nov build both passed first. Rising
+  attention 290 kept / 366 dropped / 69 added, violence 160 / 270 / 30, zone alarms 18 / 31 / 0.
+- With every day on the calibrated scale, "calibrated" was dropped from `/feed` titles (`watchfloor-feed-1.2`) and
+  website tooltips at Tom's request, ahead of the planned month; scores keep `z_method`.
+

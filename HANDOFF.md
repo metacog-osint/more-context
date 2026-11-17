@@ -33,8 +33,18 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
   from the South Sudan rescore is among the dropped). Serbia gains attention listings on 27 Aug, 27-28 Oct and 1 Nov
   and violence on 1 Nov (folded counts), and loses 8 Sep attention and 27 Oct violence. Listings the rescore adds have
   no sample headlines or map events (samples and violent.jsonl stay as built).
-- **Crisis Group (17 Nov 03:27 UTC):** Google News `site:crisisgroup.org` still lists nothing after 13 Nov 14:32 UTC
-  (`when:3d` 0, `when:7d` 6); crisisgroup.org answers HTTP 403 to a script. Due about 18 Nov (next step 2).
+- **"calibrated" dropped (17 Nov, on a branch, not deployed):** every stored day now carries the calibrated z, so
+  the label no longer marks a before and after. `/feed` titles say plain "z" (`watchfloor-feed-1.2`) and website
+  tooltips say "z"; scores keep `z_method`. Needs an `mc-api` deploy and a website deploy (Tom's yes).
+- **Crisis Group: no second automated route (checked 17 Nov, 03:27-04:45 UTC).** Google News `site:crisisgroup.org`
+  lists nothing after 13 Nov 14:32 UTC (`when:3d` 0, `when:7d` 6), and a web search of crisisgroup.org found nothing
+  newer either (11-13 Nov items), so 14-16 Nov may be a publishing lull, not a Google gap (not verified). Routes
+  tried: its own feed `rss.xml` answers 200 but is still frozen at 30 Oct; the site's Cloudflare blocks scripts,
+  robots.txt included (respected: no workaround); ReliefWeb's API v2 refuses an unapproved `appname` ("request an
+  appname", free; Tom's call, and it could also replace the ReliefWeb site search that drops 2 in 5 items without a
+  headline); Bing News RSS returned 0 items. Widening the search window would not help: a feed row counts only on its
+  published day and only from that day's runs (`daily._row_day`, `load_day_rows`). Keep the site search; look again
+  after a weekday of Crisis Group output.
 - **z calibration: live (16 Nov 2026).** Each step on Tom's yes: `ea3a2cb` merged to `main` as `0c5d8db` through
   PR #2 (CI passed). `mc-ingest-00026-fur` (17:35 UTC) and `mc-api-00024-tob` (17:36 UTC) deployed from a clean
   archive of `0c5d8db` on C:, env vars checked separate (`MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); `/feed`
@@ -205,7 +215,8 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
 ## Next steps, in order
 1. Press tone is display only: Tom reads the zone pages' press tables for a month (from 16 Nov) before any flag,
    alarm or `/feed` item. (The `watchfloor-relations` worktree was deleted 16 Nov.)
-2. Crisis Group: if Google News still lists nothing from crisisgroup.org by about 18 Nov, look for another route.
+2. Crisis Group: no other automated route found 17 Nov (above). Check the site search again on 18-19 Nov; if Google
+   still lists nothing new, Tom decides on a ReliefWeb `appname` request.
 3. Charter interview, one zone at a time, Iran & Red Sea first (December three-signal watch).
 4. Indicators that act on tips (step 3 of the tipping plan), after the charters.
 5. Headline service for other programs (step 4); Bluesky/Telegram lists need Tom's picks (`presstv`, `farsna`
@@ -217,7 +228,8 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
 8. Checked 16 Nov: `sputniknews.cn` (CH) mattered, since China is an outlet in seven zone blocks; it and
    `sputnik-georgia.com` (GG) are now Russia in `catalog/press_outlets.json` 2026-11-16.3 (on the branch; past days
    keep their rows as built). RB (rtrs.tv, glassrpske.com, rtvbn.com, balkaninsight.com) is in no block, so left as is.
-9. After the z calibration has been live a month: drop "calibrated" from `/feed` titles and website tooltips.
+9. Done 17 Nov, ahead of the month (Tom asked; the rescore put every day on the calibrated scale): "calibrated"
+   dropped from `/feed` titles and website tooltips. Live after the `mc-api` and website deploys.
 
 ## History
 - 4 Nov 2026 (session "Geo-context project review"): geometry matching `6f3a63d` (doctrine kit 0.4.1); CI later
