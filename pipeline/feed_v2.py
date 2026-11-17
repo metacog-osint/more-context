@@ -6,7 +6,8 @@ zone) and per topic (no place; a link to its page), and one per country on the v
 attention Rising list. Warnings, which are judged, wait for the zone charters (doctrine/indicators.json).
 
 Since the z calibration (Tom's picks, 16 Nov 2026; docs/method/2026-11-16-z-calibration.md):
-- a score carrying `z_method` is a calibrated z, and titles say "calibrated z" for the first month;
+- every z is calibrated (scores carry `z_method`; stored days 29 Jul-15 Nov were re-scored on 17 Nov 2026 by
+  scripts/rescore_z.py), so titles say plain "z" (they said "calibrated z" from 16 to 17 Nov 2026, feed 1.1);
 - titles give count / max(expected, 90-day median, 3), and when the floor of 3 binds they give the count instead
   ("15 articles, usually 3 or fewer"), so a near-zero baseline no longer reads "79.3x normal";
 - a zone country on a country list is a neutral observation under the zone's warning problem, not support for its
@@ -30,7 +31,7 @@ sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, contract, registers, vocab  # noqa: E402
 
 SITE = "https://watchfloor.theintelligence.company"
-METHOD = "watchfloor-feed-1.1"
+METHOD = "watchfloor-feed-1.2"
 FILES_PER_DAY = 192                     # GDELT Events: 96 fifteen-minute files a day in each of two streams
 ALARM_Z, MIN_ARTICLES = 2.0, 5         # zone violence anomaly, matching the attention alarm (z >= 2, >= 5 stories)
 LANGUAGE_KEY = "https://github.com/metacog-osint/noise-floor/blob/main/doctrine/kit/docs/language-key.md"
@@ -71,16 +72,15 @@ def _wp(eid: str) -> str:
 
 
 def _times(x: dict | None, count: int | None = None) -> str:
-    """'2.9x normal (calibrated z 3.4)' from a score; 'at 15, usually 3 or fewer (calibrated z 2.7)' when the ratio's
-    floor binds; 'no score yet' before 14 days of history. Scores built before the calibration keep the old wording."""
+    """'2.9x normal (z 3.4)' from a score; 'at 15, usually 3 or fewer (z 2.7)' when the ratio's floor binds; 'no score
+    yet' before 14 days of history."""
     if not x or x.get("z") is None:
         return "no score yet"
-    zlab = "calibrated z" if x.get("z_method") else "z"
     if x.get("floored") and count is not None:
-        return f"at {count}, usually 3 or fewer ({zlab} {x['z']:.1f})"
+        return f"at {count}, usually 3 or fewer (z {x['z']:.1f})"
     r = x.get("ratio_shown", x.get("ratio"))
     ratio = f"{r:.1f}x normal" if r is not None else "normal not known"
-    return f"{ratio} ({zlab} {x['z']:.1f})"
+    return f"{ratio} (z {x['z']:.1f})"
 
 
 def _ncf_rules() -> dict:

@@ -102,7 +102,7 @@ class Build(unittest.TestCase):
         self.assertTrue(all(p["tier"] == "routine" and p["partial_day"] for p in zones))
         self.assertIn("partial day", fc["features"][0]["properties"]["title"])
 
-    def test_titles_floor_the_ratio_and_name_the_calibrated_z(self):
+    def test_titles_floor_the_ratio_and_say_plain_z(self):
         c = countries()
         c["countries"]["KS"]["violent"] = 15
         c["countries"]["KS"]["violent_score"] = {"z": 2.7, "ratio": 79.3, "ratio_shown": 5.0, "floored": True,
@@ -110,10 +110,11 @@ class Build(unittest.TestCase):
         c["countries"]["BR"]["violent_score"] = {"z": 3.1, "ratio": 4.2, "ratio_shown": 3.5, "floored": False,
                                                  "z_method": "robust-1"}
         items = by_id(feed_v2.build(summary(), c, now=NOW))
-        self.assertIn("violent-event articles at 15, usually 3 or fewer (calibrated z 2.7), on the Rising list",
+        self.assertIn("violent-event articles at 15, usually 3 or fewer (z 2.7), on the Rising list",
                       items["country:KS:violence"]["properties"]["title"])
-        self.assertIn("3.5x normal (calibrated z 3.1)", items["country:BR:violence"]["properties"]["title"])
-        # a score built before the calibration keeps its own ratio and plain "z"
+        self.assertIn("3.5x normal (z 3.1)", items["country:BR:violence"]["properties"]["title"])
+        self.assertFalse(any("calibrated" in f["properties"]["title"] for f in feed_v2.build(summary(), c, now=NOW)["features"]))
+        # a score without ratio_shown keeps its own ratio
         self.assertIn("2.0x normal (z 2.6)", items["country:CD:attention"]["properties"]["title"])
 
     def test_missing_country_data_is_partial_not_quiet(self):
