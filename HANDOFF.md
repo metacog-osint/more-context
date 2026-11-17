@@ -2,14 +2,47 @@
 
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
-## Where things stand (16 Nov 2026, about 12:10 PM CST)
+## Where things stand (16 Nov 2026, about 9:35 PM CST)
+- **First calibrated build: 16 Nov, checked (built 03:20 UTC 17 Nov).** Run summary in `mc_state/ingest`:
+  `countries_built` and `relations_built` for 16 Nov (191 Events files, 3,384 pairs, press 181 files and 3,147 rows),
+  no `relations_error`, no `countries_retry` or `countries_failed`; one alarm (DRC-Rwanda, attention z 4.35).
+  `countries.json`: all 236 scored countries carry `z_method: robust-1`, `ratio_shown` and `floored`; all 16 zone
+  `named_score` and all 21 summary attention scores carry `pred-1`. Rising 6 attention (Estonia, China, Rwanda,
+  Latvia, Thailand, Philippines) + 4 violence (Estonia, Thailand, South Africa, Bahrain), against a mean of 3.7 + 2.0
+  under option C on the stored days (top decile: 7 and 4; 22 of 96 days had 6 or more attention listings). Plausible:
+  the sample headlines (slugs only, not verified further) are Estonia closing Russian border crossings after an
+  alleged sabotage plot, five EU countries' Rwanda deportation-hub scheme, and a US embassy alert in Bahrain amid
+  Iranian strikes. Serbia: no `RB` row, `uncatalogued` empty; RI 472 articles against an expected 470.6 (z 0.01,
+  90-day median 420.5); on 15 Nov, unfolded, RI was 149 and RB 159 (medians 230.5 and 189), so counts and baseline
+  doubled together. Press: 16 Nov is **not** marked partial (181 of 192 GKG files, inside the 10% allowance);
+  `/relations` serves it (Korea: 29 press days, all complete). `/feed` for 16 Nov: 40 items, none dropped; all 31
+  titles with a z say "calibrated z" (the other 9 are the day line and Elevated items, which have no z).
+- **Rescore of stored days: written to the bucket 04:12-04:18 UTC 17 Nov (Tom's yes).** 145 files (29 Jul-15 Nov),
+  none refused; each carries `rescored_z: {at, countries: robust-1, zones: pred-1[, folded: [RB]]}`, and the earlier
+  `rescored` (terms) stamp is kept. Same counts as the dry run below. Read back: 13 Nov Guinea violence z 2.7, floored,
+  still Rising; 13 Oct has no alarm (Sudan z 1.37); 31 Aug lists Nepal (894 articles, z 4.21); `/feed` for 13 Nov has
+  39 items, none dropped, 28 titles with "calibrated z". The days are now on one scale.
+  `scripts/rescore_z.py` (tests `tests/test_rescore_z.py`) re-scores countries.json (C for countries, B for zone
+  `named_score`, lists rebuilt; Serbia's RB folded into RI in the day itself, so a day is not scored half against a
+  folded history) and summary.json attention (B) and alarms. Data on C: `%LOCALAPPDATA%\watchfloor\zrescore` (summary
+  and countries 29 Jul-16 Nov, with manifest). `--check` 29 Jul-15 Nov with the old estimator: PASS (every stored field
+  reproduced); `--verify-new 2026-11-16` (the live calibrated build): PASS. Dry run 29 Jul-15 Nov (copy in
+  `zrescore-dry`, report `zrescore-dry\zrescore-report.json`): 145 files would change. Rising attention 290 kept /
+  366 dropped / 69 added; violence 160 / 270 / 30 (the proposal's C figures, 12 Aug-15 Nov: 287/359/68 and 160/264/29);
+  feed country items 12.8 a day to 8.5; zone attention alarms 18 kept / 31 dropped / 0 added (the 13 Oct Sudan alarm
+  from the South Sudan rescore is among the dropped). Serbia gains attention listings on 27 Aug, 27-28 Oct and 1 Nov
+  and violence on 1 Nov (folded counts), and loses 8 Sep attention and 27 Oct violence. Listings the rescore adds have
+  no sample headlines or map events (samples and violent.jsonl stay as built).
+- **Crisis Group (17 Nov 03:27 UTC):** Google News `site:crisisgroup.org` still lists nothing after 13 Nov 14:32 UTC
+  (`when:3d` 0, `when:7d` 6); crisisgroup.org answers HTTP 403 to a script. Due about 18 Nov (next step 2).
 - **z calibration: live (16 Nov 2026).** Each step on Tom's yes: `ea3a2cb` merged to `main` as `0c5d8db` through
   PR #2 (CI passed). `mc-ingest-00026-fur` (17:35 UTC) and `mc-api-00024-tob` (17:36 UTC) deployed from a clean
   archive of `0c5d8db` on C:, env vars checked separate (`MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); `/feed`
   serves `watchfloor-feed-1.1` (15 Nov: 46 items, none dropped; zone-country items carry no hypothesis). Website
   deployed 18:02 UTC from the same archive after checking the last release (17:28 UTC; its shared files equalled
-  `0c5d8db`): all 12 files under `web/` equal the commit, CSP and noindex kept. `63f1fbc` (another session's house
-  bar v2.1) is on `main` but was not in that deploy. The 16 Nov build (about 03:15 UTC 17 Nov) is the first scored
+  `0c5d8db`): all 12 files under `web/` equal the commit, CSP and noindex kept. Another session then deployed
+  `63f1fbc` (house bar tic-nav v2.1, which includes the z changes) at 18:03 UTC from worktree `watchfloor-tt14`; the
+  live files equal `63f1fbc` (checked 03:12 UTC 17 Nov, line endings aside). The 16 Nov build (about 03:15 UTC 17 Nov) is the first scored
   with the calibrated z; days built earlier keep the old z and the plain "z" wording until the rescore.
 - **z calibration: decided and built (16 Nov 2026).** Tom picked the recommended option
   on all four problems in `docs/method/2026-11-16-z-calibration.md` (option C for countries, B for zones, zone violence
@@ -167,9 +200,7 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
    draft for Tom's own charters.
 4. October usage totals (Class A and BigQuery), carried from 4 Nov.
 5. `backfill_relations.py --bucket` token refresh: done, on `main` (16 Nov).
-6. z calibration: live 16 Nov (above). Waiting: a rescore of stored days (script not written; `--check`, a dry run
-   on a copy, Tom's yes for `--write`), and whether to remove the merged worktrees (watchfloor-press,
-   watchfloor-review-fixes, watchfloor-day-precision, watchfloor-tt14, watchfloor-contrast, watchfloor-z-calibration).
+6. z calibration: live 16 Nov, stored days re-scored 17 Nov (above). The merged worktrees were removed 16 Nov; only `watchfloor-tt14` remains (another session's).
 
 ## Next steps, in order
 1. Press tone is display only: Tom reads the zone pages' press tables for a month (from 16 Nov) before any flag,
