@@ -264,6 +264,8 @@ Measurements and the reasoning behind each point: `HISTORY.md`, "Cost audit".
   `ratio_shown` = count / max(expected, 90-day median, 3) and say "usually 3 or fewer" when `floored`. Thresholds
   are unchanged (Rising z 2.5, alarm z 2.0). Before it, the live z ran about 1.3x large (z >= 2.5 on about 3% of
   event-free country-days). Zone-country `/feed` items are neutral, with no hypothesis, until the charters.
+  Stored days built before it are re-scored by `scripts/rescore_z.py` (scores, lists and alarms only, RB folded into
+  RI; `--check` with the old estimator and `--verify-new` on a calibrated day first, from 29 Jul; Tom's yes for `--write`).
 - Zone violence replaces the casualty share: violent events placed inside the zone (`countries`, or `violence`
   for Russia-NATO: NATO states + Kaliningrad RS23) in articles whose headline names the zone, z against 28 days.
   Display only, not an alarm reason (yet). The map's event layer (`/violent?zone=`) shows the same events the
