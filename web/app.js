@@ -125,6 +125,29 @@ function zoneTable(title, list, sum, day) {
   ];
 }
 
+// Elsewhere today: the other layers' findings in the zones' countries, strongest zone first (an alarm, then the
+// attention z). Zones list GDELT FIPS codes; COP uses ISO, so the codes come from web/data/fips_iso.json
+// (scripts/build_web.py). Shown for the newest day only, since the card is about the last 48 hours.
+let FIPS_ISO = null;
+async function related(box, ents, sum) {
+  if (!window.TicRelated) return;
+  try {
+    if (!FIPS_ISO) FIPS_ISO = await fetch("data/fips_iso.json").then((r) => (r.ok ? r.json() : Promise.reject(r.status)));
+  } catch (_) { return; }
+  const score = (z) => {
+    const e = sum.entities[z.id] || {};
+    return [e.alarms && e.alarms.length ? 1 : 0, (e.attention && e.attention.z) || 0];
+  };
+  const zones = ents.zones.map((z, i) => ({ z, s: score(z), i }))
+    .sort((a, b) => (b.s[0] - a.s[0]) || (b.s[1] - a.s[1]) || (a.i - b.i));
+  const ccs = [];
+  for (const { z } of zones) for (const f of z.countries || []) {
+    const iso = FIPS_ISO[f];
+    if (iso && !ccs.includes(iso)) ccs.push(iso);
+  }
+  if (ccs.length) window.TicRelated.render(box, { countries: ccs, here: "watchfloor", level: 2 });
+}
+
 async function viewHome(params) {
   setNav("home");
   const [ents, days] = await Promise.all([entities(), get("/days")]);
@@ -138,6 +161,7 @@ async function viewHome(params) {
   const filtered = Object.values(sum.entities).some((e) => e.filtered_stories !== null && e.filtered_stories !== undefined);
   if (!filtered) notes.push(h("p", { class: "note" }, "Headline-filtered counts are not available for this day; \"Stories\" shows every match."));
   const teaser = await risingTeaser(ents, day);
+  const relBox = day === days.days[0] ? h("section", { class: "panel related", id: "tic-related", hidden: true }) : null;
   show(
     h("h1", null, "Conflict zones and watch topics"),
     h("p", { class: "lede" }, "Daily counts of stories whose headline names the zone (reprints merged), and how unusual each day is against the zone's own last 28 days. Open a zone for its stories."),
@@ -146,8 +170,10 @@ async function viewHome(params) {
     notes,
     teaser,
     zoneTable("Conflict zones", ents.zones, sum, day),
+    relBox,
     zoneTable("Watch topics", ents.topics, sum, day),
   );
+  if (relBox) related(relBox, ents, sum);
 }
 
 // ---------- Rising (every country against its own normal) ----------
