@@ -7,17 +7,21 @@ figures, South Sudan exclusion, feed health pass, Crisis Group checks) is
 
 ## State (18 Nov 2026; measure before acting)
 - Live: `mc-ingest-00026-fur`, `mc-api-00025-doz` (env vars `MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); website
-  deployed 16:14 UTC 18 Nov from `5fa2741` (adds the home page's "Elsewhere today" card). origin/main `5fa2741`.
+  deployed 16:14 UTC 18 Nov from `5fa2741` (adds the home page's "Elsewhere today" card). Fetch origin/main: other sessions merge often.
 - 17 Nov build checked (03:21 UTC 18 Nov): all outputs written, not partial, no retry or relations error; `/feed`
   42 items, none dropped. AI spend $0.05 of $5 for November (15 Nov).
 - Main checkout `[local path]` was 3 commits behind origin with an uncommitted `CLAUDE.md` line (the
   "Elsewhere today" note, folded into the slim `CLAUDE.md` and this file): drop it with `git checkout -- CLAUDE.md`
   once the slim lands (Tom's yes). Untracked there: `.claude/`, `GEMINI.md` (another tool's notes).
+- **Iran & Red Sea charter: on main, not deployed (18 Nov).** `catalog/indicators/11_Iran_Red_Sea.json` (no code
+  reads it yet; only IRN-13 is exempt from the two-source rule). Zone violence counts nine countries; Saudi Arabia kept
+  (Tom: "keep all nine, but let's find a way to still highlight spikes of interest"), so each member is scored too and
+  a burst is a `spike` (badge, `/feed` anomaly). Suite area widened to the nine. Dry run 29 Jul-17 Nov (data in
+  `%LOCALAPPDATA%\watchfloor\zscope` on C:): zone z >= 2 on 3 days, spikes on 11, 12 of 98 scored days flagged.
+  Waiting on Tom's yes, each separately: `rescore_zone_scope.py --write` (112 countries.json), deploy `mc-ingest` and
+  `mc-api`, website deploy (spike badge). Until the write, stored days have no `members`, so member scores and spikes
+  wait for 14 complete days.
 - Worktrees with uncommitted work, each another session's:
-  - `_worktrees\watchfloor-iran-charter` (`charter/iran-red-sea`): edits to `CLAUDE.md`, `catalog/entities.json`,
-    `catalog/indicators/README.md`, `pipeline/countries.py`, `tests/test_events.py` (Iran & Red Sea violence scope
-    from the 18 Nov charter answers, `scripts/rescore_zone_scope.py`). Its `CLAUDE.md` line must be re-added to the
-    slim file as one short bullet under "Zone violence", not merged over it.
   - `_worktrees\watchfloor-shell` (`layout/elsewhere`): clean at `5fa2741`.
 - Branches: `wip/2026-11-01-unreviewed` (`459d578`, AI-drafted charters; do not merge, use its 13 indicators only as
   a draft for Tom's own); `tic-nav-v1.13`, `tic-nav-v2.0` (old local house-bar branches).
