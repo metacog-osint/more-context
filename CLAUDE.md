@@ -109,7 +109,7 @@ warning (did something change?) and awareness (what is the picture, how is each 
   country's last 28 days and 90-day median. Rising: z >= 2.5, >= 1.5x expected, >= 40 articles (violence 15).
   Elevated: >= 2x the 90-day median. FIPS 10-4 codes ("RI" Serbia, "CG" DR Congo, "NG" Niger, "NI" Nigeria); Belgrade's
   `RB` is folded into RI. A failed country build retries six times (`countries_retry`, then `countries_failed`;
-  rebuild with `backfill_events.py`). Origins (wire copies once, not in the pipeline): `docs/method/2026-11-18-origins.md`.
+  rebuild with `backfill_events.py`). Country `origins` (wire copies once) are display only: `docs/method/2026-11-18-origins.md`.
 - **z calibration (Tom, 16 Nov; `docs/method/2026-11-16-z-calibration.md`):** every z is normal-equivalent
   (`zstats.py`). Countries `robust-1`; zones, zone violence and pairs `pred-1`; press tone and 7-day pair values T2.
   Badges use `ratio_shown` = count / max(expected, 90-day median, 3). Stored days from 29 Jul are on this scale;

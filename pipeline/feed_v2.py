@@ -31,7 +31,8 @@ sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, contract, registers, vocab  # noqa: E402
 
 SITE = "https://watchfloor.theintelligence.company"
-METHOD = "watchfloor-feed-1.2"
+METHOD = "watchfloor-feed-1.3"  # 1.3 (18 Nov 2026): origins on country items
+ONE_STORY_SHARE = 0.15  # Australia violence 21 Oct 2026: one column was 30 of 167
 FILES_PER_DAY = 192                     # GDELT Events: 96 fifteen-minute files a day in each of two streams
 ALARM_Z, MIN_ARTICLES = 2.0, 5         # zone violence anomaly, matching the attention alarm (z >= 2, >= 5 stories)
 LANGUAGE_KEY = "https://github.com/metacog-osint/noise-floor/blob/main/doctrine/kit/docs/language-key.md"
@@ -81,6 +82,15 @@ def _times(x: dict | None, count: int | None = None) -> str:
     r = x.get("ratio_shown", x.get("ratio"))
     ratio = f"{r:.1f}x normal" if r is not None else "normal not known"
     return f"{ratio} (z {x['z']:.1f})"
+
+
+def _one_story(og: dict, articles: int | None) -> str:
+    """'; one story is 30 of its 85 articles' when the largest origin is at least ONE_STORY_SHARE of the count
+    (independent origins, Tom 18 Nov 2026: shown, never scored)."""
+    big = og.get("largest") or 0
+    if not articles or big < 5 or big < ONE_STORY_SHARE * articles:
+        return ""
+    return f"; one story is {big} of its {articles} articles"
 
 
 def _ncf_rules() -> dict:
@@ -176,18 +186,21 @@ def build(summary: dict, countries: dict | None, *, catalog: dict | None = None,
         zone = zone_of.get(cc)
         name = info.get("name") or row.get("name") or cc
         articles = row.get("violent" if measure == "violence" else "urls")
+        og = (row.get("origins") or {}).get("violent" if measure == "violence" else "urls") or {}
         if measure == "violence":
             what = (f"violent-event articles {_times(score, articles)}, on the Rising list" if listed == "rising" else
                     f"violent-event articles {score.get('ratio90') or 0:.1f}x its 90-day median, on the Elevated list")
         else:
             what = f"news attention {_times(score, articles)}, on the Rising list"
+        what += _one_story(og, articles)
         props = {**base, "id": f"watchfloor:{day}:country:{cc}:{measure}", "title": f"{name}: {what}",
                  "tier": "anomaly", "baseline_ref": BASE_28 if listed == "rising" else BASE_90,
                  "precision_class": "country", "countries": [info["iso"]],
                  "ie_aspect": ["physical"] if measure == "violence" else ["informational"],
                  "pmesii_pt": ["military"] if measure == "violence" else ["information"], "ascope": ["events"],
                  "sources": _sources(EVENTS, accessed=published),
-                 "measures": {"articles": articles, "score": score, "list": listed},
+                 "measures": {"articles": articles, "score": score, "list": listed,
+                              **({"origins": og["origins"], "largest_origin": og["largest"]} if og else {})},
                  "link": f"{SITE}/#/map?day={day}"}
         if zone:
             # No hypothesis (Tom, 16 Nov 2026): the country count is not filtered to the zone. The kit allows no

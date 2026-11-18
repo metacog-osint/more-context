@@ -201,6 +201,17 @@ function scoreBadge(s, kind, count) {
   return h("span", { class: `badge ${cls}`, title: `${zLabel(s)} ${s.z} against the last 28 days (expected ${s.expected})` }, `${ratioText(s, count)} (z ${s.z})`);
 }
 
+// Independent origins (Tom, 18 Nov 2026): distinct texts behind the articles, wire copies counted once. Shown only;
+// the score stays on articles. Flagged when one story is at least 15% of the count.
+function originsNote(o, articles) {
+  if (!o || o.origins === undefined) return null;
+  const one = articles && o.largest >= 5 && o.largest >= 0.15 * articles;
+  return h("div", {
+    class: one ? "meta warn" : "meta",
+    title: `${o.origins.toLocaleString()} independent origins: articles with the same text (wire copies) count once. Largest story: ${o.largest} articles.`,
+  }, one ? `one story is ${o.largest}` : `${o.origins.toLocaleString()} origins`);
+}
+
 function countryRows(ccs, data, metric, kind, ents) {
   return ccs.map((cc) => {
     const c = data.countries[cc] || {};
@@ -208,7 +219,7 @@ function countryRows(ccs, data, metric, kind, ents) {
     const heads = (data.samples[cc] || []).slice(0, 2);
     return h("tr", null,
       h("td", null, h("strong", null, c.name || cc), h("div", { class: "meta" }, zoneLinks(c, ents, data.day))),
-      h("td", { class: "num" }, (c[metric] ?? 0).toLocaleString()),
+      h("td", { class: "num" }, (c[metric] ?? 0).toLocaleString(), originsNote((c.origins || {})[metric], c[metric])),
       h("td", null, scoreBadge(s, kind), kind === "rising" && s.ratio90 ? h("div", { class: "meta" }, `${s.ratio90}× 90-day median`) : null),
       h("td", { class: "hide-sm" }, heads.length
         ? h("ul", { class: "heads" }, heads.map((x) => {
