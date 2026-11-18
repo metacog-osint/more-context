@@ -18,9 +18,6 @@ figures, South Sudan exclusion, feed health pass, Crisis Group checks) is
     `catalog/indicators/README.md`, `pipeline/countries.py`, `tests/test_events.py` (Iran & Red Sea violence scope
     from the 18 Nov charter answers, `scripts/rescore_zone_scope.py`). Its `CLAUDE.md` line must be re-added to the
     slim file as one short bullet under "Zone violence", not merged over it.
-  - `.claude\worktrees\watchfloor-origins-5aeb75` (`claude/watchfloor-origins-5aeb75`): independent-origins
-    measurement (`pipeline/origins.py`, `scripts/origins_backtest.py`, `docs/method/2026-11-18-origins.md`), not in
-    the pipeline; recommended against switching z to origins (Tom's call). Same: re-add its `CLAUDE.md` bullet short.
   - `_worktrees\watchfloor-shell` (`layout/elsewhere`): clean at `5fa2741`.
 - Branches: `wip/2026-11-01-unreviewed` (`459d578`, AI-drafted charters; do not merge, use its 13 indicators only as
   a draft for Tom's own); `tic-nav-v1.13`, `tic-nav-v2.0` (old local house-bar branches).
@@ -29,7 +26,7 @@ figures, South Sudan exclusion, feed health pass, Crisis Group checks) is
 1. The zone charters: interview one zone at a time, Iran & Red Sea first (December three-signal watch); final
    versions go to `catalog/indicators/`. A session is on Iran & Red Sea now (worktree above).
 2. Oryx: keep dropped (feed's newest post 7 Dec 2024; loss lists are edited in place), or poll it anyway.
-3. Independent origins: keep z on articles (recommended) or switch to origins.
+3. Independent origins: keep z on articles (recommended) or switch to origins (`docs/method/2026-11-18-origins.md`).
 4. ReliefWeb API `appname` (free; Tom requests it): would replace the ReliefWeb site search, which drops 2 in 5 items
    for having no headline. Not urgent.
 5. October usage totals (Class A and BigQuery), carried from 4 Nov.
