@@ -27,7 +27,7 @@ warning (did something change?) and awareness (what is the picture, how is each 
 - **Deploys are all by hand and each needs Tom's yes.** Deploy from a clean `git archive` of a named commit (assert
   HEAD), never from a shared working tree.
   - Website: `python -I scripts/build_web.py` first (writes the git-ignored `web/build.json` "Updated" date,
-    `web/sources.json` and `web/data/fips_iso.json`; without them the date vanishes and the home page's "Elsewhere
+    `web/data/sources.json` and `web/data/fips_iso.json`; without them the date vanishes and the home page's "Elsewhere
     today" card stays hidden), then `firebase deploy --only hosting:watchfloor --project context-484804`. Before it,
     fetch `origin/main` and check the latest hosting release (other sessions deploy too; a 16 Nov deploy rolled back
     another's house bar).
