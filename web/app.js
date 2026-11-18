@@ -92,7 +92,14 @@ function violenceCell(e, partial) {
   const s = v.named_score;
   if (partial || !s || s.z === undefined || (s.ratio_shown ?? s.ratio) === null || (s.ratio_shown ?? s.ratio) === undefined) return h("span", { class: "muted small", title: "Articles reporting violence placed in the zone whose headline names it" }, `${v.named}`);
   const cls = s.z >= 2 ? "hot" : s.z >= 1 ? "warm" : "cool";
-  return h("span", { class: `badge ${cls}`, title: `${v.named} articles reporting violence placed in the zone whose headline names it (of ${v.articles}); ${zLabel(s)} ${s.z} against the last 28 days, expected ${s.expected}` }, `${v.named} · ${ratioText(s)}`);
+  const total = h("span", { class: `badge ${cls}`, title: `${v.named} articles reporting violence placed in the zone whose headline names it (of ${v.articles}); ${zLabel(s)} ${s.z} against the last 28 days, expected ${s.expected}` }, `${v.named} · ${ratioText(s)}`);
+  const spikes = (v.spikes || []).map((k) => {
+    const m = (v.members || {})[k];
+    const ms = m && m.named_score;
+    if (!ms || ms.z === undefined) return null;
+    return h("span", { class: "badge hot", title: `Spike inside the zone: ${m.named} articles reporting violence placed in ${m.name || k} whose headline names the zone; ${zLabel(ms)} ${ms.z} against its own last 28 days, expected ${ms.expected}` }, `${m.name || k} ${m.named} · ${ratioText(ms)}`);
+  }).filter(Boolean);
+  return spikes.length ? h("span", {}, total, " ", ...spikes) : total;
 }
 
 function zoneRows(list, sum, day) {

@@ -99,6 +99,77 @@ class ZoneViolenceTests(unittest.TestCase):
         self.assertEqual(z["18_Ethiopia_Eritrea"], {"events": 3, "articles": 2, "named": 1})
         self.assertEqual(z["07_Russia_NATO"]["articles"], 1)
 
+    def test_iran_counts_the_gulf_hosts_and_iraq_when_the_headline_names_the_zone(self):
+        v = lambda i, cc, url: {"id": i, "cc": cc, "adm1": "", "url": url}
+        recs = [{"stamp": "20261117120000", "stream": "english", "violent": [
+            v("1", "BA", "https://x/iran-launches-third-round-of-strikes-on-bahrain"),
+            v("2", "IZ", "https://x/iran-backed-militia-attacks-base-in-iraq"),
+            v("3", "BA", "https://x/manama-court-jails-robbery-gang"),  # no zone term: not counted
+            v("4", "IR", "https://x/us-strikes-iran-qeshm-island"),
+        ]}]
+        z = countries.zone_violence(recs)["11_Iran_Red_Sea"]
+        self.assertEqual({k: z[k] for k in ("events", "articles", "named")}, {"events": 4, "articles": 4, "named": 3})
+        old = {"11_Iran_Red_Sea": (frozenset({"IR", "YM"}), frozenset())}
+        self.assertEqual(countries.zone_violence(recs, scopes=old, members=frozenset()),
+                         {"11_Iran_Red_Sea": {"events": 1, "articles": 1, "named": 1}})
+
+    def test_iran_counts_each_member_and_lists_the_quiet_ones(self):
+        v = lambda i, cc, url: {"id": i, "cc": cc, "adm1": "", "url": url}
+        recs = [{"stamp": "20261115120000", "stream": "english", "violent": [
+            v("1", "BA", "https://x/blasts-rock-bahrain-as-fresh-iran-strikes-target-us-base"),
+            v("2", "IR", "https://x/blasts-rock-bahrain-as-fresh-iran-strikes-target-us-base"),  # one article, two members
+            v("3", "SA", "https://x/houthis-claim-missile-attack-on-saudi-aramco-in-yemen-war"),
+            v("4", "SA", "https://x/riyadh-traffic-crash-kills-four"),  # no zone term: not counted
+        ]}]
+        z = countries.zone_violence(recs)["11_Iran_Red_Sea"]
+        self.assertEqual(z["named"], 2)  # the shared article counts once in the total
+        m = {k: x["named"] for k, x in z["members"].items()}
+        self.assertEqual(m, {"AE": 0, "BA": 1, "IR": 1, "IZ": 0, "KU": 0, "MU": 0, "QA": 0, "SA": 1, "YM": 0})
+        self.assertEqual(z["members"]["BA"]["name"], "Bahrain")
+        self.assertNotIn("members", countries.zone_violence(recs)["10_Israel_Gaza_Lebanon"])  # opt-in per zone
+
+    def test_a_burst_in_a_quiet_member_is_a_spike_when_the_total_is_not(self):
+        start = date(2026, 10, 1)
+        hist = {"zone_named": {}, "zone_member": {}}
+        complete = [start + timedelta(days=i) for i in range(28)]
+        for d in complete:  # Saudi Arabia busy and steady; Bahrain 0-1 a day
+            hist["zone_named"].setdefault("Z", {})[d] = 140 + d.day % 5
+            hist["zone_member"].setdefault("Z", {}).setdefault("SA", {})[d] = 40 + d.day % 5
+            hist["zone_member"]["Z"].setdefault("BA", {})[d] = d.day % 2
+        day = start + timedelta(days=28)
+        zv = {"named": 148, "members": {"SA": {"name": "Saudi Arabia", "named": 41},
+                                        "BA": {"name": "Bahrain", "named": 8}}}
+        countries.score_zone("Z", zv, hist, complete, day)
+        self.assertLess(zv["named_score"]["z"], 2)
+        self.assertEqual(zv["spikes"], ["BA"])
+        self.assertGreaterEqual(zv["members"]["BA"]["named_score"]["z"], countries.MEMBER_Z)
+        zv["members"]["BA"]["named"] = 4  # under MEMBER_MIN articles: no spike
+        countries.score_zone("Z", zv, hist, complete, day)
+        self.assertEqual(zv["spikes"], [])
+
+    def test_members_are_scored_from_stored_days(self):
+        with tempfile.TemporaryDirectory() as td:
+            sink = LocalSink(td)
+            start = date(2026, 10, 1)
+            for i in range(28):
+                d = start + timedelta(days=i)
+                sink.write_json(f"stories/{d:%Y/%m/%d}/countries.json", {"partial": False, "countries": {}, "zones": {
+                    "11_Iran_Red_Sea": {"named": 100, "members": {"BA": {"named": i % 2}, "SA": {"named": 40}}}}})
+            hist, complete = countries.history(sink, start + timedelta(days=28))
+            self.assertEqual(len(hist["zone_member"]["11_Iran_Red_Sea"]["BA"]), 28)
+            self.assertEqual(hist["zone_member"]["11_Iran_Red_Sea"]["SA"][start], 40)
+
+    def test_violent_jsonl_keeps_events_in_a_violence_scope(self):
+        # Bahrain is in no zone's countries, only in Iran & Red Sea's violence scope: its events go on the map.
+        with tempfile.TemporaryDirectory() as td:
+            sink = LocalSink(td)
+            rec = {"stamp": "20261117120000", "stream": "english", "countries": {"BA": [1, 1, 0, 1, 1]}, "samples": {},
+                   "violent": [{"id": "9", "cc": "BA", "adm1": "BA16", "url": "https://x/iran-drones-hit-bahrain",
+                                "lat": 26.2, "lon": 50.6}]}
+            countries.build_day(sink, date(2026, 11, 17), recs=[rec])
+            rows = sink.read_lines("stories/2026/11/17/violent.jsonl")
+            self.assertEqual([r["cc"] for r in rows], ["BA"])
+
 
 class CycleEventsTests(unittest.TestCase):
     def test_events_follow_the_gkg_slots_read(self):

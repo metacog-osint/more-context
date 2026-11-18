@@ -140,13 +140,18 @@ def build(summary: dict, countries: dict | None, *, catalog: dict | None = None,
         att, vio = e.get("attention"), (e.get("violence") or {})
         vscore = vio.get("named_score")
         att_hit = bool(e.get("alarms")) and not partial
-        vio_hit = bool(vscore and vscore.get("z") is not None and vscore["z"] >= ALARM_Z
-                       and (vio.get("named") or 0) >= MIN_ARTICLES) and not partial
+        spikes = [] if partial else [k for k in vio.get("spikes") or [] if k in (vio.get("members") or {})]
+        vio_hit = (bool(vscore and vscore.get("z") is not None and vscore["z"] >= ALARM_Z
+                        and (vio.get("named") or 0) >= MIN_ARTICLES) or bool(spikes)) and not partial
         wp = _wp(z["id"])
         page = f"{SITE}/#/zone/{z['id']}?day={day}"
         title = f"{z['name']}: news attention {_times(att, e.get('filtered_stories'))}"
         if kind == "zone":
             title += f"; violent-event articles {_times(vscore, vio.get('named'))}"
+            for k in spikes:
+                mv = vio["members"][k]
+                name = mv.get("name") or (fips.get(k) or {}).get("name") or k
+                title += f"; spike in {name}: {mv['named']} articles, {_times(mv.get('named_score'), mv['named'])}"
         props = {**base, "id": f"watchfloor:{day}:{kind}:{z['id']}", "title": title,
                  "tier": "anomaly" if (att_hit or vio_hit) else "routine",
                  "warning_problem_id": wp, "requirement_ids": ["WF-PIR-1"] + (["WF-PIR-2"] if kind == "zone" else []),
