@@ -17,10 +17,14 @@ carry the same text, so a wire story and its copies count once:
 - Outlets: per cluster, distinct registrable domains, with aggregators (MSN, Yahoo, AOL, NewsBreak...) left out.
   Wires need no table: their copies share the text, so they are one cluster whatever the domain.
 
-Nothing here is in the live pipeline yet; `scripts/origins_backtest.py` measures it on raw GDELT files.
+`scripts/origins_backtest.py` measures the clustering on raw GDELT files. The live pipeline (Tom, 18 Nov 2026: z
+stays on articles, origins shown beside them) uses the cheap form: each Events record keeps per country a count of
+articles by exact text key (`text_key`), and the daily build counts distinct keys (`day_origins`).
 """
 from __future__ import annotations
 
+import base64
+import hashlib
 from collections import defaultdict
 from urllib.parse import urlparse
 
@@ -49,6 +53,28 @@ def domain(url: str) -> str:
 
 def text_tokens(url: str, title: str = "") -> frozenset[str]:
     return tokens(normalize_title(title) or normalize_title(title_from_url(url)))
+
+
+def text_key(url: str, title: str = "") -> str:
+    """A short key for the exact text (8 characters, 48 bits), or "" when the link has no usable text. Copies of a
+    wire story share their slug, so they share a key; the daily build counts distinct keys (`day_origins`)."""
+    tk = text_tokens(url, title)
+    if not tk:
+        return ""
+    return base64.urlsafe_b64encode(hashlib.blake2b(" ".join(sorted(tk)).encode(), digest_size=6).digest()).decode()
+
+
+def day_origins(per_file: list[dict[str, int]]) -> dict:
+    """Origins from files' key counts ({key: distinct articles}, "" = articles with no text, each its own origin):
+    exact text only, so near-copies with a changed word count twice and origins err high, as in `summarise`."""
+    keys: dict[str, int] = defaultdict(int)
+    for f in per_file:
+        for k, n in f.items():
+            keys[k] += n
+    alone = keys.pop("", 0)
+    articles = alone + sum(keys.values())
+    return {"origins": alone + len(keys), "largest": max(keys.values(), default=1 if alone else 0),
+            "articles": articles}
 
 
 def overlap(a: frozenset[str], b: frozenset[str]) -> float:

@@ -26,13 +26,18 @@ figures, South Sudan exclusion, feed health pass, Crisis Group checks) is
 1. The zone charters: interview one zone at a time, Iran & Red Sea first (December three-signal watch); final
    versions go to `catalog/indicators/`. A session is on Iran & Red Sea now (worktree above).
 2. Oryx: keep dropped (feed's newest post 7 Dec 2024; loss lists are edited in place), or poll it anyway.
-3. Independent origins: keep z on articles (recommended) or switch to origins (`docs/method/2026-11-18-origins.md`).
-4. ReliefWeb API `appname` (free; Tom requests it): would replace the ReliefWeb site search, which drops 2 in 5 items
+3. ReliefWeb API `appname` (free; Tom requests it): would replace the ReliefWeb site search, which drops 2 in 5 items
    for having no headline. Not urgent.
-5. October usage totals (Class A and BigQuery), carried from 4 Nov.
-6. Delete GEO CONTEXT v4.0's paused Scheduler job `generate-watchcon-data` (project `geo-context`, paused 29 Oct).
-7. Website public or not (remove noindex, X-Robots-Tag, robots.txt; link from CONTEXT).
-8. Source list decisions (plan doc, "Source list (draft)" tab); source grades are proposed.
+4. October usage totals (Class A and BigQuery), carried from 4 Nov.
+5. Delete GEO CONTEXT v4.0's paused Scheduler job `generate-watchcon-data` (project `geo-context`, paused 29 Oct).
+6. Website public or not (remove noindex, X-Robots-Tag, robots.txt; link from CONTEXT).
+7. Source list decisions (plan doc, "Source list (draft)" tab); source grades are proposed.
+
+## Decided 18 Nov 2026 (Tom)
+- Independent origins: z stays on articles; an `origins` count is carried beside the article count on country
+  items (`docs/method/2026-11-18-origins.md`).
+- Feed contract D11 ("reported, then corroborated"): all four picks, `_ideas\feed-contract-proposal-2026-11.md`
+  section 9. Built after kit 0.6.0; Wake and Cordon first.
 
 ## Next steps, in order
 1. Press tone stays display only: Tom reads the zone pages' press tables for a month from 16 Nov before any flag,
