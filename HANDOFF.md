@@ -6,8 +6,9 @@ figures, South Sudan exclusion, feed health pass, Crisis Group checks) is
 `[local path]`. Times UTC unless marked.
 
 ## State (18 Nov 2026; measure before acting)
-- Live: `mc-ingest-00026-fur`, `mc-api-00025-doz` (env vars `MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`); website
-  deployed 16:14 UTC 18 Nov from `5fa2741` (adds the home page's "Elsewhere today" card). Fetch origin/main: other sessions merge often.
+- Live: `mc-ingest-00027-duw`, `mc-api-00026-zek` (env vars `MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`), and the
+  website, all deployed 19:23-19:25 UTC 18 Nov from `3dae530` (country `origins`, `watchfloor-feed-1.3`). Origins
+  first appear on 19 Nov, the first full day of keyed records (built about 03:20 UTC 20 Nov); 18 Nov has none.
 - 17 Nov build checked (03:21 UTC 18 Nov): all outputs written, not partial, no retry or relations error; `/feed`
   42 items, none dropped. AI spend $0.05 of $5 for November (15 Nov).
 - Main checkout `[local path]` was 3 commits behind origin with an uncommitted `CLAUDE.md` line (the
