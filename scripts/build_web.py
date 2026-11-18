@@ -1,4 +1,5 @@
-"""Prepare web/ for deploy: the public sources list, the blocklist and the "Updated" date. Run before `firebase deploy`.
+"""Prepare web/ for deploy: the public sources list, the blocklist, the FIPS-to-ISO country codes and the "Updated"
+date. Run before `firebase deploy`.
 
     python -I scripts/build_web.py
 
@@ -38,6 +39,11 @@ out.mkdir(parents=True, exist_ok=True)
 (out / "sources.json").write_text(json.dumps({"groups": cat["groups"], "sources": sources, "left_out": left_out,
                                               "catalog_version": cat["catalog_version"]}, ensure_ascii=False, indent=1),
                                   encoding="utf-8")
+# Zones list their countries in GDELT's FIPS codes; "Elsewhere today" (tic-related.js) asks COP in ISO codes.
+fips = json.loads((ROOT / "catalog" / "fips_iso.json").read_text(encoding="utf-8"))["codes"]
+(out / "fips_iso.json").write_text(json.dumps({k: v["iso"] for k, v in sorted(fips.items()) if v.get("iso")},
+                                              separators=(",", ":")), encoding="utf-8")
 (ROOT / "web" / "build.json").write_text(json.dumps({"updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}),
                                          encoding="utf-8")
-print(f"web/data/sources.json: {len(sources)} sources, {len(left_out)} left-out entries; web/build.json written")
+print(f"web/data/sources.json: {len(sources)} sources, {len(left_out)} left-out entries; web/data/fips_iso.json and "
+      "web/build.json written")
