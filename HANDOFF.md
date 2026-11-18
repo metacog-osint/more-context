@@ -2,7 +2,28 @@
 
 Read `CLAUDE.md` first; this file is current state and next steps. Times CST unless marked UTC.
 
-## Where things stand (16 Nov 2026, about 11:05 PM CST)
+## Where things stand (18 Nov 2026, about 10:00 AM CST)
+- **17 Nov build checked (built 03:21 UTC 18 Nov).** Written 03:21-03:22 UTC: `summary.json`, `stories.jsonl`,
+  `countries.json`, `violent.jsonl`, `relations.json` (191 of 191 Events files with pairs; press 191 files, 103,964
+  articles, not partial) and `relations/series.json` (120 days, 21 Jul-17 Nov). Firestore `mc_state/ingest` (read
+  15:35 UTC): `stories.last_day` 2026-11-17, no `countries_retry`, `countries_failed` or `relations_error`. The build
+  run's own `last_run` was already overwritten by later runs: read it before about 03:35 UTC, or check the outputs as
+  here. `countries.json` not partial, 452 country scores all `robust-1`, 21 attention scores all `pred-1`, no `RB`
+  (Serbia 569 articles, z 0.54). Rising 7 attention (Costa Rica, Philippines, China, Rwanda, Thailand, Bahrain,
+  Mongolia) + 3 violence (Bahrain, Costa Rica, Oman): attention at the top-decile line (7), violence above the mean
+  (2.0). Sample headlines (slugs, not verified further): a Costa Rican journalist (Camilo Rodríguez) shot dead,
+  Mongolia's President Khurelsukh to resign over a railway bribery case, UKMTO's two tanker attacks in the Strait of
+  Hormuz, Bahraini clerics jailed for an alleged Iran plot. Alarms: DRC-Rwanda (z 2.15), Critical Minerals (2.37),
+  Chips & Export Controls (2.22). `/feed` 17 Nov: 42 items, none dropped, all `watchfloor-feed-1.2`, no "calibrated".
+- **Crisis Group: publishing again, and the site search catches it (18 Nov, 15:00 UTC).** Google News
+  `site:crisisgroup.org` `when:3d` lists 2 and `when:7d` 6: "A Force in Pieces: The Security Complex Fighting Haiti's
+  Gangs" (17 Nov 10:55 UTC) and "Averting a Post-UNIFIL Vacuum in Southern Lebanon" (18 Nov 10:18 UTC). Both are in
+  the cloud's `seen_fp` for `crisisgroup` (`last_ok` 14:05 UTC 18 Nov, `newest_item` 10:18 UTC, no failures), so
+  14-16 Nov was a publishing lull, not a Google gap. No ReliefWeb `appname` needed for this; it would still fix the
+  ReliefWeb site search's missing headlines (Tom's call, not urgent). The Lebanon piece should show on Israel, Gaza
+  & Lebanon after the 18 Nov build; Haiti is no zone.
+
+## Earlier (16 Nov 2026, about 11:05 PM CST)
 - **First calibrated build: 16 Nov, checked (built 03:20 UTC 17 Nov).** Run summary in `mc_state/ingest`:
   `countries_built` and `relations_built` for 16 Nov (191 Events files, 3,384 pairs, press 181 files and 3,147 rows),
   no `relations_error`, no `countries_retry` or `countries_failed`; one alarm (DRC-Rwanda, attention z 4.35).
@@ -221,8 +242,8 @@ Read `CLAUDE.md` first; this file is current state and next steps. Times CST unl
 ## Next steps, in order
 1. Press tone is display only: Tom reads the zone pages' press tables for a month (from 16 Nov) before any flag,
    alarm or `/feed` item. (The `watchfloor-relations` worktree was deleted 16 Nov.)
-2. Crisis Group: no other automated route found 17 Nov (above). Check the site search again on 18-19 Nov; if Google
-   still lists nothing new, Tom decides on a ReliefWeb `appname` request.
+2. Crisis Group: done 18 Nov; the site search stores its new pieces (above). Optional: a ReliefWeb `appname` (free,
+   Tom requests it) to replace the ReliefWeb site search, which drops 2 in 5 items for having no headline.
 3. Charter interview, one zone at a time, Iran & Red Sea first (December three-signal watch).
 4. Indicators that act on tips (step 3 of the tipping plan), after the charters.
 5. Headline service for other programs (step 4); Bluesky/Telegram lists need Tom's picks (`presstv`, `farsna`
