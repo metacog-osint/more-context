@@ -10,5 +10,5 @@ First four, chosen because each has a known onset to backtest against:
 | --- | --- | --- |
 | 01_Ukraine_Conflict | 24 Feb 2022 full-scale invasion | waiting on Tom |
 | 10_Israel_Gaza_Lebanon | 7 Oct 2023 Hamas attack | waiting on Tom |
-| 11_Iran_Red_Sea | 13 Jun 2025 Israeli strikes on Iran | waiting on Tom |
+| 11_Iran_Red_Sea | 13 Jun 2025 Israeli strikes on Iran | converted 18 Nov 2026 (`11_Iran_Red_Sea.json`), waiting on Tom's review; no code reads it yet |
 | 06_India_Pakistan | 7 May 2025 strikes (Operation Sindoor) | waiting on Tom |

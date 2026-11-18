@@ -70,6 +70,24 @@ class Build(unittest.TestCase):
         self.assertEqual(items["zone:01_Ukraine_Conflict"]["properties"]["tier"], "routine")  # no data: no alarm
         self.assertEqual(items["zone:15_Cuba"]["geometry"], {"type": "Point", "coordinates": [-82.37, 23.11]})
 
+    def test_a_member_spike_makes_the_zone_an_anomaly_and_is_named(self):
+        s = summary()
+        s["entities"]["11_Iran_Red_Sea"] = {"attention": {"z": 0.5, "ratio": 1.2}, "alarms": [], "violence": {
+            "named": 203, "named_score": {"z": 1.45, "ratio": 1.3},
+            "members": {"BA": {"name": "Bahrain", "named": 8,
+                               "named_score": {"z": 3.69, "ratio": 16.0, "ratio_shown": 2.67, "floored": True}},
+                        "SA": {"name": "Saudi Arabia", "named": 40, "named_score": {"z": 0.2, "ratio": 1.0}}},
+            "spikes": ["BA"]}}
+        items = by_id(feed_v2.build(s, countries(), now=NOW))
+        p = items["zone:11_Iran_Red_Sea"]["properties"]
+        self.assertEqual((p["tier"], p["indicator_id"], p["direction"]), ("anomaly", "WF-IND-2", "supports"))
+        self.assertIn("spike in Bahrain: 8 articles, at 8, usually 3 or fewer (z 3.7)", p["title"])
+        self.assertNotIn("Saudi", p["title"])
+        s["partial"] = True
+        p = by_id(feed_v2.build(s, countries(), now=NOW))["zone:11_Iran_Red_Sea"]["properties"]
+        self.assertEqual(p["tier"], "routine")
+        self.assertNotIn("spike", p["title"])
+
     def test_topics_have_no_place_but_a_page_and_functions(self):
         p = by_id(feed_v2.build(summary(), countries(), now=NOW))["topic:T4_GNSS_Counterspace"]
         self.assertIsNone(p["geometry"])

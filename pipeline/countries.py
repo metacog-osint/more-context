@@ -30,6 +30,13 @@ counted measure the number of distinct texts behind its articles (wire copies co
 largest, beside the article counts. Display only: z, lists and alarms stay on articles. Exact text keys
 (ORIGINS_METHOD), so origins run about 3% above the backtest's 80%-overlap clustering. Absent on days with a file
 recorded before the keys existed.
+
+Member spikes (`violence.members`, Iran & Red Sea since Tom's 18 Nov 2026 answer "keep all nine, but let's find a way
+to still highlight spikes of interest"): the same zone-named count per scope country (`members`), each scored the
+same way against its own 28 days. A member is a spike at z >= MEMBER_Z, ratio >= RISING_RATIO and MEMBER_MIN articles
+or more (`spikes`, highest z first). So a burst in a quiet member (Iranian strikes on Bahrain, 15 Nov) still shows
+when a busy one (Saudi Arabia's Yemen-war reporting) dominates the zone total. An article with events in two members
+counts for both.
 """
 from __future__ import annotations
 
@@ -53,6 +60,7 @@ RISING_Z = 2.5
 RISING_RATIO = 1.5
 MIN_ARTICLES = {"urls": 40, "violent": 15}
 ELEVATED_RATIO = 2.0
+MEMBER_Z, MEMBER_MIN = RISING_Z, 5
 REF_DAYS, MIN_REF_DAYS = 90, 60
 MAX_LISTED = 15
 Z_METHOD = "robust-1"  # option C (zstats.robust_z)
@@ -91,23 +99,61 @@ def violence_scopes() -> dict[str, tuple[frozenset, frozenset]]:
     return out
 
 
-def zone_violence(recs: list[dict], matcher: TermMatcher | None = None) -> dict[str, dict]:
-    """Per zone: placed violent events inside it, their articles, and articles whose headline names the zone."""
+@lru_cache(maxsize=1)
+def member_zones() -> frozenset:
+    """Zones whose violence is also counted per scope country (`violence.members`)."""
+    cat = json.loads((CATALOG / "entities.json").read_text(encoding="utf-8"))
+    return frozenset(z["id"] for z in cat["zones"] if (z.get("violence") or {}).get("members"))
+
+
+def zone_violence(recs: list[dict], matcher: TermMatcher | None = None,
+                  scopes: dict[str, tuple[frozenset, frozenset]] | None = None,
+                  members: frozenset | None = None) -> dict[str, dict]:
+    """Per zone: placed violent events inside it, their articles, and articles whose headline names the zone.
+    `scopes` (zone id -> (countries, ADM1 codes)) defaults to the catalog's (`violence_scopes`); `members` (zone ids
+    also counted per scope country or ADM1 code, every one listed, zeros too) to `member_zones`."""
     matcher = matcher or TermMatcher()
-    scopes = violence_scopes()
+    scopes = violence_scopes() if scopes is None else scopes
+    members = member_zones() if members is None else members
     ev: dict[str, set] = {z: set() for z in scopes}
     urls: dict[str, set] = {z: set() for z in scopes}
+    by: dict[str, dict[str, set]] = {z: {k: set() for k in (*scopes[z][0], *scopes[z][1])} for z in scopes if z in members}
     for r in recs:
         for v in r.get("violent", []):
+            cc = canon(v["cc"])
             for zid, (ccs, adm1) in scopes.items():
-                if canon(v["cc"]) in ccs or v.get("adm1") in adm1:
+                if cc in ccs or v.get("adm1") in adm1:
                     ev[zid].add(v["id"])
                     urls[zid].add(v["url"])
+                    if zid in by:
+                        by[zid][cc if cc in ccs else v["adm1"]].add(v["url"])
     out = {}
     for zid in scopes:
-        named = sum(1 for u in urls[zid] if matcher.hit(zid, title_from_url(u)))
-        out[zid] = {"events": len(ev[zid]), "articles": len(urls[zid]), "named": named}
+        hits = {u: matcher.hit(zid, title_from_url(u)) for u in urls[zid]}
+        out[zid] = {"events": len(ev[zid]), "articles": len(urls[zid]), "named": sum(hits.values())}
+        if zid in by:
+            nm = names()
+            out[zid]["members"] = {k: {"name": nm.get(k, k), "named": sum(hits[u] for u in us)}
+                                   for k, us in sorted(by[zid].items())}
     return out
+
+
+def score_zone(zid: str, zv: dict, hist: dict, complete: list[date], day: date) -> None:
+    """Adds `named_score` to a zone's violence and, where it counts members, each member's `named_score` and the
+    day's `spikes`. A zone (or member) is scored on the complete days that recorded it."""
+    zh = hist["zone_named"].get(zid, {})
+    zv["named_score"] = score(zh, [d for d in complete if d in zh], day, zv["named"])
+    if "members" not in zv:
+        return
+    spikes = []
+    for k, mv in zv["members"].items():
+        mh = hist.get("zone_member", {}).get(zid, {}).get(k, {})
+        s = score(mh, [d for d in complete if d in mh], day, mv["named"])
+        mv["named_score"] = s
+        ratio_ok = (s.get("ratio") or 0) >= RISING_RATIO or (s.get("expected") is not None and s["expected"] <= 1)
+        if mv["named"] >= MEMBER_MIN and (s.get("z") or 0) >= MEMBER_Z and ratio_ok:
+            spikes.append(k)
+    zv["spikes"] = sorted(spikes, key=lambda k: -zv["members"][k]["named_score"]["z"])
 
 
 def _keys_for(sink, day: date) -> list[str]:
@@ -203,7 +249,7 @@ def history(sink, day: date, days: int = REF_DAYS) -> tuple[dict[str, dict[str, 
     """(metric -> country -> day -> count, the complete days read), from earlier days' countries.json.
     A country absent from a complete day had zero articles that day."""
     out: dict[str, dict[str, dict[date, int]]] = {m: {} for m in SCORED}
-    out["zone_named"] = {}
+    out["zone_named"], out["zone_member"] = {}, {}
     complete = []
     for i in range(1, days + 1):
         d = day - timedelta(days=i)
@@ -217,6 +263,8 @@ def history(sink, day: date, days: int = REF_DAYS) -> tuple[dict[str, dict[str, 
                 h[d] = h.get(d, 0) + c.get(m, 0)
         for zid, zv in (s.get("zones") or {}).items():
             out["zone_named"].setdefault(zid, {})[d] = zv.get("named", 0)
+            for k, mv in (zv.get("members") or {}).items():
+                out["zone_member"].setdefault(zid, {}).setdefault(k, {})[d] = mv.get("named", 0)
     return out, complete
 
 
@@ -289,7 +337,7 @@ def build_day(sink, day: date, recs: list[dict] | None = None) -> dict:
     recs = day_records(sink, day) if recs is None else recs
     partial = is_partial(recs)
     tot = totals(recs)
-    hist, complete = history(sink, day) if not partial else ({m: {} for m in (*SCORED, "zone_named")}, [])
+    hist, complete = history(sink, day) if not partial else ({m: {} for m in (*SCORED, "zone_named", "zone_member")}, [])
     zc, nm = zone_countries(), names()
     orig = origin_counts(recs)
     profs = {m: profile(hist[m], complete, day) for m in SCORED} if not partial else {}
@@ -318,18 +366,19 @@ def build_day(sink, day: date, recs: list[dict] | None = None) -> dict:
                 s = samples.setdefault(cc, [])
                 s.extend(u for u in urls if u not in s and len(s) < SAMPLES_KEPT)
     violent, seen = [], set()
+    vsc = set().union(*(s[0] for s in violence_scopes().values()))
+    vadm1 = set().union(*(s[1] for s in violence_scopes().values()))
     for r in recs:
         for v in r.get("violent", []):
             cc = canon(v["cc"])
-            if (cc in zc or cc in shown) and v["id"] not in seen:
+            if (cc in zc or cc in shown or cc in vsc or v.get("adm1") in vadm1) and v["id"] not in seen:
                 seen.add(v["id"])
                 violent.append({**v, "cc": cc, "stream": r["stream"], "file": r["stamp"]})
     zones = zone_violence(recs)
     if not partial:
         for zid, zv in zones.items():
             # A zone is scored on the complete days that recorded it (a new zone waits for 14 of them).
-            zh = hist["zone_named"].get(zid, {})
-            zv["named_score"] = score(zh, [d for d in complete if d in zh], day, zv["named"])
+            score_zone(zid, zv, hist, complete, day)
     out = {"day": day.isoformat(), "partial": partial, "files": len(recs), "scored": list(SCORED),
            "lists": lists, "countries": scored, "samples": samples, "zones": zones, "uncatalogued": uncatalogued(tot)}
     if orig:

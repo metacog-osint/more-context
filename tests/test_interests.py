@@ -33,6 +33,10 @@ class InterestsTests(unittest.TestCase):
         self.assertLessEqual(set(doc["areas"]), wps)
         self.assertLessEqual(set(doc.get("boxes", {})), set(doc["areas"]))
         self.assertEqual(doc["areas"]["WF-WP-Z01"], ["UA"])  # FIPS UP -> ISO UA
+        # Iran & Red Sea's area is its nine violence countries (suite_area, Tom 18 Nov 2026); Russia-NATO's violence
+        # scope (every NATO state) does not widen its area.
+        self.assertEqual(doc["areas"]["WF-WP-Z11"], ["AE", "BH", "IQ", "IR", "KW", "OM", "QA", "SA", "YE"])
+        self.assertNotIn("US", doc["areas"]["WF-WP-Z07"])
         named = {w for i in doc["interests"] for w in i.get("warning_problems", [])}
         self.assertLessEqual(named, wps)  # topics an interest serves are real warning problems
 
