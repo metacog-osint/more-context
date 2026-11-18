@@ -65,3 +65,58 @@ class OriginsTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LiveOriginsTests(unittest.TestCase):
+    """The live form (18 Nov 2026): exact text keys in each Events record, distinct keys counted per day."""
+
+    def test_wire_copies_share_a_key_and_other_texts_do_not(self):
+        a = origins.text_key("https://news.example.com/world/drone-attack-hits-us-radar-base-in-bahrain-12345")
+        b = origins.text_key("https://paper.example.org/2026/11/15/drone-attack-hits-us-radar-base-in-bahrain/")
+        c = origins.text_key("https://paper.example.org/2026/11/15/bahrain-court-jails-activists-for-protest/")
+        self.assertEqual(a, b)
+        self.assertNotEqual(a, c)
+        self.assertEqual(origins.text_key("https://example.com/article/1234567"), "")
+
+    def test_day_origins_sums_files_and_counts_textless_links_apart(self):
+        o = origins.day_origins([{"k1": 3, "k2": 1, "": 2}, {"k1": 2}])
+        self.assertEqual(o, {"origins": 4, "largest": 5, "articles": 8})
+
+    def test_events_record_and_country_build_carry_origins(self):
+        import tempfile
+        from datetime import date, datetime, timedelta, timezone
+
+        from pipeline import countries, events
+        from pipeline.sinks import LocalSink
+        from tests.test_events import row, zipped
+
+        slug = "australian-community-column-on-local-violence-and-crime"
+        rows = [row(str(i), "AS", f"https://site{i}.example.com.au/story/{slug}/") for i in range(6)]
+        rows += [row("90", "AS", "https://other.example.com/sydney-storm-floods-homes-overnight"),
+                 row("91", "AS", "https://other.example.com/news/998877", root="04")]
+        rec = events.record(events.parse_zip(zipped(rows)), "20261021000000", "english")
+        self.assertEqual(sorted(rec["texts"]["AS"].values()), [1, 1, 6])
+        self.assertEqual(sum(rec["vtexts"]["AS"].values()), 7)  # the numeric link is not violent
+        with tempfile.TemporaryDirectory() as td:
+            sink = LocalSink(td)
+            d = date(2026, 10, 21)
+            recs = []
+            for i in range(96):
+                stamp = (datetime(2026, 10, 21, tzinfo=timezone.utc) + timedelta(minutes=15 * i)).strftime("%Y%m%d%H%M%S")
+                for s in ("english", "translation"):
+                    r = rec if i == 0 and s == "english" else {"stamp": stamp, "stream": s, "rows": 0, "countries": {},
+                                                               "samples": {}, "violent": [], "texts": {}, "vtexts": {}}
+                    recs.append({**r, "stamp": stamp, "stream": s})
+            sink.write_json(f"events/{d:%Y/%m/%d}/000000.json", {"files": recs})
+            countries.build_day(sink, d)
+            c = sink.read_json(f"stories/{d:%Y/%m/%d}/countries.json")
+            self.assertEqual(c["origins_method"], countries.ORIGINS_METHOD)
+            self.assertEqual(c["countries"]["AS"]["origins"], {"urls": {"origins": 3, "largest": 6},
+                                                               "violent": {"origins": 2, "largest": 6}})
+            # One file recorded before the keys existed: the day carries no origins rather than some.
+            recs[5] = {k: v for k, v in recs[5].items() if k not in ("texts", "vtexts")}
+            sink.write_json(f"events/{d:%Y/%m/%d}/000000.json", {"files": recs})
+            countries.build_day(sink, d)
+            c = sink.read_json(f"stories/{d:%Y/%m/%d}/countries.json")
+            self.assertNotIn("origins_method", c)
+            self.assertNotIn("origins", c["countries"]["AS"])

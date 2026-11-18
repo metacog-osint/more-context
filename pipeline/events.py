@@ -15,6 +15,9 @@ One file becomes one compact record:
   Italian strike notice coded as fights), so consumers filter them further.
 - `pairs` (since 15 Nov 2026): per directed pair of actor countries, articles and the kinds of events they carry
   (`pipeline/relations.py`), for the relations layer.
+- `texts`, `vtexts` (since 18 Nov 2026): per country, the file's articles (all, and violent) counted by exact text
+  key (`origins.text_key`, "" for links with no text), so the daily build can count independent origins beside the
+  article counts (Tom, 18 Nov 2026: z stays on articles). About 1.4 KiB gzip a file.
 Events dated more than two days before the file are references to the past ("a year ago...") and are skipped.
 
 Since 30 Oct 2026 the records ride in the run's cycle file as rows with `"kind": "events"` first (`as_row`), so a
@@ -28,7 +31,7 @@ import urllib.error
 import zipfile
 from datetime import datetime, timedelta
 
-from . import gdelt
+from . import gdelt, origins
 from .relations import pair_table
 
 FILE_NAMES = {"english": "{stamp}.export.CSV.zip", "translation": "{stamp}.translation.export.CSV.zip"}
@@ -104,6 +107,7 @@ def record(rows: list[list[str]], stamp: str, stream: str) -> dict:
     best: dict[str, dict[str, int]] = {}  # cc -> url -> sample score
     violent = []
     seen_violent = set()
+    keys: dict[str, str] = {}
     for r in rows:
         cc = canon(r[GCC])
         if not cc or r[DAY] < oldest:
@@ -133,10 +137,20 @@ def record(rows: list[list[str]], stamp: str, stream: str) -> dict:
     countries = {}
     for cc, n in ev.items():
         countries[cc] = [n] + [len(sets[m].get(cc, ())) for m in ("urls", "root", "place", "violent")]
+    texts, vtexts = {}, {}
+    for out, m in ((texts, "urls"), (vtexts, "violent")):
+        for cc, urls in sets[m].items():
+            t = out[cc] = {}
+            for u in urls:
+                k = keys.get(u)
+                if k is None:
+                    k = keys[u] = origins.text_key(u)
+                t[k] = t.get(k, 0) + 1
     samples = {cc: [u for u, _ in sorted(b.items(), key=lambda kv: -kv[1])[:SAMPLES_PER_COUNTRY]]
                for cc, b in best.items()}
     return {"stamp": stamp, "stream": stream, "rows": len(rows), "countries": countries,
-            "samples": samples, "violent": violent, "pairs": pair_table(rows, stamp)}
+            "samples": samples, "violent": violent, "pairs": pair_table(rows, stamp),
+            "texts": texts, "vtexts": vtexts}
 
 
 def country_names(rows: list[list[str]]) -> dict[str, str]:

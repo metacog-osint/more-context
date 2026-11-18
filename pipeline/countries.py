@@ -24,6 +24,12 @@ violent event placed inside the zone (its `countries`, or `violence.countries` +
 headline names the zone (headline terms on the article link's words). The headline check matters: on 26 Oct only
 about half of Israel's and a fifth of Venezuela's violent-event articles were about the zone, and Russia-NATO's
 were nearly all noise (a Viking king placed in Oslo). Scored like attention, against the zone's last 28 days.
+
+Independent origins (Tom, 18 Nov 2026; docs/method/2026-11-18-origins.md): each country carries `origins`, per
+counted measure the number of distinct texts behind its articles (wire copies count once) and the size of the
+largest, beside the article counts. Display only: z, lists and alarms stay on articles. Exact text keys
+(ORIGINS_METHOD), so origins run about 3% above the backtest's 80%-overlap clustering. Absent on days with a file
+recorded before the keys existed.
 """
 from __future__ import annotations
 
@@ -33,7 +39,7 @@ from functools import lru_cache
 from pathlib import Path
 from statistics import median
 
-from . import measures, zstats
+from . import measures, origins, zstats
 from .events import METRICS, ROW_PREFIX, canon
 from .press import ROW_PREFIX as PRESS_PREFIX
 from .relevance import TermMatcher
@@ -50,6 +56,7 @@ ELEVATED_RATIO = 2.0
 REF_DAYS, MIN_REF_DAYS = 90, 60
 MAX_LISTED = 15
 Z_METHOD = "robust-1"  # option C (zstats.robust_z)
+ORIGINS_METHOD = "exact-text-1"  # origins.text_key, distinct keys a day
 SAMPLES_KEPT = 6
 # GDELT codes that are not countries (GDELT's FIPS.country.txt: oceans, undersea features, undesignated
 # sovereignty, no man's land): never listed, and not reported as missing from the catalog.
@@ -166,6 +173,25 @@ def totals(recs: list[dict]) -> dict[str, dict[str, int]]:
     return out
 
 
+def origin_counts(recs: list[dict]) -> dict[str, dict[str, dict]]:
+    """Per country and measure (`urls`, `violent`): {"origins", "largest"} from the records' text keys; empty
+    unless every record has them (a day that straddles the change counts no origins rather than some)."""
+    if not recs or any("texts" not in r for r in recs):
+        return {}
+    per: dict[str, dict[str, list]] = {}
+    for r in recs:
+        for field, m in (("texts", "urls"), ("vtexts", "violent")):
+            for cc, t in (r.get(field) or {}).items():
+                per.setdefault(canon(cc), {}).setdefault(m, []).append(t)
+    out = {}
+    for cc, ms in per.items():
+        out[cc] = {}
+        for m, files in ms.items():
+            o = origins.day_origins(files)
+            out[cc][m] = {"origins": o["origins"], "largest": o["largest"]}
+    return out
+
+
 def is_partial(recs: list[dict]) -> bool:
     per_stream: dict[str, int] = {}
     for r in recs:
@@ -265,12 +291,15 @@ def build_day(sink, day: date, recs: list[dict] | None = None) -> dict:
     tot = totals(recs)
     hist, complete = history(sink, day) if not partial else ({m: {} for m in (*SCORED, "zone_named")}, [])
     zc, nm = zone_countries(), names()
+    orig = origin_counts(recs)
     profs = {m: profile(hist[m], complete, day) for m in SCORED} if not partial else {}
     scored = {}
     for cc, t in tot.items():
         c = {"name": nm.get(cc, cc), **t}
         if cc in zc:
             c["zones"] = zc[cc]
+        if orig:
+            c["origins"] = orig.get(cc, {})
         if not partial:
             for m in SCORED:
                 c[f"{m}_score"] = score(hist[m].get(cc, {}), complete, day, t[m], profs[m])
@@ -303,6 +332,8 @@ def build_day(sink, day: date, recs: list[dict] | None = None) -> dict:
             zv["named_score"] = score(zh, [d for d in complete if d in zh], day, zv["named"])
     out = {"day": day.isoformat(), "partial": partial, "files": len(recs), "scored": list(SCORED),
            "lists": lists, "countries": scored, "samples": samples, "zones": zones, "uncatalogued": uncatalogued(tot)}
+    if orig:
+        out["origins_method"] = ORIGINS_METHOD
     sink.write_json(f"stories/{day:%Y/%m/%d}/countries.json", out)
     sink.write_lines(f"stories/{day:%Y/%m/%d}/violent.jsonl", violent)
     return {"day": out["day"], "partial": partial, "files": len(recs),

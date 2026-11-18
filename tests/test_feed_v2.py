@@ -164,3 +164,18 @@ class Route(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Origins(unittest.TestCase):
+    def test_country_items_carry_origins_and_name_one_big_story(self):
+        c = countries()
+        c["countries"]["KS"]["origins"] = {"violent": {"origins": 12, "largest": 8}, "urls": {"origins": 90, "largest": 3}}
+        c["countries"]["CD"]["origins"] = {"urls": {"origins": 95, "largest": 3}}
+        items = by_id(feed_v2.build(summary(), c, now=NOW))
+        ks = items["country:KS:violence"]["properties"]
+        self.assertEqual((ks["measures"]["origins"], ks["measures"]["largest_origin"]), (12, 8))
+        self.assertIn("one story is 8 of its 20 articles", ks["title"])
+        cd = items["country:CD:attention"]["properties"]
+        self.assertEqual(cd["measures"]["origins"], 95)
+        self.assertNotIn("one story", cd["title"])
+        self.assertNotIn("origins", items["country:BR:violence"]["properties"]["measures"])

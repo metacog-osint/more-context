@@ -72,6 +72,7 @@ tr.alarm td { background: var(--alarm-soft); }
 .story-title { font-weight: 600; text-decoration: none; }
 .story-title:hover { text-decoration: underline; }
 .meta { color: var(--muted); font-size: 13px; margin-top: 3px; }
+.meta.warn { color: var(--accent-ink); }
 .coding { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
 .chip { font-size: 12px; padding: 1px 7px; border-radius: 4px; background: var(--chip); }
 .chip.on { color: var(--ok); } .chip.off { color: var(--alarm); }
