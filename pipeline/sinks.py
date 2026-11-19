@@ -90,6 +90,17 @@ class LocalSink:
         self.write_json(key, obj)
         return True
 
+    def read_lines_versioned(self, key: str) -> tuple[list[dict], str | int]:
+        """(rows, version) of a JSON-lines object; ([], 0) when it does not exist."""
+        p = self.root / key
+        return (self.read_lines(key), self._version(key)) if p.exists() else ([], 0)
+
+    def write_lines_if(self, key: str, rows: list[dict], version: str | int) -> bool:
+        if self._version(key) != version:
+            return False
+        self.write_lines(key, rows)
+        return True
+
 
 class GCSSink:
     def __init__(self, bucket: str):
@@ -139,6 +150,22 @@ class GCSSink:
 
         try:
             self._put(key, json.dumps(obj, ensure_ascii=False), "application/json", if_generation_match=version)
+            return True
+        except PreconditionFailed:
+            return False
+
+    def read_lines_versioned(self, key: str) -> tuple[list[dict], int]:
+        """(rows, generation) of a JSON-lines object; ([], 0) when it does not exist."""
+        blob = self.bucket.get_blob(key)
+        if blob is None:
+            return [], 0
+        return _parse(self._get(blob)), blob.generation
+
+    def write_lines_if(self, key: str, rows: list[dict], version: int) -> bool:
+        from google.api_core.exceptions import PreconditionFailed
+
+        try:
+            self._put(key, _lines(rows), "application/x-ndjson", if_generation_match=version)
             return True
         except PreconditionFailed:
             return False

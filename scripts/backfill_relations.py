@@ -50,6 +50,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline import events, gdelt, press, relations  # noqa: E402
 from pipeline.sinks import LocalSink  # noqa: E402
+from scripts.rescore_archive import ArchiveError, archive_local, copy_object, stamp_now  # noqa: E402
 
 STREAMS = ("english", "translation")
 API = "https://storage.googleapis.com"
@@ -113,6 +114,12 @@ class TokenSink:
             if e.code == 404:
                 return None
             raise
+
+    def archive(self, key: str, stamp: str) -> None:
+        """Copy an existing object to archive/rescore/<stamp>/<key> before it is replaced (retention M4); an
+        object that does not exist yet has nothing to keep. Raises ArchiveError."""
+        if self.exists(key):
+            copy_object(self.bucket, key, self._open, stamp)
 
     def write_json(self, key: str, obj: dict) -> None:
         body = gzip.compress(json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
@@ -202,6 +209,17 @@ def main() -> int:
         ap.error("give exactly one of --root and --bucket")
     sink = TokenSink(a.bucket) if a.bucket else LocalSink(Path(a.root))
     end = date.fromisoformat(a.end)
+    stamp = stamp_now()
+
+    def keep(key: str) -> None:  # the original goes to archive/rescore/<stamp>/ first; no copy, no write
+        try:
+            if isinstance(sink, TokenSink):
+                sink.archive(key, stamp)
+            else:
+                archive_local(Path(a.root), [key], stamp)
+        except ArchiveError as e:
+            sys.exit(f"REFUSING to write {key}: {e}")
+
     if not a.series_only:
         if not a.start:
             ap.error("--start is required unless --series-only")
@@ -235,10 +253,12 @@ def main() -> int:
                         rec["press"] = old["press"]
                     line = (f"{d}: {rec['files']} files, {failed} failed, {len(rec['pairs'])} pairs, "
                             f"{'partial' if rec['partial'] else 'complete'}")
+                keep(key)
                 sink.write_json(key, rec)
                 print(f"{line}, {time.time() - t0:.0f} s, written", flush=True)  # only once the write succeeded
                 d += timedelta(days=1)
     last = series_end(sink, end, datetime.now(timezone.utc).date())
+    keep("relations/series.json")
     s = relations.rebuild_series(sink, last)
     print(f"series to {last}: {len(s['days'])} days, {sum(len(v['pairs']) for v in s['days'].values())} pair-days",
           flush=True)

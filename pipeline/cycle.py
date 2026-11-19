@@ -15,7 +15,7 @@ from __future__ import annotations
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 
-from . import blocklist, countries, daily, events, feeds, gdelt, health, ondemand, press, relations, statestore
+from . import blocklist, countries, daily, events, feeds, gdelt, health, healthlog, ondemand, press, relations, statestore
 from .budget import BudgetExceeded
 from .match import Matcher
 from .sources import lookup_domain
@@ -203,6 +203,7 @@ def run_cycle(sink, now: datetime | None = None, streams=STREAMS, poll_rss: bool
 
     run_alarms(sink, state, summary, ai_on, code_alarm)
     state["last_run"] = summary
+    healthlog.record(sink, state, summary)  # this run's health line goes to health/YYYY-MM-DD.jsonl (retention M1)
     store.write(state, backup=bool(days))  # Firestore state: the run that builds a day refreshes the bucket copy
     return summary
 

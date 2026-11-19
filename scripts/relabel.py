@@ -9,7 +9,8 @@ the old place list): rows the old zone never matched were not kept. A wider rule
     python -I scripts/relabel.py --root data/backfill/baseline --start 2026-09-28 --end 2026-10-26 --dry-run
     python -I scripts/relabel.py --root data/relabel/all --start 2026-09-28 --end 2026-10-26
 
-Cycle files are rewritten in place under --root (copy the originals first if you want them), then every day from
+Cycle files are rewritten in place under --root; each original is first copied to <root's parent>/archive/rescore/
+<UTC stamp>/<path> (retention M4) and nothing is written if that copy fails. Then every day from
 --start to --end is rebuilt oldest first, so each day's attention baseline uses the rebuilt days before it.
 A summary that was a backfill keeps its backfill mark.
 """
@@ -26,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline import daily  # noqa: E402
 from pipeline.match import Matcher, load_catalog  # noqa: E402
 from pipeline.sinks import LocalSink  # noqa: E402
+from scripts.rescore_archive import ArchiveError, archive_local, stamp_now  # noqa: E402
 
 
 def relabel_rows(rows: list[dict], retired: set[str], matcher: Matcher) -> tuple[list[dict], Counter]:
@@ -58,6 +60,7 @@ def main() -> int:
     start, end = date.fromisoformat(a.start), date.fromisoformat(a.end)
 
     total, files = Counter(), 0
+    stamp = stamp_now()
     d = start
     while d <= end + timedelta(days=1):  # rows published late on `end` can sit in the next day's first files
         for key in sink.list(f"cycles/{d:%Y/%m/%d}"):
@@ -67,6 +70,10 @@ def main() -> int:
                 total += moved
                 files += 1
                 if not a.dry_run:
+                    try:
+                        archive_local(Path(a.root), [key], stamp)
+                    except ArchiveError as e:
+                        sys.exit(f"REFUSING to write: {e}")
                     sink.write_lines(key, rows)
         d += timedelta(days=1)
     print(f"{'would relabel' if a.dry_run else 'relabelled'} rows in {files} cycle files: {dict(total)}")
@@ -77,6 +84,10 @@ def main() -> int:
     while d <= end:
         key = f"stories/{d:%Y/%m/%d}/summary.json"
         old = sink.read_json(key) if sink.exists(key) else None
+        try:  # the rebuild replaces the day's story files
+            archive_local(Path(a.root), sink.list(f"stories/{d:%Y/%m/%d}/"), stamp)
+        except ArchiveError as e:
+            sys.exit(f"REFUSING to rebuild: {e}")
         r = daily.build_day(sink, d)
         if old and old.get("backfill"):
             s = sink.read_json(key)

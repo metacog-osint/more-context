@@ -16,7 +16,10 @@ from email.utils import parsedate_to_datetime
 
 USER_AGENT = "MORE-CONTEXT/0.1 (+https://context.theintelligence.company; feed reader)"
 MAX_BYTES = 5_000_000
-SUMMARY_CHARS = 400
+# Stored per feed item (retention M5, 18 Nov 2026: was 400, which cut long items for good). Nothing in the pipeline
+# or the site shows a feed item's summary yet; a display that does must cut to DISPLAY_SUMMARY_CHARS itself.
+SUMMARY_CHARS = 2000
+DISPLAY_SUMMARY_CHARS = 400
 
 NS = {
     "atom": "http://www.w3.org/2005/Atom",

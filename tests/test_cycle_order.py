@@ -115,7 +115,8 @@ class StateWritesTests(unittest.TestCase):
             with mock.patch.object(daily, "build_day", lambda s, day: {"day": day.isoformat(), "alarms": {}}), \
                     mock.patch("pipeline.countries.build_day", lambda s, day, recs=None: {"day": day.isoformat()}),                     mock.patch("pipeline.relations.build_day", lambda s, day, r, p: {"day": day.isoformat()}):
                 cycle.run_cycle(sink, now=build, streams=(), ai_on=False, poll=feed, store=store)
-            self.assertEqual(sink.keys_written, ["cycles/2026/10/29/032000.jsonl", cycle.STATE_KEY])
+            # the first run of a new UTC day also sends the closed day's health lines (health/<day>.jsonl, retention M1)
+            self.assertEqual(sink.keys_written, ["cycles/2026/10/29/032000.jsonl", "health/2026-10-28.jsonl", cycle.STATE_KEY])
             self.assertEqual(sink.read_json(cycle.STATE_KEY)["stories"]["last_day"], "2026-10-28")
             self.assertEqual(store.read()["stories"]["last_day"], "2026-10-28")
 

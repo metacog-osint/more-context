@@ -28,6 +28,7 @@ from pipeline import daily, gdelt  # noqa: E402
 from pipeline.cycle import gdelt_rows  # noqa: E402
 from pipeline.match import Matcher  # noqa: E402
 from pipeline.sinks import LocalSink  # noqa: E402
+from scripts.rescore_archive import ArchiveError, archive_local, stamp_now  # noqa: E402
 
 STREAMS = ("english", "translation")
 
@@ -101,7 +102,12 @@ def main() -> int:
         print(f"{len(problems)} files missing or failed, e.g. {problems[:3]}")
     if not a.no_build:
         d = start
+        stamp = stamp_now()
         while d <= end:
+            try:  # the build replaces the day's story files: keep the originals first (retention M4)
+                archive_local(Path(a.root), sink.list(f"stories/{d:%Y/%m/%d}/"), stamp)
+            except ArchiveError as e:
+                sys.exit(f"REFUSING to build {d}: {e}")
             r = daily.build_day(sink, d)
             s = sink.read_json(f"stories/{d:%Y/%m/%d}/summary.json")
             s["backfill"] = {"every": a.every, "built": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
