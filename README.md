@@ -25,3 +25,9 @@ match a zone or topic, groups them into stories, and writes a report to `data/re
 ```
 python -m unittest discover -s tests -t .
 ```
+
+## Licence
+
+Copyright © 2026 Thomas Brummer, The Intelligence Company. MORE CONTEXT's code is licensed under the GNU Affero General Public License
+v3.0 (`LICENSE`). Third-party and shared files keep their own licences, and data keeps its sources'
+terms; both are listed in `NOTICE`.
