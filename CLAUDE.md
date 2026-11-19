@@ -32,7 +32,7 @@ warning (did something change?) and awareness (what is the picture, how is each 
     fetch `origin/main` and check the latest hosting release (other sessions deploy too; a 16 Nov deploy rolled back
     another's house bar).
   - Functions: the `gcloud functions deploy` lines in `scripts/deploy_ai.sh`. **In PowerShell single-quote the env-var argument:**
-    `'--set-env-vars=MC_BUCKET=more-context-484804,MC_AI=on,MC_STATE=firestore'` (unquoted, `gcloud.ps1` joined them
+    `'--set-env-vars=MC_BUCKET=more-context-484804,MC_AI=on,MC_STATE=firestore,MC_AI_MONTHLY_CAP_USD=15'` (unquoted, `gcloud.ps1` joined them
     into one bad bucket name, 29 Oct). After any deploy check `gcloud functions describe mc-ingest --gen2
     --region=us-central1 --project=context-484804 --format="json(serviceConfig.environmentVariables)"` shows three
     separate variables. **No rollback by traffic:** old images are cleaned up, and a failed `update-traffic` pins the
@@ -56,8 +56,8 @@ warning (did something change?) and awareness (what is the picture, how is each 
 - **AI spend on demand, capped (26 Oct):** always-on work costs $0. Alarm = attention z >= 2 and >= 5 stories; each
   15-minute cycle codes at most 2 flagged entity-days (`state.ai.pending`); it is a spending trigger, not a warning
   level. `POST /code` (anyone may call it) codes one entity-day's top 25 uncached stories; `GET /zone` and `/status`
-  never spend. A story is never coded twice. Ledger `state/ai_spend.json`: hard cap $5 per UTC month, on-view at most
-  $0.50/day and never the last $1. Kill switch: redeploy with `MC_AI=off`. A $5 Cloud Billing alert is the backstop.
+  never spend. A story is never coded twice. Ledger `state/ai_spend.json`: hard cap $15 per UTC month (Tom, 19 Nov 2026; env `MC_AI_MONTHLY_CAP_USD=15` on mc-api and mc-ingest, code default stays 5), on-view at most
+  $0.50/day and never the last $1. Kill switch: redeploy with `MC_AI=off`. A $15 Cloud Billing alert is the backstop. Most anonymous visitors can spend is about $14/mo.
 - **Costs (29 Oct: no paid usage, lose nothing, keep a historical record):** free tiers are per billing account
   (shared with geo-context and two other projects; figures in `HISTORY.md` "Cost audit"): 5 GB storage, 5,000 Class
   A a month, 3 Scheduler jobs (6 on the account; paused ones count). Past 5 GB, move older files to Tom's own storage.
