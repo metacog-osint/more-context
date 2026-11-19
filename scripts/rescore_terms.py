@@ -42,6 +42,7 @@ from pipeline import countries, daily, measures  # noqa: E402
 from pipeline.relevance import TERMS, TermMatcher  # noqa: E402
 from pipeline.sinks import LocalSink, gz  # noqa: E402
 from pipeline.stories import title_from_url  # noqa: E402
+from scripts.rescore_archive import PREFIX as ARCHIVE_PREFIX, ArchiveError, archive_bucket, stamp_now  # noqa: E402
 
 BUCKET = "more-context-484804"
 FILES = ("summary.json", "countries.json", "stories.jsonl", "violent.jsonl")
@@ -159,9 +160,23 @@ def fetch(root: Path, days: list[date]) -> dict:
     return manifest
 
 
-def upload(root: Path, keys: list[str]) -> None:
+def upload(root: Path, keys: list[str], urlopen=urllib.request.urlopen, stamp: str | None = None) -> None:
+    """Upload the changed files. Every original is first copied to archive/rescore/<UTC stamp>/<key> in the bucket
+    (retention M4); if any copy fails nothing is written."""
     tok = _token()
     manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+    keys = list(dict.fromkeys(keys))
+    stamp = stamp or stamp_now()
+
+    def opener(req):
+        req.add_header("Authorization", "Bearer " + tok)
+        return urlopen(req, timeout=120)
+
+    try:
+        archived = archive_bucket(BUCKET, keys, manifest, opener, stamp)
+    except ArchiveError as e:
+        sys.exit(f"REFUSING to write: {e}. Nothing was uploaded.")
+    print(f"archived {len(archived)} originals under {ARCHIVE_PREFIX}/{stamp}/", flush=True)
     for key in keys:
         body = gz((root / key).read_bytes())
         q = urllib.parse.urlencode({"uploadType": "media", "name": key, "contentEncoding": "gzip",
@@ -170,7 +185,7 @@ def upload(root: Path, keys: list[str]) -> None:
                                      method="POST", headers={"Authorization": "Bearer " + tok,
                                                              "Content-Type": "application/json"})
         try:
-            with urllib.request.urlopen(req, timeout=120) as r:
+            with urlopen(req, timeout=120) as r:
                 manifest[key] = json.loads(r.read())["generation"]
             print("wrote", key, flush=True)
         except urllib.error.HTTPError as e:
