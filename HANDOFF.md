@@ -10,8 +10,14 @@ figures, South Sudan exclusion, feed health pass, Crisis Group checks) is
   and the website, deployed 20:08-20:12 UTC 18 Nov from `7f99841` (Iran & Red Sea charter, on top of `3dae530`'s
   country `origins`, `watchfloor-feed-1.3`). Origins first appear on 19 Nov, the first full day of keyed records
   (built about 03:20 UTC 20 Nov); 18 Nov has none.
-- 17 Nov build checked (03:21 UTC 18 Nov): all outputs written, not partial, no retry or relations error; `/feed`
-  42 items, none dropped. AI spend $0.05 of $5 for November (15 Nov).
+- 18 Nov build checked (built 03:22 UTC 19 Nov; first day with the nine-member Iran & Red Sea zone), 20 Nov: summary,
+  stories, countries, violent, relations and relations/series written, none partial; Firestore `stories.last_day` has
+  since moved to 2026-11-19, no `countries_retry`, `countries_failed` or `relations_error`. Country scores robust-1,
+  zone scores pred-1, no RB. Zone has IR, YM, BA, QA, AE, KU, MU, SA, IZ, each with a named_score; spikes KU (z 3.9, 16
+  articles) and MU (z 2.5, 11). violent.jsonl 4,050 events, all nine members present. `/feed` 39 items, none dropped;
+  Iran & Red Sea tier anomaly. Crisis Group "Averting a Post-UNIFIL Vacuum" is in stories under Israel, Gaza & Lebanon.
+  18 Nov has no origins (expected). Alarms list empty. Not checked: sample headlines for the rising lists (the
+  `samples` block holds URLs only). AI spend $0.05 of $5 for November (15 Nov).
 - Main checkout `[local path]` was 3 commits behind origin with an uncommitted `CLAUDE.md` line (the
   "Elsewhere today" note, folded into the slim `CLAUDE.md` and this file): drop it with `git checkout -- CLAUDE.md`
   once the slim lands (Tom's yes). Untracked there: `.claude/`, `GEMINI.md` (another tool's notes).
