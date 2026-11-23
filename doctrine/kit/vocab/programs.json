@@ -89,7 +89,7 @@
      "terms": "Headwind code MIT; US public domain (OFAC, Federal Register); FAO CC BY-NC-SA 3.0 IGO", "fresh_hours": 24, "stale_hours": 72,
      "extra": {"events": "https://headwind.theintelligence.company/data/events.json"},
      "owns": ["sanctions lists and deltas", "export controls", "commodity and energy prices", "critical minerals"]},
-    {"id": "vis", "name": "Vis", "status": "planned", "status_note": "prototype in [local path] (local only); not deployed. Set live when its address serves a real feed", "family": "Weather", "warning_problem_prefix": "VS-WP",
+    {"id": "vis", "name": "Vis", "status": "planned", "status_note": "prototype in ../weather-impact (local only); not deployed. Set live when its address serves a real feed", "family": "Weather", "warning_problem_prefix": "VS-WP",
      "feed": "https://vis.theintelligence.company/data/feed.geojson", "site": "https://vis.theintelligence.company",
      "terms": "Vis code MIT; CC BY 4.0 (Open-Meteo, ECMWF); NOAA NCEP public domain", "fresh_hours": 18, "stale_hours": 48,
      "owns": ["theatre weather and illumination effects by zone"]},
