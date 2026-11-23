@@ -44,8 +44,9 @@ warning (did something change?) and awareness (what is the picture, how is each 
   BigQuery) is measured on a sample and approved by Tom first. No BigQuery anywhere in Watchfloor.
 - GCP project `context-484804`, shared with v4.3: Watchfloor's resources carry the `mc_` prefix. One Scheduler job per
   job, defined here (v4.3's own is `trigger-context-update`). No secrets in files; Tom sets them.
-- Hidden from search engines until Tom says public: `noindex` meta, `X-Robots-Tag`, `robots.txt` Disallow. To go
-  public remove all three and link from CONTEXT. Footer: "A project of The Intelligence Company. Updated <date>." +
+- Hidden from search engines until Tom says public: `noindex` meta and `X-Robots-Tag`. `robots.txt` was opened to
+  crawlers on Tom's yes of 21 Nov 2026 (ideas#92), so crawlers can read the noindex. To go
+  public remove both and link from CONTEXT. Footer: "A project of The Intelligence Company. Updated <date>." +
   terms + data credits (GDELT requires citation and link) + a Sources page. `web/app.js` inserts API text as text.
 - **Two-source rule (27 Oct):** an indicator hit counts once two independent sources report it (different outlets,
   not one government); an official claim counts once an outlet outside that government reports it. Single-source
