@@ -1,11 +1,11 @@
 # Watchfloor (working name MORE CONTEXT)
 
-Tom's parallel rebuild of CONTEXT (v4.3, `[local path]`, context.theintelligence.company); both are built
+Tom's parallel rebuild of CONTEXT (v4.3, `../geo-context`, context.theintelligence.company); both are built
 and scored side by side and the better parts win. Publicly available information only, no classification markings.
 Public repo `metacog-osint/more-context`: nothing private in tracked files.
 
 **Current state and open items: [`HANDOFF.md`](./HANDOFF.md)**; read it first. Fuller notes: `HISTORY.md`, `docs/`;
-pre-slim text (18 Nov): `[local path]`. Plan:
+pre-slim text (18 Nov): the private planning notes. Plan:
 https://claude.ai/artifact/ShyAN6L2qhb6MBiq5284kk. Keep this file under 12 KB.
 
 **Name (Tom, 27 Oct 2026):** public name Watchfloor; internal ids (repo `more-context`, the functions, bucket and
@@ -22,7 +22,7 @@ warning (did something change?) and awareness (what is the picture, how is each 
   <USD>` is **billable** (Tom's yes).
 - Tests: `python -m unittest discover -s tests -t .` (CI `ci.yml` runs it plus `doctrine/kit/tic.py kitcheck` and
   `registers doctrine` on every push and PR; **CI does not deploy**). 39 `tests.test_match` failures are expected
-  locally: they read `[local path]` from disk.
+  locally: they read `../geo-context/functions/index.js` from disk.
 - Local preview: `scripts/dev_server.py --root <data folder>` (launch config `watchfloor-dev`, port 8734), AI off.
 - **Deploys are all by hand and each needs Tom's yes.** Deploy from a clean `git archive` of a named commit (assert
   HEAD), never from a shared working tree.
@@ -86,8 +86,8 @@ warning (did something change?) and awareness (what is the picture, how is each 
   (Tom's reviewed pairs and `press` blocks), `press_outlets.json`, FIPS tables, `eval/relevance_v1.jsonl`.
 - `pipeline/` is standard-library Python; `scripts/` holds backfills, rescores, evals and builders; `data/` is ignored.
 - `doctrine/`: registers (SQ1, PIRs, EEIs, warning problems `WF-WP-*`, indicators `WF-IND-1..6`, grades proposed).
-  `doctrine/kit/` is vendored: never edit it here; `python [local path]
-  [local path]`. `doctrine/interests.json` comes from `scripts/build_interests.py` (edit the script; rerun
+  `doctrine/kit/` is vendored: never edit it here; `python ../tic-doctrine/tools/sync.py
+  .`. `doctrine/interests.json` comes from `scripts/build_interests.py` (edit the script; rerun
   after changing a zone's countries, sea `boxes` or an interest). `doctrine/kit/geo/` must ship with the API.
 
 ## How it works (gotchas)
