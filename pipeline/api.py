@@ -166,6 +166,35 @@ def _slug_title(url: str) -> str:
     return "" if not words or sum(any(ch.isdigit() for ch in w) for w in words) * 2 >= len(words) else t
 
 
+def _tier_history(sink, d: str, days: list[str], catalog: dict, feed_v2) -> list[tuple[str, dict]] | None:
+    """Comparable tiers of the built days before `d`, newest first, for the feed's last_change. Read only, each day
+    cached for a day. None if any read fails, so the feed then states no last_change rather than a wrong one."""
+    def load(day: str):
+        stem = f"stories/{day[:4]}/{day[5:7]}/{day[8:10]}"
+        s = sink.read_json(f"{stem}/summary.json")
+        if not s:
+            return None
+        c = sink.read_json(f"{stem}/countries.json")
+        zones = (c or {}).get("zones") or {}
+        lean = {"partial": s.get("partial"), "entities": {
+            eid: {"alarms": e.get("alarms") or [], "violence": zones.get(eid)} for eid, e in s.get("entities", {}).items()}}
+        # {"state": None} is a real answer (a day that cannot be compared); _cached does not keep a bare None.
+        return {"state": feed_v2.day_states(lean, c, catalog, fips)}
+
+    out = []
+    try:
+        fips = feed_v2._load("catalog/fips_iso.json")["codes"]
+        for day in [x for x in days if x < d][:feed_v2.LOOKBACK_DAYS]:
+            hit = _cached(f"tiers:{day}", 86400, lambda: load(day))
+            if hit is None:
+                return None
+            if hit["state"] is not None:
+                out.append((day, hit["state"]))
+    except Exception:  # the feed must still be served
+        return None
+    return out
+
+
 def _countries(sink, d: str) -> dict | None:
     c = sink.read_json(f"stories/{d[:4]}/{d[5:7]}/{d[8:10]}/countries.json")
     if not c:
@@ -302,7 +331,8 @@ def handle(method: str, path: str, params: dict, body: dict | None, sink, *, ai_
             if not any(e.get("violence") for e in summary["entities"].values()):
                 _CACHE.pop(f"summary:{d}", None)  # country counts land seconds after the stories
             ctry = _cached(f"countries:{d}", 3600, lambda: _countries(sink, d))
-            return 200, feed_v2.build(summary, ctry, catalog=catalog)
+            return 200, feed_v2.build(summary, ctry, catalog=catalog,
+                                      history=_tier_history(sink, d, days, catalog, feed_v2))
         if method == "GET" and path == "/relations":
             from . import relations
             cat = relations.catalog()

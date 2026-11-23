@@ -40,6 +40,69 @@ def by_id(fc):
     return {f["properties"]["id"].split(":", 2)[2]: f for f in fc["features"]}
 
 
+class Revision21(unittest.TestCase):
+    """Contract revision 2.1 fields (ideas#183)."""
+
+    def feed(self, **kw):
+        return feed_v2.build(summary(), countries(), now=NOW, **kw)
+
+    def test_header_and_every_item_state_the_fields(self):
+        fc = self.feed(history=[])
+        self.assertEqual(fc["contract_rev"], "2.1")
+        self.assertEqual(fc["dropped"], [])
+        for f in fc["features"]:
+            p = f["properties"]
+            self.assertNotIn(DAY, p["subject_id"])
+            self.assertEqual((p["event_start"], p["event_time_precision"]), (f"{DAY}T00:00:00Z", "day"))
+            self.assertNotIn("event_end", p)
+            self.assertIn("last_change", p)
+            if p["tier"] == "anomaly":
+                self.assertIsInstance(p["signal"]["value"], (int, float), p["id"])
+
+    def test_subject_ids_are_stable_and_use_iso(self):
+        one = {f["properties"]["subject_id"] for f in self.feed()["features"]}
+        later = summary()
+        later["day"] = "2026-10-22"
+        two = {f["properties"]["subject_id"] for f in feed_v2.build(later, countries(), now=NOW)["features"]}
+        self.assertEqual(one, two)
+        self.assertIn("watchfloor:summary:daily", one)
+        self.assertIn("watchfloor:zone:15_Cuba", one)
+        self.assertIn("watchfloor:country:KR:violence", one)  # FIPS KS is ISO KR
+        self.assertNotIn("watchfloor:country:KS:violence", one)
+
+    def test_signal_is_the_test_that_tripped(self):
+        items = by_id(self.feed())
+        self.assertEqual(items["zone:15_Cuba"]["properties"]["signal"]["name"], "headline-matched stories")
+        self.assertEqual(items["zone:15_Cuba"]["properties"]["signal"]["value"], 40)
+        self.assertEqual(items["zone:03_Korea_Peninsula"]["properties"]["signal"]["value"], 28)
+
+    def test_last_change_finds_the_most_recent_move(self):
+        s = "watchfloor:zone:15_Cuba"
+        hist = [("2026-10-20", {s: "anomaly"}), ("2026-10-19", {s: "routine"}), ("2026-10-18", {s: "routine"})]
+        self.assertEqual(feed_v2.last_change(s, "anomaly", DAY, hist), ("raised", "2026-10-20T00:00:00Z"))
+        self.assertEqual(feed_v2.last_change(s, "routine", DAY, hist), ("lowered", f"{DAY}T00:00:00Z"))
+        self.assertEqual(feed_v2.last_change(s, "anomaly", DAY, hist[:1]), ("none", None))
+        self.assertEqual(feed_v2.last_change(s, "routine", DAY, [("2026-10-20", {})]), ("new", f"{DAY}T00:00:00Z"))
+        c = "watchfloor:country:SY:violence"
+        self.assertEqual(feed_v2.last_change(c, "anomaly", DAY, [("2026-10-20", {})]), ("raised", f"{DAY}T00:00:00Z"))
+
+    def test_a_partial_day_does_not_read_as_lowered(self):
+        s = "watchfloor:zone:15_Cuba"
+        hist = [("2026-10-20", {s: "anomaly"}), ("2026-10-19", {s: "routine"})]
+        fc = feed_v2.build(summary(partial=True), countries(), now=NOW, history=hist)
+        p = by_id(fc)["zone:15_Cuba"]["properties"]
+        self.assertEqual((p["tier"], p["last_change"], p["last_change_at"]), ("routine", "raised", "2026-10-20T00:00:00Z"))
+
+    def test_partial_days_are_not_comparable(self):
+        cat = {"zones": [], "topics": []}
+        self.assertIsNone(feed_v2.day_states({"partial": True, "entities": {}}, {"lists": {}}, cat, {}))
+        self.assertIsNone(feed_v2.day_states({"entities": {}}, None, cat, {}))
+
+    def test_without_history_no_last_change_is_guessed(self):
+        for f in self.feed()["features"]:
+            self.assertNotIn("last_change", f["properties"])
+
+
 class Build(unittest.TestCase):
     def test_every_item_passes_the_kit_linter(self):
         fc = feed_v2.build(summary(), countries(), now=NOW)
