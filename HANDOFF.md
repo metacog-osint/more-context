@@ -3,7 +3,7 @@
 Current state and open items. Read `CLAUDE.md` first. Replace lines as they change; delete items when done; leave
 shas and "landed" notes to git. Slimmed 18 Nov 2026 from 27 KB; the full earlier handoff (build checks, rescore
 figures, South Sudan exclusion, feed health pass, Crisis Group checks) is
-`D:\Projects\_ideas\archive\watchfloor-HANDOFF-2026-11-18.md`. Times UTC unless marked.
+the private planning notes. Times UTC unless marked.
 
 ## State (18 Nov 2026; measure before acting)
 - Live: `mc-ingest-00028-giw`, `mc-api-00027-biw` (env vars `MC_BUCKET`, `MC_AI=on`, `MC_STATE=firestore`, checked),
@@ -18,7 +18,7 @@ figures, South Sudan exclusion, feed health pass, Crisis Group checks) is
   Iran & Red Sea tier anomaly. Crisis Group "Averting a Post-UNIFIL Vacuum" is in stories under Israel, Gaza & Lebanon.
   18 Nov has no origins (expected). Alarms list empty. Not checked: sample headlines for the rising lists (the
   `samples` block holds URLs only). AI spend $0.05 of $5 for November (15 Nov).
-- Main checkout `D:\Projects\more-context` was 3 commits behind origin with an uncommitted `CLAUDE.md` line (the
+- Main checkout this repo was 3 commits behind origin with an uncommitted `CLAUDE.md` line (the
   "Elsewhere today" note, folded into the slim `CLAUDE.md` and this file): drop it with `git checkout -- CLAUDE.md`
   once the slim lands (Tom's yes). Untracked there: `.claude/`, `GEMINI.md` (another tool's notes).
 - **Iran & Red Sea charter: live (18 Nov).** `catalog/indicators/11_Iran_Red_Sea.json` (no code
@@ -49,7 +49,7 @@ figures, South Sudan exclusion, feed health pass, Crisis Group checks) is
 ## Decided 18 Nov 2026 (Tom)
 - Independent origins: z stays on articles; an `origins` count is carried beside the article count on country
   items (`docs/method/2026-11-18-origins.md`).
-- Feed contract D11 ("reported, then corroborated"): all four picks, `_ideas\feed-contract-proposal-2026-11.md`
+- Feed contract D11 ("reported, then corroborated"): all four picks, the private planning notes
   section 9. Built after kit 0.6.0; Wake and Cordon first.
 
 ## Next steps, in order
