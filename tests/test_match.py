@@ -6,7 +6,7 @@ from pathlib import Path
 from pipeline.match import Matcher, load_catalog
 
 M = Matcher()
-V43_SOURCE = Path("D:/Projects/geo-context/functions/index.js")
+V43_SOURCE = Path(__file__).resolve().parents[2] / "geo-context" / "functions" / "index.js"
 
 
 class ZoneTests(unittest.TestCase):
