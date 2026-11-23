@@ -2,9 +2,9 @@
 
 For Tom's decision. Nothing here is live: no scoring change, no bucket write, no commit, no deploy. Measured
 16 Nov 2026, about 9:00-10:45 AM CST, from read-only copies of the stored days. Answers the 15 Nov 2026 suite review,
-Watchfloor section (`D:\Projects\_ideas\suite-review-2026-11-15\findings.md:1441-1457`).
+Watchfloor section (`the private planning notes:1441-1457`).
 
-Prototype code: worktree `D:\Projects\_worktrees\watchfloor-z-calibration`, branch `method/z-calibration` (from
+Prototype code: worktree a separate worktree, branch `method/z-calibration` (from
 `origin/main` `017cc35`, uncommitted), folder `scripts/zcal/`: `estimators.py` (the options), `real.py` (stored days),
 `sim.py` (event-free simulation), `report_real.py`, `listings.py`, `zones.py`, `zone_filter.py`, `tone.py`. Standard
 library only, run with `python -I`. Data copies on C: (`%TEMP%\zcal`): `countries.json` 29 Jul-15 Nov (29 Jul-14 Nov
@@ -143,7 +143,7 @@ today's alarm volume would need a lower alarm threshold under B (not measured).
 **What happens.** The title's ratio is `count / expected` (`pipeline/feed_v2.py:63-68` `_times`, ratio from
 `pipeline/measures.py:53`). On a baseline of mostly zero days the expected value is near zero: Guinea's violence on
 13 Nov was 15 articles against 0.19 expected (Fridays 0, 1, 0, 0), so "79.3x normal (z 6.7)". The z is the bigger
-problem for COP: COP ranks Watchfloor items by `measures.score.z` (`D:\Projects\cop\config\programs.json`, the
+problem for COP: COP ranks Watchfloor items by `measures.score.z` (`../cop\config\programs.json`, the
 `watchfloor` strength rule; `tools/snapshot.py:74-87`), and a near-zero baseline with the 0.15 SD floor gives a large z.
 
 **Measured, live listings 12 Aug-15 Nov 2026 (stored `countries.json`):**
