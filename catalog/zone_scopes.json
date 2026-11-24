@@ -1,0 +1,27 @@
+{
+ "note": "Scope id of each zone and topic at this catalog_version. Written by pipeline/zone_scope.py.",
+ "catalog_version": "2026-11-24.1",
+ "scopes": {
+  "01_Ukraine_Conflict": "297de7d19986",
+  "07_Russia_NATO": "ee19b4c08ac5",
+  "02_Taiwan_Strait": "1e4bfb4faa86",
+  "08_South_China_Sea": "4f772787a490",
+  "03_Korea_Peninsula": "857f2b21e394",
+  "10_Israel_Gaza_Lebanon": "2051b7e139b6",
+  "11_Iran_Red_Sea": "2bc2156e602d",
+  "06_India_Pakistan": "8619f09b3a5d",
+  "13_Sudan": "705cd10c0fbc",
+  "18_Ethiopia_Eritrea": "60b468ed3ecd",
+  "19_Somalia": "caca63b3f97b",
+  "12_Sahel_West_Africa": "9e537d08e7d2",
+  "14_DRC_Rwanda": "b26e61046f09",
+  "16_Myanmar": "253c956b4b17",
+  "05_Venezuela": "453ab83b8f55",
+  "15_Cuba": "757c8efc4493",
+  "T1_Critical_Minerals": "2aa7dd5ad94f",
+  "T2_Semiconductors": "a11b5a291b98",
+  "T3_Undersea_Infrastructure": "6b3082a206e4",
+  "T4_GNSS_Counterspace": "53d1479fcc1b",
+  "T5_Sanctions_Shadow_Fleet": "87293e7833b8"
+ }
+}
