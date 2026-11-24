@@ -616,13 +616,13 @@ async function viewZone(id, params) {
       btn.disabled = true; msg.textContent = "Coding with Gemini…";
       try {
         const r = await post("/code", { entity: id, day, filter });
-        msg.textContent = `Coded ${r.coded} stories for $${r.cost_usd.toFixed(4)}.`;
+        msg.textContent = `Coded ${r.coded} stories.`;
         setTimeout(() => render(), 600);
       } catch (e) {
-        msg.textContent = e.status === 429 ? "The AI budget for now is used up. Stories stay readable." : `Failed: ${e.message}`;
+        msg.textContent = e.status === 429 ? "Coding is not available right now. Stories stay readable." : `Failed: ${e.message}`;
       }
     },
-  }, uncoded ? `Code ${uncoded} stor${uncoded === 1 ? "y" : "ies"} with Gemini (about $${Math.max(uncoded * COST_PER_STORY, 0.001).toFixed(3)})` : "All shown stories are coded");
+  }, uncoded ? `Code ${uncoded} stor${uncoded === 1 ? "y" : "ies"} with Gemini` : "All shown stories are coded");
   // Loaded after the page so a slow program feed never holds up the stories.
   const suiteBox = h("div", null, h("p", { class: "muted small" }, "Loading reports from the other programs…"));
   const isZone = ents.zones.some((e) => e.id === id);
@@ -642,7 +642,7 @@ async function viewZone(id, params) {
     z.stories.length
       ? h("ul", { class: "stories panel", "data-tic-fold": true }, z.stories.map(storyItem))
       : h("p", { class: "muted" }, filter === "terms" ? "No headline names this zone for that day. Untick the filter to see every match." : "No stories for that day."),
-    h("p", { class: "muted small" }, `Showing up to 25 stories, largest first. ${z.coded} coded. Coding is capped at $5 a month for the whole site; this page has $${left.toFixed(2)} left today.`),
+    h("p", { class: "muted small" }, `Showing up to 25 stories, largest first. ${z.coded} coded.`),
     h("h2", null, "From news feeds and searches"),
     h("p", { class: "muted small" }, "A saved Google News search for this zone, plus items whose headlines name it from Watchfloor's own feeds, outlet searches and Telegram channels. Kept apart from the counts above, which use GDELT only."),
     (z.feeds || []).length
@@ -724,7 +724,7 @@ function viewAbout() {
       li("Free measures run on GDELT's stories: attention, the day's count of stories whose headline names the zone, against the zone's own last 28 days (adjusted for the day of the week). Counting one source keeps each day comparable with the zone's history. On a labelled test, 82% of those stories were on topic, against 42% of everything the matching rules catch."),
       li("Stories from the feeds, searches and Telegram channels appear on each zone page, apart from those counts."),
       li("Each zone and topic page also shows what The Intelligence Company's other programs report there now: travel advisories, embassy posture, airspace and navigational warnings (Cordon), GPS interference (Noisefloor), fire detections and natural hazards (Elements), cyber activity (Vigil) and dated events (Verdict). Each program collects its own data; Watchfloor links to it and does not count it."),
-      li("Google Gemini codes a story only when someone opens a zone or a free alarm fires: relevance, event type (PLOVER), direction, and a plain-English gist. Every coding is cached, and spending is capped at $5 a month."),
+      li("Google Gemini codes a story only when someone opens a zone or a free alarm fires: relevance, event type (PLOVER), direction, and a plain-English gist. Every coding is cached."),
       li("Warning ladders (Watch, Warning, Crisis) with headline-observable indicators are being written for each zone and will be backtested against known onsets.")),
     h("h2", null, "Two-source rule"),
     h("p", null, "An indicator counts once two independent sources report it: different outlets, not both from the same government. An official claim counts once an outlet outside that government reports it too."),
