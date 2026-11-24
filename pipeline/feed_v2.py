@@ -35,6 +35,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, CONTRACT_REV, contract, registers, vocab  # noqa: E402
+from pipeline.zone_scope import scope_id  # noqa: E402
 
 SITE = "https://watchfloor.theintelligence.company"
 METHOD = "watchfloor-feed-1.4"  # 1.4 (23 Nov 2026): contract 2.1 fields; 1.3: origins on country items
@@ -255,6 +256,7 @@ def build(summary: dict, countries: dict | None, *, catalog: dict | None = None,
                  "countries": sorted({iso(cc) for cc in z.get("countries", []) if iso(cc)}),
                  "sources": _sources(GKG, *([EVENTS] if kind == "zone" else []), accessed=published),
                  "measures": {"attention": att, "stories": e.get("filtered_stories"),
+                              "catalog_version": catalog.get("catalog_version"), "zone_scope": scope_id(z),
                               **({"violence": vscore, "violent_articles": vio.get("named")} if kind == "zone" else {})},
                  "indicators_present": [i for i, hit in (("WF-IND-1", att_hit), ("WF-IND-2", vio_hit)) if hit],
                  "link": page}
