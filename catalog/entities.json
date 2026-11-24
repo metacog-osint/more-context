@@ -1,5 +1,5 @@
 {
-  "catalog_version": "2026-10-27.1",
+  "catalog_version": "2026-11-24.1",
   "notes": "match_v43 copies CONTEXT v4.3's rules exactly (functions/index.js, commit 2ad5779) so early measurements compare like with like. Zones are first-match-wins in list order; a topic can overlap a zone. loc/themes match GKG V1 Locations/Themes, case-sensitive; url matches the lower-cased article URL. profile: one-sentence scope used for embeddings and model prompts (Phase 2). 27 Oct 2026 (Tom): 17_Horn_of_Africa retired and split into 18_Ethiopia_Eritrea (first) and 19_Somalia, same themes, so stored rows were relabelled rather than re-downloaded (scripts/relabel.py).",
   "retired": [
     {"id": "17_Horn_of_Africa", "on": "2026-10-27", "into": ["18_Ethiopia_Eritrea", "19_Somalia"], "why": "Ethiopia's renewed war was lost inside a zone dominated by Somalia and diaspora coverage (Tom)"}
