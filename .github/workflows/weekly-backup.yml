@@ -1,0 +1,80 @@
+# Weekly second copy of Firestore and the Watchfloor bucket, into TIC's PRIVATE archive (ideas#196, approved
+# both 23 Nov 2026). Firestore `(default)` in context-484804 (Context's zone history, Watchfloor's state) and
+# gs://more-context-484804 were single copies. This job only reads them: a read-only service account
+# (roles/datastore.viewer on the project, object and bucket reader on the bucket) and the shared TIC_ARCHIVE_TOKEN.
+# Snapshots go to metacog-osint/tic-archive releases context-firestore-YYYY-MM and watchfloor-bucket-YYYY-MM; only
+# files whose content changed since the last snapshot are uploaded, and nothing there is ever replaced.
+# This repo is public, so its logs are: both scripts print counts, bytes and asset names only.
+name: weekly-backup
+on:
+  schedule:
+    - cron: "17 9 * * 0"      # Sundays 09:17 UTC (3:17 AM CST)
+  workflow_dispatch:
+    inputs:
+      restore_bucket:
+        description: "Also restore the bucket snapshot and compare it byte for byte (downloads the whole lane)"
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: weekly-backup
+  cancel-in-progress: false
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ secrets.TIC_ARCHIVE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Secrets present
+        env:
+          KEY: ${{ secrets.GCP_BACKUP_SA_KEY }}
+        run: |
+          [ -n "$GH_TOKEN" ] || { echo "::error::secret TIC_ARCHIVE_TOKEN is not set"; exit 1; }
+          [ -n "$KEY" ] || { echo "::error::secret GCP_BACKUP_SA_KEY is not set"; exit 1; }
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_BACKUP_SA_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: pip install --quiet "google-auth>=2.26,<3" "requests>=2.28,<3"
+
+      - name: Firestore, dump every document
+        run: python -I tools/firestore_dump.py --project context-484804 --out work/firestore
+      - name: Firestore, put into the private archive
+        run: python -I tools/tic_archive.py put --program context --lane firestore --src work/firestore
+      - name: Firestore, restore the newest snapshot and compare
+        run: |
+          python -I tools/tic_archive.py restore --program context --lane firestore --dest work/restore-firestore
+          diff -rq work/firestore work/restore-firestore >/dev/null || { echo "::error::restored Firestore snapshot differs from the dump"; exit 1; }
+          python -I tools/firestore_dump.py --out work/restore-firestore --check-only
+
+      - name: Bucket, copy every object as stored (gzip kept) and list its metadata
+        run: |
+          mkdir -p work/bucket/objects work/bucket/meta
+          gcloud storage cp -r --do-not-decompress --no-user-output-enabled "gs://more-context-484804/*" work/bucket/objects/
+          gcloud storage objects list "gs://more-context-484804/**" \
+            --format="json(name,size,md5Hash,contentType,contentEncoding,updated)" > work/bucket/meta/objects.json
+          python -I - <<'EOF'
+          import json, pathlib
+          meta = json.loads(pathlib.Path("work/bucket/meta/objects.json").read_text())
+          root = pathlib.Path("work/bucket/objects")
+          missing = [m for m in meta if not (root / m["name"]).is_file()]
+          print(f"bucket: {len(meta)} objects listed, {sum(int(m['size']) for m in meta)} bytes, {len(missing)} not copied")
+          if missing:
+              print("::error::some listed objects were not copied"); raise SystemExit(1)
+          EOF
+      - name: Bucket, put into the private archive
+        run: python -I tools/tic_archive.py put --program watchfloor --lane bucket --src work/bucket
+      - name: Bucket, restore the newest snapshot and compare (on request)
+        if: ${{ inputs.restore_bucket }}
+        run: |
+          python -I tools/tic_archive.py restore --program watchfloor --lane bucket --dest work/restore-bucket
+          diff -rq work/bucket work/restore-bucket >/dev/null || { echo "::error::restored bucket snapshot differs"; exit 1; }
+          echo "bucket restore: identical"
