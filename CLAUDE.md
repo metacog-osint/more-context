@@ -44,9 +44,8 @@ warning (did something change?) and awareness (what is the picture, how is each 
   BigQuery) is measured on a sample and approved by Tom first. No BigQuery anywhere in Watchfloor.
 - GCP project `context-484804`, shared with v4.3: Watchfloor's resources carry the `mc_` prefix. One Scheduler job per
   job, defined here (v4.3's own is `trigger-context-update`). No secrets in files; Tom sets them.
-- Hidden from search engines until Tom says public: `noindex` meta and `X-Robots-Tag`. `robots.txt` was opened to
-  crawlers on Tom's yes of 21 Nov 2026 (ideas#92), so crawlers can read the noindex. To go
-  public remove both and link from CONTEXT. Footer: "A project of The Intelligence Company. Updated <date>." +
+- Hidden from search engines until Tom says public: `noindex` meta and `X-Robots-Tag`. `robots.txt` is open to
+  crawlers (Tom, 21 Nov 2026, ideas#92) so they can read the noindex. To go public remove both; link from CONTEXT. Footer: "A project of The Intelligence Company. Updated <date>." +
   terms + data credits (GDELT requires citation and link) + a Sources page. `web/app.js` inserts API text as text.
 - **Two-source rule (27 Oct):** an indicator hit counts once two independent sources report it (different outlets,
   not one government); an official claim counts once an outlet outside that government reports it. Single-source
@@ -57,7 +56,7 @@ warning (did something change?) and awareness (what is the picture, how is each 
 - **AI spend on demand, capped (26 Oct):** always-on work costs $0. Alarm = attention z >= 2 and >= 5 stories; each
   15-minute cycle codes at most 2 flagged entity-days (`state.ai.pending`); it is a spending trigger, not a warning
   level. `POST /code` (anyone may call it) codes one entity-day's top 25 uncached stories; `GET /zone` and `/status`
-  never spend. A story is never coded twice. Ledger `state/ai_spend.json`: hard cap $15 per UTC month (Tom, 19 Nov 2026; env `MC_AI_MONTHLY_CAP_USD=15` on mc-api and mc-ingest, code default stays 5), on-view at most
+  never spend. A story is never coded twice. Ledger `state/ai_spend.json`: hard cap $15 per UTC month (Tom, 19 Nov 2026; env `MC_AI_MONTHLY_CAP_USD=15` on mc-api and mc-ingest, code default 5), on-view at most
   $0.50/day and never the last $1. Kill switch: redeploy with `MC_AI=off`. A $15 Cloud Billing alert is the backstop. Most anonymous visitors can spend is about $14/mo.
 - **Costs (29 Oct: no paid usage, lose nothing, keep a historical record):** free tiers are per billing account
   (shared with geo-context and two other projects; figures in `HISTORY.md` "Cost audit"): 5 GB storage, 5,000 Class
@@ -128,6 +127,4 @@ warning (did something change?) and awareness (what is the picture, how is each 
 - **Changing the watchlist:** a split within the old zone's rules runs `scripts/relabel.py`; anything wider needs
   `scripts/backfill.py`. Cross-language grouping needs Vertex embeddings (billable).
 
-## Build status
-Ingest live since 26 Oct 2026; relevance and coding under way (code only filtered or top stories: ~$12/month
-against ~$188 for all). Charters: one interview per zone, then `catalog/indicators/`.
+Build status: see `HANDOFF.md` ("Build status").

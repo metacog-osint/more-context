@@ -68,3 +68,7 @@ the private planning notes. Times UTC unless marked.
 - Some 7-day press-tone z run large on a short baseline (UK press on Ukraine z 10.2, 16 Nov); cause not checked.
 - Rising listings added by the 17 Nov rescore have no sample headlines or map events (stored as built).
 - Known term misses: Arabic "جنوب السودان" also means "southern Sudan"; Abyei left out of Sudan's terms (Tom, 15 Nov).
+
+## Build status (moved from CLAUDE.md, 25 Nov 2026)
+Ingest live since 26 Oct 2026; relevance and coding under way (code only filtered or top stories: ~$12/month
+against ~$188 for all). Charters: one interview per zone, then `catalog/indicators/`.
