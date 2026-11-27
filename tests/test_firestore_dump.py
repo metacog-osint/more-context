@@ -51,6 +51,31 @@ class FakeSession:
                 "fields": {"v": {"stringValue": rel}, "b": {"bytesValue": "AAE="}}}
 
 
+class ContextSession(FakeSession):
+    """Context's live pages: `current_data/_metadata` is a document, `current_data/regional` is not (only its
+    `entities` subcollection is written), so Firestore lists `regional` only when showMissing is sent."""
+
+    def request(self, method, url, timeout=None, json=None, params=None):
+        self.calls += 1
+        path = url.split("/v1/", 1)[1]
+        if method == "POST":
+            parent = path[: -len(":listCollectionIds")]
+            if parent == ROOT:
+                return Resp({"collectionIds": ["current_data"]})
+            if parent == f"{ROOT}/current_data/regional":
+                return Resp({"collectionIds": ["entities"]})
+            return Resp({})
+        if path == f"{ROOT}/current_data":
+            docs = [self.doc("current_data/_metadata")]
+            if (params or {}).get("showMissing") == "true":
+                docs.append({"name": f"{ROOT}/current_data/regional"})
+            return Resp({"documents": docs})
+        if path == f"{ROOT}/current_data/regional/entities":
+            return Resp({"documents": [self.doc("current_data/regional/entities/Sudan"),
+                                       self.doc("current_data/regional/entities/Myanmar")]})
+        return Resp({}, 404)
+
+
 class DumpTest(unittest.TestCase):
     def run_dump(self, out):
         return fd.dump(fd.Firestore("p", FakeSession()), out)
@@ -92,9 +117,34 @@ class DumpTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t, self.assertRaises(fd.DumpError):
             fd.dump(fd.Firestore("p", Bad()), Path(t))
 
+    def test_subcollection_under_a_missing_parent(self):
+        with tempfile.TemporaryDirectory() as t:
+            out = Path(t)
+            s = fd.dump(fd.Firestore("p", ContextSession()), out)
+            self.assertEqual(s["collections"], {"current_data": 1, "current_data/regional/entities": 2})
+            self.assertEqual(s["documents"], 3)
+            self.assertEqual(s["missing_parents"], 1)
+            # The missing parent itself is not written as a document
+            meta = (out / "current_data" / "other.jsonl").read_text(encoding="utf-8").splitlines()
+            self.assertEqual([json.loads(x)["name"] for x in meta], ["current_data/_metadata"])
+            ents = (out / "current_data~regional~entities" / "other.jsonl").read_text(encoding="utf-8").splitlines()
+            self.assertEqual([json.loads(x)["name"] for x in ents],
+                             ["current_data/regional/entities/Myanmar", "current_data/regional/entities/Sudan"])
+            self.assertEqual(fd.check(out)["documents"], 3)
+
     def test_month_file(self):
         self.assertEqual(fd.month_file("2026-01-19_1200Z_04_Iran"), "2026-01")
         self.assertEqual(fd.month_file("ingest"), "other")
+
+
+class WeeklyBackupWorkflowTest(unittest.TestCase):
+    def test_bucket_listing_comes_before_the_copy(self):
+        # Copying first fails the week whenever an object is written between the copy and the listing
+        wf = (Path(__file__).resolve().parents[1] / ".github" / "workflows" / "weekly-backup.yml").read_text(
+            encoding="utf-8")
+        listing = wf.index('gcloud storage objects list "gs://more-context-484804/**"')
+        copy = wf.index('gcloud storage cp -r --do-not-decompress')
+        self.assertLess(listing, copy)
 
 
 if __name__ == "__main__":

@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """firestore_dump.py: copy every document of a Firestore database to JSON Lines files, for the weekly backup.
 
-Why (ideas#196, 23 Nov 2026): Firestore `(default)` in context-484804 holds Context's whole zone history
-(`snapshots`, since 19 Jan) and Watchfloor's state, with point-in-time recovery off and no backup or export, so it
-was a single copy. The weekly workflow (.github/workflows/weekly-backup.yml) runs this, then puts the folder into
-TIC's private archive (tools/tic_archive.py, lane context-firestore). No TIC program loses data;
-this only reads.
+Firestore `(default)` in context-484804 holds Context's zone history (`snapshots`, since 19 Jan), Context's live
+pages (`current_data`) and Watchfloor's state. The weekly workflow (.github/workflows/weekly-backup.yml) runs this,
+then puts the folder into TIC's private archive (tools/tic_archive.py, lane context-firestore). This only reads.
+
+Subcollections are walked under every document and under every missing parent (a path that has subcollections but
+no document of its own, such as `current_data/regional`); a missing parent itself is not written, since it holds
+no fields.
 
 Output, one folder per collection path (a subcollection's path keeps its parent document, `/` becomes `~`):
     <out>/<collection>/<YYYY-MM>.jsonl   documents whose id starts with a date (Context's run ids)
     <out>/<collection>/other.jsonl       every other document
-    <out>/counts.json                    documents per collection and in all
+    <out>/counts.json                    documents per collection, in all, and missing parents seen
 Each line is {"name", "createTime", "updateTime", "fields"} exactly as Firestore's REST API returns it (typed
 values, so bytes and timestamps restore unchanged). Lines are sorted by name and keys sorted, so a month that did
 not change gives the same bytes and the archive stores it once.
@@ -78,9 +80,12 @@ class Firestore:
                 return sorted(ids)
 
     def documents(self, parent: str, collection: str):
+        """Every document of the collection, plus each missing parent: a path with no document of its own but with
+        subcollections under it (Context's `current_data/regional`, which only holds `entities`). Firestore returns
+        those only when showMissing is sent, as a name with no createTime, updateTime or fields."""
         token = None
         while True:
-            params = {"pageSize": PAGE}
+            params = {"pageSize": PAGE, "showMissing": "true"}
             if token:
                 params["pageToken"] = token
             j = self._call("GET", f"{API}/{parent}/{collection}", params=params)
@@ -90,11 +95,19 @@ class Firestore:
                 return
 
 
+def is_missing(doc: dict) -> bool:
+    """A missing parent (showMissing) carries only its name: every stored document has a createTime."""
+    return "createTime" not in doc
+
+
 def dump(fs: Firestore, out: Path, subcollections: bool = True) -> dict:
-    """Write every document under `out`; return {collection path: count}."""
+    """Write every document under `out`; return {"collections": {path: count}, "documents", "missing_parents"}.
+
+    A missing parent is not written (it has no fields to keep), but its subcollections are walked like any other."""
     prefix = fs.root + "/"
     groups: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(list))
     counts: dict[str, int] = defaultdict(int)
+    missing = 0
     queue = [(fs.root, cid) for cid in fs.collection_ids(fs.root)]
     while queue:
         parent, cid = queue.pop(0)
@@ -102,12 +115,15 @@ def dump(fs: Firestore, out: Path, subcollections: bool = True) -> dict:
             name = doc["name"]
             if not name.startswith(prefix):
                 raise DumpError("a document name is outside the database root")
-            rel = name[len(prefix):]
-            coll_path, doc_id = rel.rsplit("/", 1)
-            line = {"name": rel, "createTime": doc.get("createTime"), "updateTime": doc.get("updateTime"),
-                    "fields": doc.get("fields", {})}
-            groups[coll_path][month_file(doc_id)].append(line)
-            counts[coll_path] += 1
+            if is_missing(doc):
+                missing += 1
+            else:
+                rel = name[len(prefix):]
+                coll_path, doc_id = rel.rsplit("/", 1)
+                line = {"name": rel, "createTime": doc.get("createTime"), "updateTime": doc.get("updateTime"),
+                        "fields": doc.get("fields", {})}
+                groups[coll_path][month_file(doc_id)].append(line)
+                counts[coll_path] += 1
             if subcollections:
                 queue += [(name, sub) for sub in fs.collection_ids(name)]
     out.mkdir(parents=True, exist_ok=True)
@@ -119,7 +135,8 @@ def dump(fs: Firestore, out: Path, subcollections: bool = True) -> dict:
             with open(d / f"{month}.jsonl", "w", encoding="utf-8", newline="\n") as f:
                 for line in lines:
                     f.write(json.dumps(line, sort_keys=True, ensure_ascii=False, separators=(",", ":")) + "\n")
-    summary = {"collections": dict(sorted(counts.items())), "documents": sum(counts.values())}
+    summary = {"collections": dict(sorted(counts.items())), "documents": sum(counts.values()),
+               "missing_parents": missing}
     (out / "counts.json").write_text(json.dumps(summary, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     return summary
 
@@ -161,7 +178,8 @@ def main(argv=None) -> int:
         check(out)
         for c, n in s["collections"].items():
             print(f"firestore-dump: {c}: {n}")
-        print(f"firestore-dump: {s['documents']} documents in {len(s['collections'])} collections")
+        print(f"firestore-dump: {s['documents']} documents in {len(s['collections'])} collections, "
+              f"{s['missing_parents']} parent paths with subcollections but no document")
         return 0
     except DumpError as e:
         print(f"::error::firestore-dump: {e}", file=sys.stderr)
