@@ -1,5 +1,5 @@
 """What The Intelligence Company's other programs report for a zone or topic: the zone page's "From the suite" panel
-(Tom, 1 Nov 2026: leverage the other programs' data instead of recreating it).
+(1 Nov 2026: leverage the other programs' data instead of recreating it).
 
 Watchfloor's interests (doctrine/interests.json, written by scripts/build_interests.py) are matched by the doctrine
 kit (tips.py) against COP's bus plus any wanted feed the bus does not carry. A zone gets the tips whose areas include

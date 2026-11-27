@@ -8,7 +8,7 @@ carry, such as Reuters, AP and AFP (`catalog/sources.json`). Sites that are not 
 Gemini on Vertex AI, and tracks indicators, attention, escalation and how different source groups frame
 the same events. Every signal is backtested before it drives a status.
 
-Built by Thomas Brummer, The Intelligence Company. Not affiliated with any government.
+Built by The Intelligence Company. Not affiliated with any government.
 Publicly available information only. A media signal, not ground truth.
 
 ## Run the reprint measurement

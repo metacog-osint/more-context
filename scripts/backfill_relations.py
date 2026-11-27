@@ -8,10 +8,10 @@ skipped unless --force. About 20 MB of downloads and 10-25 s a day.
     python -I scripts/backfill_relations.py --series-only --end 2026-11-14 --root data/backfill/relations
 
 --bucket NAME reads and writes the Cloud Storage bucket instead of --root, through the storage JSON API with the
-gcloud user's token (`gcloud auth print-access-token`; never printed), so it runs on Tom's laptop without the
+gcloud user's token (`gcloud auth print-access-token`; never printed), so it runs on a laptop without the
 google-cloud-storage package: one write per day plus one for the series (Class A), and up to 120 reads to rebuild
-the series. Objects are gzip with Content-Encoding gzip, like pipeline/sinks.py. Writes to the live bucket: Tom's
-yes first. The token lasts an hour: it is fetched again after TOKEN_MAX_AGE, and once more on an HTTP 401, so a long
+the series. Objects are gzip with Content-Encoding gzip, like pipeline/sinks.py. Writes to the live bucket: approval
+first. The token lasts an hour: it is fetched again after TOKEN_MAX_AGE, and once more on an HTTP 401, so a long
 run no longer stops part way (16 Nov 2026: a 401 at 05:29 UTC lost 5 Nov). A day's line prints after its write.
 
 The series is always rebuilt to the last stored day (the later of --end, the live series' last day and any stored
@@ -24,7 +24,7 @@ That example re-does 15 Nov 2026, built as partial because the ingest only began
 (mc-ingest-00022-zul); run it after that day's build (after 03:20 UTC 16 Nov).
 
 --press does the press-tone section instead (pipeline/press.py): every GKG 2.1 file of each day, both streams (about
-1.3 GB of downloads and 5 minutes a day on Tom's connection), summed into the day's `press` section; the rest of an
+1.3 GB of downloads and 5 minutes a day on a home connection), summed into the day's `press` section; the rest of an
 existing relations.json is kept. A pairs run keeps an existing `press` section the same way. Days that already have
 a press section are skipped unless --force. Run it from C: when D: may sleep (data stays in memory; nothing is saved
 but the day files).
@@ -199,7 +199,7 @@ def main() -> int:
     ap.add_argument("--start")
     ap.add_argument("--end", required=True)
     ap.add_argument("--root")
-    ap.add_argument("--bucket", help="write to this bucket instead of --root (Tom's yes first)")
+    ap.add_argument("--bucket", help="write to this bucket instead of --root (needs approval first)")
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--series-only", action="store_true", help="only rebuild relations/series.json")

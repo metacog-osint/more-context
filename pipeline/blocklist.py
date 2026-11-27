@@ -1,4 +1,4 @@
-"""Sites left out of Watchfloor's data: catalog/blocklist.json (Tom's yes, 31 Oct 2026), each entry with its reason.
+"""Sites left out of Watchfloor's data: catalog/blocklist.json (31 Oct 2026), each entry with its reason.
 
 GDELT rows are dropped by domain (subdomains included) or by URL pattern, at ingest and again when a day is built, so
 a rebuilt or backfilled day leaves them out too. Google News search items are dropped by their " - Publisher" tail.

@@ -209,7 +209,7 @@ function scoreBadge(s, kind, count) {
   return h("span", { class: `badge ${cls}`, title: baselineNote(s, count, "articles") }, `${ratioText(s, count)} (z ${s.z})`);
 }
 
-// Independent origins (Tom, 18 Nov 2026): distinct texts behind the articles, wire copies counted once. Shown only;
+// Independent origins (18 Nov 2026): distinct texts behind the articles, wire copies counted once. Shown only;
 // the score stays on articles. Flagged when one story is at least 15% of the count.
 function originsNote(o, articles) {
   if (!o || o.origins === undefined) return null;

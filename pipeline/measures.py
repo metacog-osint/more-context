@@ -1,7 +1,7 @@
 """Measures computed from the daily story build. No model calls; all free.
 
 - attention_anomaly: how unusual today's story count is against the entity's own last 28 complete days,
-  adjusted for day of week. Counts are log-transformed (news volume is skewed). Since the z calibration (Tom's pick,
+  adjusted for day of week. Counts are log-transformed (news volume is skewed). Since the z calibration (picked
   16 Nov 2026; docs/method/2026-11-16-z-calibration.md) z is normal-equivalent (pipeline/zstats.py, option B):
   residual SD on its real degrees of freedom, the weekday mean's own error, Student t. Before it, z ran about 1.3x
   too large (z >= 2.5 on about 3% of event-free days, against 0.62%).

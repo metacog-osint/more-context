@@ -6,7 +6,7 @@
     python -I run.py feed-health
     python -I run.py eval-relevance [--set catalog/eval/relevance_v1.jsonl]
     python -I run.py vertex-estimate [--set ...] [--per-request 25]      # no calls, no cost
-    python -I run.py code-stories --cap 0.25 [--set ...] [--out ...]      # BILLABLE: needs Tom's yes
+    python -I run.py code-stories --cap 0.25 [--set ...] [--out ...]      # BILLABLE: needs approval
 """
 from __future__ import annotations
 
@@ -383,7 +383,7 @@ def main(argv: list[str] | None = None) -> int:
     v.add_argument("--thinking-tokens", type=int, default=0, help="assumed thinking tokens per request")
     v.set_defaults(func=cmd_vertex_estimate)
     k = sub.add_parser("code-stories", help="BILLABLE: code stories with Gemini on Vertex under a spend cap")
-    k.add_argument("--cap", type=float, required=True, help="hard spend cap in USD (approved by Tom)")
+    k.add_argument("--cap", type=float, required=True, help="hard spend cap in USD (approved in advance)")
     k.add_argument("--set", default=default_set)
     k.add_argument("--limit", type=int, default=0)
     k.add_argument("--per-request", type=int, default=25)

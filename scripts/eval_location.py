@@ -1,4 +1,4 @@
-"""Score "where + what" relevance rules on a labelled set (Tom, 27 Oct 2026). Free: re-downloads the GDELT files the
+"""Score "where + what" relevance rules on a labelled set (27 Oct 2026). Free: re-downloads the GDELT files the
 set came from (no models, no BigQuery).
 
 v4.3 puts an article in a zone when a zone place is named anywhere and a broad theme appears anywhere. These rules

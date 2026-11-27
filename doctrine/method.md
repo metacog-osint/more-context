@@ -33,7 +33,7 @@ inside the 28-day window (Ethiopia, 27 Oct 2026), so the 90-day ratio is publish
 
 ## Anomaly versus warning
 Everything Watchfloor publishes today is a measurement (kind observation; tier routine or anomaly). Warnings, which
-are judged and carry likelihood and confidence, come only through the zone charters once Tom finalises them
+are judged and carry likelihood and confidence, come only through the zone charters once they are final
 (`catalog/indicators/`); until then no watch condition is set and anomalies move nothing.
 
 ## Two-source rule and independence

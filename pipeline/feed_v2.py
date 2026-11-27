@@ -5,7 +5,7 @@ storage writes. Every item is a measurement (kind observation): a daily summary,
 zone) and per topic (no place; a link to its page), and one per country on the violence Rising or Elevated list or the
 attention Rising list. Warnings, which are judged, wait for the zone charters (doctrine/indicators.json).
 
-Since the z calibration (Tom's picks, 16 Nov 2026; docs/method/2026-11-16-z-calibration.md):
+Since the z calibration (picked 16 Nov 2026; docs/method/2026-11-16-z-calibration.md):
 - every z is calibrated (scores carry `z_method`; stored days 29 Jul-15 Nov were re-scored on 17 Nov 2026 by
   scripts/rescore_z.py), so titles say plain "z" (they said "calibrated z" from 16 to 17 Nov 2026, feed 1.1);
 - titles give count / max(expected, 90-day median, 3), and when the floor of 3 binds they give the count instead
@@ -94,7 +94,7 @@ def _times(x: dict | None, count: int | None = None) -> str:
 
 def _one_story(og: dict, articles: int | None) -> str:
     """'; one story is 30 of its 85 articles' when the largest origin is at least ONE_STORY_SHARE of the count
-    (independent origins, Tom 18 Nov 2026: shown, never scored)."""
+    (independent origins, 18 Nov 2026: shown, never scored)."""
     big = og.get("largest") or 0
     if not articles or big < 5 or big < ONE_STORY_SHARE * articles:
         return ""
@@ -312,7 +312,7 @@ def build(summary: dict, countries: dict | None, *, catalog: dict | None = None,
                               **({"origins": og["origins"], "largest_origin": og["largest"]} if og else {})},
                  "link": f"{SITE}/#/map?day={day}"}
         if zone:
-            # No hypothesis (Tom, 16 Nov 2026): the country count is not filtered to the zone. The kit allows no
+            # No hypothesis (16 Nov 2026): the country count is not filtered to the zone. The kit allows no
             # indicator_id without a hypothesis_id, so the indicator link goes too; the warning problem stays.
             props.update({"warning_problem_id": _wp(zone), "requirement_ids": ["WF-PIR-2"]})
         else:

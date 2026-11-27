@@ -1,6 +1,6 @@
 """Per-country daily counts from GDELT Events records, each country against its own normal, and the Rising list.
 
-So new crises surface without a catalog edit (Tom, 27 Oct 2026, after Ethiopia's renewed war was lost inside the
+So new crises surface without a catalog edit (27 Oct 2026, after Ethiopia's renewed war was lost inside the
 Horn of Africa zone). Every country is counted, not just the zones, from the per-file records `events.py` makes
 (rows in each run's cycle file; `events/` files before 30 Oct 2026).
 
@@ -8,7 +8,7 @@ Two counts per country-day, both distinct articles with at least one event locat
 - attention (`urls`): any event;
 - violence (`violent`): an assault, fight or mass-violence event (CAMEO 18-20).
 Each is scored against the country's own previous 28 complete days and against the median of its previous 90
-complete days. Since the z calibration (Tom's pick, 16 Nov 2026; docs/method/2026-11-16-z-calibration.md) the 28-day
+complete days. Since the z calibration (picked 16 Nov 2026; docs/method/2026-11-16-z-calibration.md) the 28-day
 z is option C (pipeline/zstats.robust_z): one pooled weekday shape for all countries that day, median centre, MAD
 scale with a Poisson floor, Student t; z >= 2.5 on 0.3-0.4% of event-free country-days, against about 3% before.
 Zone violence keeps option B (the zone's own weekday means: zone-named counts do not share GDELT's weekend dip). The 90-day reference keeps a long crisis visible after its
@@ -25,13 +25,13 @@ headline names the zone (headline terms on the article link's words). The headli
 about half of Israel's and a fifth of Venezuela's violent-event articles were about the zone, and Russia-NATO's
 were nearly all noise (a Viking king placed in Oslo). Scored like attention, against the zone's last 28 days.
 
-Independent origins (Tom, 18 Nov 2026; docs/method/2026-11-18-origins.md): each country carries `origins`, per
+Independent origins (18 Nov 2026; docs/method/2026-11-18-origins.md): each country carries `origins`, per
 counted measure the number of distinct texts behind its articles (wire copies count once) and the size of the
 largest, beside the article counts. Display only: z, lists and alarms stay on articles. Exact text keys
 (ORIGINS_METHOD), so origins run about 3% above the backtest's 80%-overlap clustering. Absent on days with a file
 recorded before the keys existed.
 
-Member spikes (`violence.members`, Iran & Red Sea since Tom's 18 Nov 2026 answer "keep all nine, but let's find a way
+Member spikes (`violence.members`, Iran & Red Sea since the 18 Nov 2026 answer "keep all nine, but let's find a way
 to still highlight spikes of interest"): the same zone-named count per scope country (`members`), each scored the
 same way against its own 28 days. A member is a spike at z >= MEMBER_Z, ratio >= RISING_RATIO and MEMBER_MIN articles
 or more (`spikes`, highest z first). So a burst in a quiet member (Iranian strikes on Bahrain, 15 Nov) still shows

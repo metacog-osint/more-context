@@ -22,7 +22,7 @@
                                          Noisefloor, Elements, Vigil, Verdict), linked to them, never counted here
                                          (pipeline/suite.py; doctrine kit tips)
 
-Anyone may call it (Tom, 26 Oct 2026). Spending is bounded by the ledger (pipeline/budget.py): $5 a month,
+Anyone may call it (26 Oct 2026). Spending is bounded by the ledger (pipeline/budget.py): $5 a month,
 on-view work at most $0.50 a day and never the last $1 (kept for alarms). A request codes at most 25 stories
 that Watchfloor already stored; callers cannot send their own text to the model.
 """

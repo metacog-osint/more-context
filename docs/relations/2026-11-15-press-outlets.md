@@ -1,30 +1,30 @@
-# Press tone by outlet country: checks and Tom's outlet picks (15 Nov 2026)
+# Press tone by outlet country: checks and outlet picks (15 Nov 2026)
 
-The next layer after the country pairs (`docs/relations/2026-11-15-relations-tone.md`, layer 3). Tom approved
-planning the build on 15 Nov 2026 and picked outlets zone by zone the same evening. **Live 16 Nov 2026** (`e6c617c`; section below). Data files
+The next layer after the country pairs (`docs/relations/2026-11-15-relations-tone.md`, layer 3). Planning the
+build was approved on 15 Nov 2026 and outlets were picked zone by zone the same evening. **Live 16 Nov 2026** (`e6c617c`; section below). Data files
 named here are in the git-ignored `data/relations/`.
 
 ## What each zone measures
 For each zone country as the most-mentioned country of a GKG article (GKG 2.1 V2 enhanced locations, field 10,
 counted by mention, as the probe did): articles a day and mean tone per outlet country (GDELT's 2018 domain table),
 the 7-day mean tone and its z against that outlet country's own 28 days. Display only: no flags, alarms or `/feed`
-items until Tom has read it for a month. Each outlet country is read against its own baseline only (tone is a
+items until it has been read for a month. Each outlet country is read against its own baseline only (tone is a
 dictionary score that differs by language and outlet mix).
 
 **Automatic in every zone:** outlets of the zone's own countries about the zone's other countries (South Korean
 outlets on North Korea about 36 a day, India on Pakistan 100, Pakistan on India 64, Israel on Lebanon 20, Russia on
 Poland 82 and Belarus 42, Russia on Finland 23 and on each Baltic state 5-12).
 
-## Tom's picks (outside outlets, FIPS codes)
+## Outlet picks (outside outlets, FIPS codes)
 Volumes: estimated articles a day where the zone country is the main subject, 1-14 Nov 2026 (one 15-minute file an
 hour, both streams, x4; `data/relations/press_all_zones.json`, script `press_all_zones.py`).
 
 | Zone | Outlet countries | Notes |
 |---|---|---|
-| 01 Ukraine | RS, US, GM, UK, CH, PL, IT, GR, RI, FR | Tom added Poland, Italy, Greece, Serbia, France. Poland and France on Ukraine were not in the top nine (under 76 a day): measure them. |
+| 01 Ukraine | RS, US, GM, UK, CH, PL, IT, GR, RI, FR | Added Poland, Italy, Greece, Serbia, France. Poland and France on Ukraine were not in the top nine (under 76 a day): measure them. |
 | 07 Russia-NATO | UP, US, GM, CH, UK | Outside outlets on the Baltic states are all under 6 a day. |
 | 02 Taiwan Strait | CH, US, JA | Japan about 4 a day: weekly. |
-| 08 South China Sea | CH, US, MY, RP, VM | Tom listed the zone's own countries (Philippines, Vietnam). Their outlets on each other are automatic; confirm with Tom whether he also wants each country's press on itself. Malaysia about 9 a day on Vietnam: weekly. |
+| 08 South China Sea | CH, US, MY, RP, VM | The list named the zone's own countries (Philippines, Vietnam). Their outlets on each other are automatic; confirm whether to also read each country's press on itself. Malaysia about 9 a day on Vietnam: weekly. |
 | 03 Korea | US, CH, JA, RS, GM | On North Korea only US reads daily (47); Germany 18, Russia 5, Japan 3.4, China 3.1. |
 | 10 Israel-Gaza-Lebanon | US, TU, EG, SY, UK, GM, QA | Qatar about 1.4 a day: GDELT's table barely places Qatari outlets; check where aljazeera.com/.net land. Gaza (GZ) and the West Bank (WE) are mostly geocoded as Israel. |
 | 11 Iran & Red Sea | US, IS, SA, TU, RS, CH, UK, IN, IZ | On Yemen: Saudi 21, Turkey 20, Israel 15, US 10. |
@@ -53,11 +53,11 @@ hour, both streams, x4; `data/relations/press_all_zones.json`, script `press_all
   file (max 0.5 and 1.3 s); a run reads 1 English and up to 4 translation files, so worst case about 5 s of 300 s.
   Press rows for a full day: about 0.29 MB gzip (zone countries as subjects, every outlet country).
 - **V1 vs V2 locations:** the most-mentioned country differs in 25% of articles (41,236 agree of 54,799); use V2.
-- **Backfill:** a full GKG day is 1.3 GB and about 5 minutes on Tom's connection: 28 days (enough for the z) about
+- **Backfill:** a full GKG day is 1.3 GB and about 5 minutes on a home connection: 28 days (enough for the z) about
   36 GB and 2.5 hours.
 
 ## Built and live 16 Nov 2026 (`e6c617c`; functions 01:49-01:52 UTC, website 04:28 UTC, history 19 Oct-15 Nov backfilled 04:27-06:15 UTC)
-- **Tom, 16 Nov:** the South China Sea block also reads each country's press on itself: Philippine outlets on the
+- **16 Nov:** the South China Sea block also reads each country's press on itself: Philippine outlets on the
   Philippines, Vietnamese on Vietnam and Chinese on China ("Yes, add self-coverage").
 - `pipeline/press.py`: per GKG file a `FileTable` (fed by the cycle's existing GKG loop, after the blocklist, matched
   or not) counts, for each subject country, `O>S` = [articles mentioning S, their tone sum, articles where S is the
@@ -66,7 +66,7 @@ hour, both streams, x4; `data/relations/press_all_zones.json`, script `press_all
   common unknown domains (the daily `press` section keeps the top 50, so new outlets can be added).
   `countries.day_records_and_press` reads Events and press rows in one pass; `relations.build_day` writes `press`
   into `relations.json` and the zones' rows into `relations/series.json` (no new writes).
-- **Catalog:** `catalog/relations.json` 2026-11-16.1 gives 13 zones a `press` block (`about`, `outlets` = Tom's picks,
+- **Catalog:** `catalog/relations.json` 2026-11-16.1 gives 13 zones a `press` block (`about`, `outlets` = the outlets picked,
   `home` = the zone's own countries, automatic, `self`); Russia-NATO's subjects leave out Russia. `catalog/press_domains.tsv`:
   the 2018 table trimmed to 11,397 domains (13 Nov full day plus 6-12 Nov one file an hour; the week added 1,281 that
   13 Nov missed), 205 KB, 1.6 MB in memory. `catalog/press_outlets.json`: the "Suede" drop and 58 overrides. 258 rows in all (Russia-NATO 126, mostly NATO states' press on
@@ -98,5 +98,5 @@ hour, both streams, x4; `data/relations/press_all_zones.json`, script `press_all
    pairs.
 5. `scripts/backfill_relations.py --press` for history (full files, 28 days); tests; local preview with
    `scripts/dev_server.py`.
-6. Tom's yes for each of commit, push, deploy (clean `git archive`, `scripts/deploy_ai.sh` commands, env vars
+6. Approval for each of commit, push, deploy (clean `git archive`, `scripts/deploy_ai.sh` commands, env vars
    checked) and the bucket backfill.

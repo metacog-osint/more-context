@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Deploy the MORE CONTEXT 15-minute ingest to Google Cloud project context-484804.
 # Creates: one Cloud Storage bucket, two service accounts, one private Cloud Run function, and one
-# Cloud Scheduler job. Run only with Tom's approval (it creates billable resources, expected $0-0.10/month).
+# Cloud Scheduler job. Run only with approval (it creates billable resources, expected $0-0.10/month).
 # Safe to re-run: create steps that already exist print an error and the script continues.
 set -u
 PROJECT=context-484804

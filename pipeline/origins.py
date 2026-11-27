@@ -17,7 +17,7 @@ carry the same text, so a wire story and its copies count once:
 - Outlets: per cluster, distinct registrable domains, with aggregators (MSN, Yahoo, AOL, NewsBreak...) left out.
   Wires need no table: their copies share the text, so they are one cluster whatever the domain.
 
-`scripts/origins_backtest.py` measures the clustering on raw GDELT files. The live pipeline (Tom, 18 Nov 2026: z
+`scripts/origins_backtest.py` measures the clustering on raw GDELT files. The live pipeline (18 Nov 2026: z
 stays on articles, origins shown beside them) uses the cheap form: each Events record keeps per country a count of
 articles by exact text key (`text_key`), and the daily build counts distinct keys (`day_origins`).
 """
