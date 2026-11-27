@@ -1,6 +1,6 @@
-# Weekly second copy of Firestore and the Watchfloor bucket, into TIC's PRIVATE archive (ideas#196, approved
-# both 23 Nov 2026). Firestore `(default)` in context-484804 (Context's zone history, Watchfloor's state) and
-# gs://more-context-484804 were single copies. This job only reads them: a read-only service account
+# Weekly second copy of Firestore and the Watchfloor bucket, into TIC's PRIVATE archive. Firestore `(default)` in
+# context-484804 (Context's zone history and live pages, Watchfloor's state) and gs://more-context-484804.
+# This job only reads them: a read-only service account
 # (roles/datastore.viewer on the project, object and bucket reader on the bucket) and the shared TIC_ARCHIVE_TOKEN.
 # Snapshots go to metacog-osint/tic-archive releases context-firestore-YYYY-MM and watchfloor-bucket-YYYY-MM; only
 # files whose content changed since the last snapshot are uploaded, and nothing there is ever replaced.
@@ -57,12 +57,15 @@ jobs:
           diff -rq work/firestore work/restore-firestore >/dev/null || { echo "::error::restored Firestore snapshot differs from the dump"; exit 1; }
           python -I tools/firestore_dump.py --out work/restore-firestore --check-only
 
-      - name: Bucket, copy every object as stored (gzip kept) and list its metadata
+      # The listing is taken first and the copy after, so every listed object already exists when the copy runs.
+      # Watchfloor writes to the bucket every 15 minutes: an object created after the listing may be copied too
+      # (it is kept, and the next week's listing names it); only a listed object missing from the copy fails.
+      - name: Bucket, list every object's metadata, then copy every object as stored (gzip kept)
         run: |
           mkdir -p work/bucket/objects work/bucket/meta
-          gcloud storage cp -r --do-not-decompress --no-user-output-enabled "gs://more-context-484804/*" work/bucket/objects/
           gcloud storage objects list "gs://more-context-484804/**" \
             --format="json(name,size,md5Hash,contentType,contentEncoding,updated)" > work/bucket/meta/objects.json
+          gcloud storage cp -r --do-not-decompress --no-user-output-enabled "gs://more-context-484804/*" work/bucket/objects/
           python -I - <<'EOF'
           import json, pathlib
           meta = json.loads(pathlib.Path("work/bucket/meta/objects.json").read_text())
