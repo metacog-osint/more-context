@@ -2,9 +2,9 @@
  "entity": "11_Iran_Red_Sea",
  "warning_problem_id": "WF-WP-Z11",
  "version": "2026-11-18.2",
- "status": "draft for Tom's review: converted 18 Nov 2026 from Tom's charter; no code reads this file yet",
- "source": "Watchfloor: Build Plan, tab Indicator charters (draft) > Iran & Red Sea, v0.2 (28 Oct 2026) with Tom's answers of 28 Oct and 18 Nov 2026: https://claude.ai/artifact/ShyAN6L2qhb6MBiq5284kk",
- "author": "Tom Brummer (answers); converted by Claude",
+ "status": "draft for review: converted 18 Nov 2026 from the zone charter; no code reads this file yet",
+ "source": "Watchfloor: Build Plan, tab Indicator charters (draft) > Iran & Red Sea, v0.2 (28 Oct 2026) with the answers of 28 Oct and 18 Nov 2026: https://claude.ai/artifact/ShyAN6L2qhb6MBiq5284kk",
+ "author": "tic-analyst (answers); converted by Claude",
  "key_questions": [
   "Will US or Israeli strikes on Iran resume, and will Iran hit Israel, US bases or Gulf states?",
   "Will shipping through Hormuz or the Red Sea and Bab el-Mandeb be disrupted?",
@@ -13,9 +13,9 @@
   "Are Iran-aligned groups (Houthis, Iraqi militias) escalating?"
  ],
  "ladder": {
-  "watch": "A lull inside the war that began on 28 Feb 2026, not a ceasefire (Tom, 28 Oct): no active strike exchanges; indirect talks continue on a settlement track; Hormuz and the Red Sea open with routine harassment.",
-  "warning": "Signs of renewed war: force build-ups, ultimatums, embassy drawdowns, airspace closures, ship seizures or attacks, talks declared over. Isolated limited strikes are Warning (Tom, 18 Nov).",
-  "crisis": "A campaign: strikes on Iran or by Iran on 2 or more days in any 7, or one strike that does real damage or causes casualties (Tom, 18 Nov; replaces 28 Oct's 'any strike returns the zone to Crisis'); Hormuz traffic halted or a declared closure; a sustained campaign against shipping or Gulf infrastructure."
+  "watch": "A lull inside the war that began on 28 Feb 2026, not a ceasefire (28 Oct): no active strike exchanges; indirect talks continue on a settlement track; Hormuz and the Red Sea open with routine harassment.",
+  "warning": "Signs of renewed war: force build-ups, ultimatums, embassy drawdowns, airspace closures, ship seizures or attacks, talks declared over. Isolated limited strikes are Warning (18 Nov).",
+  "crisis": "A campaign: strikes on Iran or by Iran on 2 or more days in any 7, or one strike that does real damage or causes casualties (18 Nov; replaces 28 Oct's 'any strike returns the zone to Crisis'); Hormuz traffic halted or a declared closure; a sustained campaign against shipping or Gulf infrastructure."
  },
  "crisis_rule": {
   "indicator": "WF-Z11-IND-03",
@@ -25,13 +25,13 @@
   "decided": "2026-11-18"
  },
  "two_source_rule": {
-  "applies_to": "every indicator except WF-Z11-IND-13, which counts the state framing itself (Tom, 18 Nov 2026)",
-  "rule": "A hit counts once two independent sources report it (different outlets, not both from the same government); an official claim counts once an outlet outside that government reports it. A single-source hit is shown as claimed and moves nothing (Tom, 27 Oct 2026).",
+  "applies_to": "every indicator except WF-Z11-IND-13, which counts the state framing itself (18 Nov 2026)",
+  "rule": "A hit counts once two independent sources report it (different outlets, not both from the same government); an official claim counts once an outlet outside that government reports it. A single-source hit is shown as claimed and moves nothing (27 Oct 2026).",
   "suite": "An item from another TIC program counts as one independent source; its own grade and freshness stand."
  },
  "violence_scope": {
   "countries": ["IR", "YM", "BA", "QA", "AE", "KU", "MU", "SA", "IZ"],
-  "note": "FIPS codes, as GDELT: Iran, Yemen, Bahrain, Qatar, UAE, Kuwait, Oman, Saudi Arabia, Iraq. Tom, 18 Nov: add the Gulf states that host US forces and Iraq. Set in catalog/entities.json as the zone's violence.countries; only violent events in articles whose headline names the zone count. Saudi Arabia kept (Tom, 18 Nov), with each member also scored so a burst in one shows as a spike (violence.members). The suite area is the same nine (violence.suite_area).",
+  "note": "FIPS codes, as GDELT: Iran, Yemen, Bahrain, Qatar, UAE, Kuwait, Oman, Saudi Arabia, Iraq. 18 Nov: add the Gulf states that host US forces and Iraq. Set in catalog/entities.json as the zone's violence.countries; only violent events in articles whose headline names the zone count. Saudi Arabia kept (18 Nov), with each member also scored so a burst in one shows as a spike (violence.members). The suite area is the same nine (violence.suite_area).",
   "decided": "2026-11-18"
  },
  "indicators": [
@@ -50,7 +50,7 @@
    "evidence": "Strike or launch reports with places named", "first_sources": ["IRNA", "Tasnim", "IDF", "CENTCOM"],
    "flag_when": "Any credible report, counted at two independent sources", "hypothesis_id": "WF-WP-Z11-H1", "direction": "supports"},
   {"id": "WF-Z11-IND-04", "charter_id": "IRN-04", "step": "warning",
-   "step_note": "Crisis if transits stop: stopped or mostly halted transits, or a declared closure (Tom, 28 Oct)",
+   "step_note": "Crisis if transits stop: stopped or mostly halted transits, or a declared closure (28 Oct)",
    "text": "Hormuz incidents: seizures, harassment, mines, tolls, UKMTO advisories, war-risk insurance jumps",
    "evidence": "Vessel names, UKMTO warnings", "first_sources": ["UKMTO", "shipping press", "wires"],
    "flag_when": "Any credible report, counted at two independent sources",
@@ -76,7 +76,7 @@
    "suite_evidence": [{"program": "noisefloor", "kinds": ["new", "event", "spoof-new", "spoof-above", "spoof-region-above"], "area": "Iran and the Gulf",
      "rule": "only items new or above Noisefloor's own baseline: Gulf interference is a standing condition (Iran case notes, 14 Nov 2026), so ended and below-scale items do not count"}],
    "hypothesis_id": "WF-WP-Z11-H1", "direction": "supports"},
-  {"id": "WF-Z11-IND-08", "charter_id": "IRN-08", "step": "warning", "step_note": "Slow background (Tom, 28 Oct)",
+  {"id": "WF-Z11-IND-08", "charter_id": "IRN-08", "step": "warning", "step_note": "Slow background (28 Oct)",
    "text": "Nuclear: IAEA access denied or restored, enrichment announcements, NPT withdrawal threats",
    "evidence": "IAEA statements, Iranian officials", "first_sources": ["IAEA", "Iranian state media"],
    "flag_when": "Any official report, counted once an outlet outside that government reports it",
@@ -94,10 +94,10 @@
    "text": "Attacks on Gulf energy or infrastructure; Gulf air-defence alerts",
    "evidence": "Facility names", "first_sources": ["Saudi and UAE state media", "wires"],
    "flag_when": "Any credible report, counted at two independent sources", "hypothesis_id": "WF-WP-Z11-H1", "direction": "supports"},
-  {"id": "WF-Z11-IND-12", "charter_id": "IRN-12", "step": "watch", "step_note": "Warning if protests spread or succession reports multiply (Tom, 28 Oct)",
+  {"id": "WF-Z11-IND-12", "charter_id": "IRN-12", "step": "watch", "step_note": "Warning if protests spread or succession reports multiply (28 Oct)",
    "text": "Internal Iran: mass protests, crackdowns, leadership health or succession reports",
    "evidence": "Protest or succession stories", "first_sources": ["wires", "Iranian outlets"],
-   "flag_when": "3+ stories in a day from 2+ independent outlets (two-source rule applies; Tom, 18 Nov 2026)", "hypothesis_id": null, "direction": null},
+   "flag_when": "3+ stories in a day from 2+ independent outlets (two-source rule applies; 18 Nov 2026)", "hypothesis_id": null, "direction": null},
   {"id": "WF-Z11-IND-13", "charter_id": "IRN-13", "step": "warning",
    "text": "State-media framing of an imminent \"decisive response\"; Basij or IRGC mobilisation",
    "evidence": "Repeated framing across Iranian state outlets", "first_sources": ["IRNA", "Press TV", "Tasnim"],
@@ -109,7 +109,7 @@
   {"date": "2024-04-13", "event": "Iran's first direct attack on Israel, after the 1 April strike on its Damascus consulate", "warnable": true},
   {"date": "2024-10-01", "event": "Iran's second missile attack on Israel"},
   {"date": "2025-06-13", "event": "Israel's strikes on Iran (the twelve-day war; US strikes on 22 June)", "warnable": true, "note": "drawdowns and an IAEA resolution came days before"},
-  {"date": "2026-02-28", "event": "Start of the US-Israeli war with Iran (date from Tom)", "use": "replay Dec 2025-Feb 2026 to profile force posture, rhetoric and state-media framing in the run-up, then compare the last 30 days with that profile"}
+  {"date": "2026-02-28", "event": "Start of the US-Israeli war with Iran (date from the analyst)", "use": "replay Dec 2025-Feb 2026 to profile force posture, rhetoric and state-media framing in the run-up, then compare the last 30 days with that profile"}
  ],
  "noise": [
   "US domestic politics that mentions the Iran war (gas prices, midterms, rallies, war-cost proposals)",

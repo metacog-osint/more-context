@@ -1,6 +1,6 @@
 """Keep the original of every object a rescore, relabel or backfill is about to overwrite (retention fix M4, 18 Nov 2026).
 
-Rule (Tom, 18 Nov 2026): no program loses data. A re-score replaces scores in place; the values computed under the
+Rule (18 Nov 2026): no program loses data. A re-score replaces scores in place; the values computed under the
 previous method must survive it. Before any overwrite, each original goes to `archive/rescore/<UTC stamp>/<path>`:
 
 - in the bucket (`archive_bucket`): a server-side copy (Cloud Storage `rewrite`), pinned to the generation the script

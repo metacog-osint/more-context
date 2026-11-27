@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Turn on MORE CONTEXT's AI coding under the $15/month cap (pipeline/budget.py). Run only with Tom's yes.
+# Turn on MORE CONTEXT's AI coding under the $15/month cap (pipeline/budget.py). Run only with approval.
 # 1. lets the ingest service account call Vertex AI (alarm coding and the API both run as it)
 # 2. redeploys mc-ingest with MC_AI=on (alarm-triggered coding)
 # 3. deploys the public API mc-api (anyone may read and request on-view coding; the ledger caps spend)

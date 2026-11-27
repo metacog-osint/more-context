@@ -17,7 +17,7 @@ One file becomes one compact record:
   (`pipeline/relations.py`), for the relations layer.
 - `texts`, `vtexts` (since 18 Nov 2026): per country, the file's articles (all, and violent) counted by exact text
   key (`origins.text_key`, "" for links with no text), so the daily build can count independent origins beside the
-  article counts (Tom, 18 Nov 2026: z stays on articles). About 1.4 KiB gzip a file.
+  article counts (18 Nov 2026: z stays on articles). About 1.4 KiB gzip a file.
 Events dated more than two days before the file are references to the past ("a year ago...") and are skipped.
 
 Since 30 Oct 2026 the records ride in the run's cycle file as rows with `"kind": "events"` first (`as_row`), so a

@@ -1,4 +1,4 @@
-"""Calibrated z-scores (method proposal docs/method/2026-11-16-z-calibration.md; Tom's picks, 16 Nov 2026).
+"""Calibrated z-scores (method proposal docs/method/2026-11-16-z-calibration.md; picked 16 Nov 2026).
 
 Every z here is normal-equivalent: the standard-normal quantile of the estimator's predictive tail probability, so on
 event-free data z >= 2.5 should come up about 0.62% of the time. The live estimator before this (in-sample weekday

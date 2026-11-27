@@ -7,7 +7,7 @@ it only lists and sizes (one list call per 1,000 objects). The old plain copy st
 counted as storage, then goes.
 
     python -I scripts/recompress.py --bucket more-context-484804                     # dry run
-    python -I scripts/recompress.py --bucket more-context-484804 --run --limit 800   # rewrite (needs Tom's yes)
+    python -I scripts/recompress.py --bucket more-context-484804 --run --limit 800   # rewrite (needs approval)
 
 Rewrites are conditional on the object's generation: an object changed since the listing is skipped, never
 overwritten. Re-running skips objects already gzip. Run it again after a backfill upload (gcloud storage rsync

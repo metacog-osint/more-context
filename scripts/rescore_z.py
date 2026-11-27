@@ -1,6 +1,6 @@
 """Re-score stored days with the calibrated z (docs/method/2026-11-16-z-calibration.md, proposal step 3). Free.
 
-The z calibration (Tom's picks, 16 Nov 2026; live from the 16 Nov build) changed the estimators, not the counts. Days
+The z calibration (picked 16 Nov 2026; live from the 16 Nov build) changed the estimators, not the counts. Days
 built before it keep the old z (option A: in-sample weekday means, population SD, read as normal) until re-scored:
 - countries.json: each country's `urls_score` and `violent_score` become option C (`robust-1`, pipeline/zstats.robust_z,
   against that day's pooled weekday shape per metric), the Rising and Elevated lists are rebuilt from them, and each

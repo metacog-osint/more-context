@@ -89,7 +89,7 @@
    "title": "Ukraine Conflict (zone)",
    "scope": "Russia's war against Ukraine: fighting along the front, missile and drone strikes by both sides, Ukraine's defence and foreign military aid, and talks on a ceasefire or settlement.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -143,7 +143,7 @@
    "title": "Russia-NATO Border (zone)",
    "scope": "Military competition between Russia and NATO on the alliance's eastern flank (Nordic and Baltic states, Poland, Kaliningrad, the Arctic): deployments, exercises, airspace and drone incursions, sabotage, and nuclear posture.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -197,7 +197,7 @@
    "title": "Taiwan Strait (zone)",
    "scope": "Military and political pressure across the Taiwan Strait: People's Liberation Army activity around Taiwan, Taiwan's defence and US support, and relations between Beijing and Taipei.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -251,7 +251,7 @@
    "title": "South China Sea (zone)",
    "scope": "Territorial disputes and maritime confrontation in the South China Sea between China and the Philippines, Vietnam, Malaysia and others: coast guard and militia incidents, island building, and US and allied presence.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -305,7 +305,7 @@
    "title": "Korea Peninsula (zone)",
    "scope": "Security on the Korean Peninsula: North Korea's missile and nuclear programmes, tension along the DMZ, North Korea's ties with China and Russia, and the US-South Korea alliance.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -359,7 +359,7 @@
    "title": "Israel, Gaza & Lebanon (zone)",
    "scope": "Israel's wars with Hamas in Gaza and Hezbollah in Lebanon: fighting and strikes, ceasefire terms, hostages and prisoners, the humanitarian crisis, the West Bank, and Israeli politics where it shapes the war.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -413,7 +413,7 @@
    "title": "Iran & Red Sea (zone)",
    "scope": "Confrontation between Iran and Israel, the United States and Gulf states: strikes and threats, the nuclear programme and talks, Iran-aligned armed groups, and Houthi attacks on Red Sea and Gulf shipping.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -467,7 +467,7 @@
    "title": "India-Pakistan (zone)",
    "scope": "Military and political confrontation between India and Pakistan: the Line of Control and Kashmir, militant attacks and cross-border strikes, nuclear signalling, and crisis diplomacy.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -521,7 +521,7 @@
    "title": "Sudan (zone)",
    "scope": "Sudan's civil war between the Sudanese Armed Forces and the Rapid Support Forces: fighting in Darfur, Kordofan and around Khartoum, drone strikes, atrocities, famine and displacement, and peace efforts.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -575,7 +575,7 @@
    "title": "Ethiopia & Eritrea (zone)",
    "scope": "Ethiopia's renewed civil war and its neighbours: fighting in Tigray, Amhara and Afar between federal forces and the TPLF-Fano alliance, Eritrea's role and the Ethiopia-Eritrea confrontation, violence in Oromia, and talks or mediation.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -629,7 +629,7 @@
    "title": "Somalia (zone)",
    "scope": "Somalia and Djibouti: al-Shabaab's insurgency and counter-terrorism operations including US strikes, the African Union mission, disputes between Mogadishu and the federal states, elections, Somaliland, and piracy in the Gulf of Aden.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -683,7 +683,7 @@
    "title": "Sahel & West Africa (zone)",
    "scope": "Jihadist insurgency and military rule in Mali, Burkina Faso and Niger, and its spread toward coastal West Africa: attacks, army and Russian Africa Corps operations, junta politics, and neighbours' interventions.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -737,7 +737,7 @@
    "title": "DRC-Rwanda (M23) (zone)",
    "scope": "Conflict in eastern Democratic Republic of the Congo: the Rwanda-backed M23 and other armed groups, fighting in North and South Kivu, Rwanda-DRC tension, and peace talks.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -791,7 +791,7 @@
    "title": "Myanmar (zone)",
    "scope": "Myanmar's civil war between the military government and resistance forces and ethnic armed groups: fighting and airstrikes, junta politics, the Rohingya crisis, and the role of China and neighbours.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -845,7 +845,7 @@
    "title": "Venezuela (zone)",
    "scope": "Venezuela's political and security crisis: the struggle between government and opposition, US pressure (military, legal and sanctions), oil, migration, and tension with neighbours.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -899,7 +899,7 @@
    "title": "Cuba (zone)",
    "scope": "Pressure on Cuba's government: the US embargo and sanctions, economic collapse and blackouts, protest and repression, migration, and Cuba's ties with Russia and China.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -953,7 +953,7 @@
    "title": "Critical Minerals & Rare Earths (topic)",
    "scope": "Supply security for critical minerals and rare earths: export controls, stockpiling and industrial policy, and state-backed deals for lithium, cobalt, gallium, germanium, antimony, tungsten and similar materials.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -1000,7 +1000,7 @@
    "title": "Chips & Export Controls (topic)",
    "scope": "The strategic contest over semiconductors: export controls on chips and chipmaking tools, national fab and subsidy programmes, and supply-chain risk involving Taiwan, China, the United States, Europe, Japan and Korea.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -1047,7 +1047,7 @@
    "title": "Undersea Cables & Infrastructure (topic)",
    "scope": "Security of undersea cables, pipelines and other seabed infrastructure: damage and suspected sabotage, suspicious vessels, protection and monitoring, and the resulting investigations and trials.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -1094,7 +1094,7 @@
    "title": "GPS Jamming & Counterspace (topic)",
    "scope": "Interference with satellite navigation and space systems: GPS/GNSS jamming and spoofing affecting aviation and shipping, and counterspace weapons such as anti-satellite tests and satellite jamming.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [
@@ -1141,7 +1141,7 @@
    "title": "Sanctions & Shadow Fleet (topic)",
    "scope": "Sanctions as a tool of statecraft and their evasion: new measures and enforcement, the shadow fleet of tankers moving sanctioned oil, price caps, and evasion schemes.",
    "frozen": "2026-10-30",
-   "charter": "pending: Tom writes the charter in catalog/indicators/; its indicators join this list when final",
+   "charter": "pending: the analyst writes the charter in catalog/indicators/; its indicators join this list when final",
    "watch_condition": {
     "current": "not set until the charter is final",
     "levels": [

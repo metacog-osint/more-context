@@ -1,7 +1,7 @@
 # Relations and tone: a probe on the Korean Peninsula (15 Nov 2026)
 
-A design for Tom to approve, from a read-only prototype. Nothing here is deployed; no bucket, Firestore or Vertex
-use. Tom's ask (15 Nov 2026): casualty counts are a small part of what matters; track relations between nations,
+A design for approval, from a read-only prototype. Nothing here is deployed; no bucket, Firestore or Vertex
+use. The aim (15 Nov 2026): casualty counts are a small part of what matters; track relations between nations,
 between people and their governments, how one country's people and press see another, and changes in tone, for
 every zone, measured first on North Korea.
 
@@ -24,7 +24,7 @@ every zone, measured first on North Korea.
 
 - `scripts/relations_probe.py` (standard library; run with `python -I`; data under the git-ignored `data/`):
   - `fetch`: every GDELT Events 2.0 file, English and translation streams, 12 Jul to 14 Nov 2026 (126 days,
-    192 files a day, about 20 MB a day; 11 to 24 s a day on Tom's connection). Per day it keeps per-pair tables for
+    192 files a day, about 20 MB a day; 11 to 24 s a day on a home connection). Per day it keeps per-pair tables for
     every country pair (70 to 118 KB gzip a day) and the raw rows that touch North Korea (about 25 KB gzip a day).
   - `series`: daily and 7-day values for North Korea with South Korea, the US, Japan, China and Russia, each
     direction, with z-scores against each series' own previous 28 days (`pipeline.measures.attention_anomaly`, log
@@ -158,7 +158,7 @@ press rising without statements (press-driven). It would not score statement tex
 
 ## Proposed design (for approval)
 
-**Built 15 Nov 2026 on Tom's yes, pair layer only** (branch `relations-tone`; not merged or deployed):
+**Built 15 Nov 2026, pair layer only** (branch `relations-tone`; not merged or deployed):
 `pipeline/relations.py`, `catalog/relations.json`, `GET /relations`, the zone page's "Relations between countries"
 panel and `scripts/backfill_relations.py`, as described below with two changes: the state-and-people `within` table
 and the GKG `press` rows are not built, and the API computes z and flags from the series on read instead of storing
@@ -192,7 +192,7 @@ them. `CLAUDE.md` has the summary.
   material conflict articles, 7-day conflict share, Goldstein and tone, their z-scores, and the press table.
 - `GET /relations?pair=PRK-KOR&days=120`: one pair in full.
 - The zone page gets a "Relations" panel (small multiples like the chart above), display only, as zone violence
-  started. No new alarm and no `/feed` items until Tom sets thresholds after a month of reading it.
+  started. No new alarm and no `/feed` items until thresholds are set after a month of reading it.
 
 **Measures to show, and the rule for flagging a day (proposed):**
 - Flag a pair-day at z >= 2.5 with at least 5 articles on the flagged count (daily articles both ways, or either
@@ -247,5 +247,5 @@ them. `CLAUDE.md` has the summary.
     python -I scripts/relations_probe.py gkg-sample --start 2026-11-01 --end 2026-11-14 --root data/relations
 
 `fetch` and `gkg-sample` need GDELT's domain table at `data/relations/ref/domains_by_country_2018.txt` (download it
-once from the address in the script's `DOMAINS_URL`). About 25 minutes for `fetch` and 10 for `gkg-sample` on Tom's
+once from the address in the script's `DOMAINS_URL`). About 25 minutes for `fetch` and 10 for `gkg-sample` on a home
 connection; `fetch` holds a day's parsed rows in memory (about 0.5 GB).

@@ -1,6 +1,6 @@
 # Watchfloor z calibration: measured proposal (16 Nov 2026)
 
-For Tom's decision. Nothing here is live: no scoring change, no bucket write, no commit, no deploy. Measured
+Written for a decision. Nothing here is live: no scoring change, no bucket write, no commit, no deploy. Measured
 16 Nov 2026, about 9:00-10:45 AM CST, from read-only copies of the stored days. Answers the 15 Nov 2026 suite review,
 Watchfloor section (`the private planning notes:1441-1457`).
 
@@ -11,9 +11,9 @@ library only, run with `python -I`. Data copies on C: (`%TEMP%\zcal`): `countrie
 from `more-context\data\rescore`, 15 Nov and `relations/series.json` read from the bucket), `violent.jsonl` and
 `summary.json` read in place from `data\rescore` (no recursive scan).
 
-## Decision (Tom, 16 Nov 2026, about 10:05 AM CST)
+## Decision (16 Nov 2026, about 10:05 AM CST)
 
-Tom picked the recommended option on all four: C for countries and B for zones, zone violence and pair counts; the
+The recommended option was picked on all four: C for countries and B for zones, zone violence and pair counts; the
 ratio floor max(expected, 90-day median, 3); zone-country items neutral now, (b) after the charters; T2 for press tone
 and the pairs' 7-day values. Built the same day on branch `method/z-calibration` (section "What was built", at the end).
 
@@ -135,7 +135,7 @@ today's alarm volume would need a lower alarm threshold under B (not measured).
    pair-count flags).
 2. `countries.score` uses C for the Rising list, the feed and COP.
 3. Rescore the stored `countries.json` and `summary.json` scores with the new estimators (like `rescore_terms.py`:
-   `--check` first, a dry run on a copy, Tom's yes before `--write`), so the history and the website agree.
+   `--check` first, a dry run on a copy, approval before `--write`), so the history and the website agree.
 4. Rename "z" in titles to "z (calibrated)" for the first month, so COP and readers know the scale changed on that date.
 
 ## 2. "N× normal" on small counts
@@ -281,11 +281,11 @@ display only (HANDOFF.md, next step 1).
 
 ## What happens next
 
-Each step waits for Tom's yes:
+Each step waits for approval:
 1. Pick the options (or others) for 1-4.
 2. Build them on a branch with tests (`tests/test_measures.py`, `tests/test_feed_v2.py`, a calibration test that runs
    the event-free simulation on a fixed seed and asserts the z >= 2.5 rate stays under 1%).
-3. Rescore stored days with `--check`, then a dry run on a copy; Tom's yes for `--write` to the bucket.
+3. Rescore stored days with `--check`, then a dry run on a copy; approval for `--write` to the bucket.
 4. Commit, push, deploy both functions, each on its own yes. COP needs no change; its next snapshot reads the new z.
 
 Not covered here: the Elevated list (90-day ratio, no z), the zone-violence `named_score` beyond its shared estimator,
@@ -319,9 +319,9 @@ days built before the deploy keep the old z, and titles and badges for them keep
 
 ## After (17 Nov 2026)
 
-- Stored days 29 Jul-15 Nov re-scored and written to the bucket by `scripts/rescore_z.py` (04:12-04:18 UTC, Tom's
-  yes): 145 files; `--check` with the old estimator and `--verify-new` on the 16 Nov build both passed first. Rising
+- Stored days 29 Jul-15 Nov re-scored and written to the bucket by `scripts/rescore_z.py` (04:12-04:18 UTC,
+  approved): 145 files; `--check` with the old estimator and `--verify-new` on the 16 Nov build both passed first. Rising
   attention 290 kept / 366 dropped / 69 added, violence 160 / 270 / 30, zone alarms 18 / 31 / 0.
 - With every day on the calibrated scale, "calibrated" was dropped from `/feed` titles (`watchfloor-feed-1.2`) and
-  website tooltips at Tom's request, ahead of the planned month; scores keep `z_method`.
+  website tooltips on request, ahead of the planned month; scores keep `z_method`.
 

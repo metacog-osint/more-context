@@ -1,11 +1,11 @@
 """Write doctrine/interests.json: what Watchfloor reads from the suite's other programs instead of collecting it again
-(doctrine kit 0.4.1 tips; Tom, 1 Nov 2026). Run after changing a zone's countries, boxes or an interest below.
+(doctrine kit 0.4.1 tips; 1 Nov 2026). Run after changing a zone's countries, boxes or an interest below.
 
     python -I scripts/build_interests.py            # write
     python -I scripts/build_interests.py --check    # exit 1 if the file is out of date (tests run this)
 
 Areas are the zones' countries from catalog/entities.json (a zone's violence countries where its `violence` block
-sets `suite_area`: Iran & Red Sea, Tom 18 Nov 2026), in ISO alpha-2 (the feed contract's codes) through
+sets `suite_area`: Iran & Red Sea, 18 Nov 2026), in ISO alpha-2 (the feed contract's codes) through
 catalog/fips_iso.json; each area is the zone's warning problem id (WF-WP-Z01 ...). Boxes add adjacent sea areas
 [west, south, east, north] for items placed by geometry (such as NGA navigational warnings). Topics have no countries:
 their interests are worldwide ("anywhere") and name the topic in `warning_problems`, which the zone page's

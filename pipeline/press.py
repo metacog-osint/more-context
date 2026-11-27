@@ -1,6 +1,6 @@
-"""Press tone by outlet country from GDELT GKG 2.1 (Tom approved the plan 15 Nov 2026; the build 16 Nov 2026).
+"""Press tone by outlet country from GDELT GKG 2.1 (plan approved 15 Nov 2026; the build 16 Nov 2026).
 
-Checks, Tom's outlet picks and the plan: `docs/relations/2026-11-15-press-outlets.md`.
+Checks, outlet picks and the plan: `docs/relations/2026-11-15-press-outlets.md`.
 
 Per GKG file (`FileTable`, fed by the cycle's existing GKG loop): for every article with a tone, the countries its
 V2 enhanced locations mention (field 10, counted by mention) and the outlet's country (GDELT's 2018 domain table,
@@ -14,8 +14,8 @@ the `press` section of `stories/YYYY/MM/DD/relations.json` and puts the zones' r
 On read (`zone_view`): per row (outlet country > subject country), daily main-subject articles, the 7-day mean tone
 and its z against the 21 days before the week, article-weighted (T2, pipeline/zstats.py, 16 Nov 2026; the earlier
 z compared overlapping 7-day windows and ran large: UK press on Ukraine read 10.2 on 15 Nov, 3.0 under T2). Each outlet country is read only against its own past: tone is a
-dictionary score that differs by language and outlet mix. Display only: no flags, alarms or feed items until Tom
-has read it for a month.
+dictionary score that differs by language and outlet mix. Display only: no flags, alarms or feed items until
+it has been read for a month.
 """
 from __future__ import annotations
 
@@ -252,7 +252,7 @@ def row_view(daily: dict[date, list], complete: set[date], dates: list[date], sh
     last = _week(daily, end, complete)
     if last and last[0] >= TONE_MIN_7D:
         tone_7d = round(last[1] / last[0], 2)
-        # T2 (zstats.weighted_window_z; Tom's pick, 16 Nov 2026): article-weighted week against the 21 days before
+        # T2 (zstats.weighted_window_z; picked 16 Nov 2026): article-weighted week against the 21 days before
         # it, daily-tone SD with autocorrelation inflation, Student t. A weekly or thin row shows its z only on a
         # week of Z_MIN_WEEK_THIN articles or more (its daily tones are too few to judge a smaller week).
         pick = lambda d: (daily[d][2], daily[d][3]) if d in complete and d in daily else (0, 0.0)  # noqa: E731

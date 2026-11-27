@@ -1,6 +1,6 @@
 """Where the ingest state lives: the bucket object `state/state.json`, or a Firestore document (MC_STATE=firestore).
 
-Why Firestore (Tom, 29 Oct 2026): every bucket write is a Class A operation and 5,000 a month are free; a run every
+Why Firestore (29 Oct 2026): every bucket write is a Class A operation and 5,000 a month are free; a run every
 15 minutes writes its cycle file and the state, ~5,850 a month. Firestore's free tier allows 20,000 document writes
 a day in the project's `(default)` database (Native, nam5), so the state moves there and the bucket keeps one write
 a run. MORE CONTEXT's collections carry the `mc_` prefix; v4.3's share the database.

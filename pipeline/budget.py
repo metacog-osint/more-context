@@ -1,6 +1,6 @@
 """Monthly AI spend ledger: every Vertex call is reserved against it first and settled afterwards.
 
-Tom's limits (26 Oct 2026): a hard cap of $5 per calendar month (UTC), across everything MORE CONTEXT
+Limits (26 Oct 2026): a hard cap of $5 per calendar month (UTC), across everything MORE CONTEXT
 asks of Gemini. Anyone may trigger on-view coding while the cap allows; alarm-triggered coding stays on.
 
 - `view` work (a person opened a zone or story) may use the cap minus ALARM_RESERVE, and at most

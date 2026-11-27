@@ -161,7 +161,7 @@ class Build(unittest.TestCase):
         items = by_id(feed_v2.build(summary(), countries(), now=NOW))
         ks = items["country:KS:violence"]["properties"]
         self.assertEqual((ks["warning_problem_id"], ks["countries"]), ("WF-WP-Z03", ["KR"]))
-        # The country count is not filtered to the zone: no hypothesis, no direction (Tom, 16 Nov 2026).
+        # The country count is not filtered to the zone: no hypothesis, no direction (16 Nov 2026).
         for k in ("hypothesis_id", "direction", "indicator_id", "indicator_state"):
             self.assertNotIn(k, ks)
         self.assertNotIn("country:KS:violence:elevated", items)  # rising wins; one violence item per country

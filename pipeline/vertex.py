@@ -1,6 +1,6 @@
 """Vertex AI (Gemini) client for story coding, plus a dry-run cost estimate.
 
-Vertex AI is the only model provider for MORE CONTEXT. Every billable call needs Tom's approval, so
+Vertex AI is the only model provider for MORE CONTEXT. Every billable call needs approval, so
 `Coder.generate` refuses to run without an explicit spend cap and stops once the running cost (from
 Vertex's own usage counts) reaches it. `estimate_*` make no network calls.
 

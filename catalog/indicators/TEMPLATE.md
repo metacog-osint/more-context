@@ -1,6 +1,6 @@
 # Indicator charter: <Zone name> (<zone id, e.g. 01_Ukraine_Conflict>)
 
-Author: Tom Brummer · Version 0.1 · Date: <YYYY-MM-DD>
+Author: tic-analyst · Version 0.1 · Date: <YYYY-MM-DD>
 
 Write in plain language; Claude converts each charter into catalog data (ids, thresholds) and shows
 you the result before it is used. Leave a cell blank if unsure; blanks become questions, not guesses.

@@ -1,4 +1,4 @@
-"""Relations between countries from GDELT Events (Tom, 15 Nov 2026: "Yes, build it").
+"""Relations between countries from GDELT Events (15 Nov 2026).
 
 Design and the Korean Peninsula probe it rests on: `docs/relations/2026-11-15-relations-tone.md`.
 
@@ -22,7 +22,7 @@ share, mean Goldstein and tone; z of the daily counts against the series' own pr
 (`measures.attention_anomaly`, log and weekday-adjusted, as for zone attention); 7-day conflict share, Goldstein
 and tone, article-weighted, with z against the 21 days before the week (zstats.weighted_window_z, T2, 16 Nov 2026). A pair-day is flagged when a count's z >= FLAG_Z on at least
 FLAG_MIN articles (probe: 20 of 26 dated Korean events caught, 18 of 20 unlisted flags real news). Display only:
-no alarm, no feed item, until Tom sets thresholds after a month of reading.
+no alarm, no feed item, until thresholds are set after a month of reading.
 
 GDELT's limits (probe, 15 Nov 2026): direction and partner are often wrong, so a pair is read both ways together;
 small pairs (Japan-North Korea, a median of 1-2 articles a day each way) are too thin to read daily; GDELT carries
@@ -259,7 +259,7 @@ def anomaly_z(history: dict[date, float], day: date, count: float) -> float | No
 def _window_z(daily: dict[date, list], complete: set[date], day: date, idx: int,
               floor: float) -> tuple[float, float] | None:
     """(z, baseline mean) of the 7-day value ending `day` (vector index `idx` over articles, VEC[0]) against the 21
-    days before the week, article-weighted, T2 (zstats.weighted_window_z; Tom's pick, 16 Nov 2026). The old z
+    days before the week, article-weighted, T2 (zstats.weighted_window_z; picked 16 Nov 2026). The old z
     compared overlapping 7-day windows and ran large (|z| >= 2.5 on 12.6% of pair-days)."""
     week = [day - timedelta(days=k) for k in range(WINDOW)]
     if not all(d in complete for d in week):

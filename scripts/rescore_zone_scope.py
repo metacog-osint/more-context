@@ -8,7 +8,7 @@ from the bucket for it), keeps each placed violent event's id, country, ADM1 and
 with --zones, oldest first, then re-scores each one's `named_score` (option B, `pred-1`) against the re-counted days
 before it; a zone with `violence.members` also gets its `members` (each scored the same way) and `spikes`. Nothing
 else in countries.json changes. First use: 11_Iran_Red_Sea gains the Gulf states that host US
-forces and Iraq (Tom's charter answer, 18 Nov 2026).
+forces and Iraq (charter answer, 18 Nov 2026).
 
     python -I scripts/rescore_zone_scope.py --start 2026-07-29 --end 2026-11-17 --root <dir> --cache <dir> --download --fetch
     python -I scripts/rescore_zone_scope.py ... --zones 11_Iran_Red_Sea --check-scope IR,YM

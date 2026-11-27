@@ -106,7 +106,7 @@ def build_day(sink, day: date) -> dict:
         stories = build_stories(arts)
         urls = {a["url"] for a in arts}
         # Attention and alarms count stories whose headline names the zone: on the 26 Oct labelled set that is
-        # 82% on topic against 42% for every v4.3 match (scripts/eval_location.py; Tom, 27 Oct 2026).
+        # 82% on topic against 42% for every v4.3 match (scripts/eval_location.py; 27 Oct 2026).
         kept = [s for s in stories if matcher.hit(eid, s.get("title") or "")]
         entities[eid] = {
             "articles": len(urls),
