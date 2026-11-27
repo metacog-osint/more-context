@@ -1,5 +1,6 @@
 // Watchfloor web app: a static page over the public API (pipeline/api.py). No build step, no dependencies.
 // Every string from the API is inserted as text (never as HTML): headlines are third-party content.
+import { baselineNote, ratioBase, ratioText, readableHeads, tooFew } from "./score.js";
 
 // On localhost the site reads scripts/dev_server.py's local API instead of the cloud one.
 const API = ["localhost", "127.0.0.1"].includes(location.hostname) ? `${location.origin}/api` : "https://mc-api-odg3xhcd4a-uc.a.run.app";
@@ -68,22 +69,17 @@ function fail(e) {
 
 // ---------- Zones (home) ----------
 // Since the z calibration (16 Nov 2026) a score carries z_method and ratio_shown: count / max(expected, 90-day
-// median, 3); `floored` means the floor of 3 bound, so the count is shown against "usually 3 or fewer". Every stored
-// day was re-scored on 17 Nov 2026, so tooltips say plain "z" (they said "calibrated z" from 16 to 17 Nov).
-function zLabel() { return "z"; }
-function ratioText(s, count) {
-  if (s.floored) return count !== undefined && count !== null ? `${count} (usually ≤3)` : "usually ≤3";
-  const r = s.ratio_shown ?? s.ratio;
-  return r === null || r === undefined ? "?" : `${r}×`;
-}
+// median, 3); `floored` means the floor of 3 bound, so the count is shown against "usually 3 or fewer". The ratio
+// and the z can therefore rest on different baselines: web/score.js names each in the tooltip, and a count under 5
+// on a baseline of 3 or fewer a day shows "too few to judge" in place of a ratio and a z.
 
-function attentionBadge(att, partial) {
+function attentionBadge(att, partial, count) {
   if (partial) return h("span", { class: "badge cool", title: "Ingest covered only part of this UTC day, so it is not compared with full days" }, "partial day");
   if (!att) return h("span", { class: "badge cool", title: "Needs 14 complete days of history" }, "baseline building");
+  if (tooFew(att, count)) return h("span", { class: "badge cool", title: baselineNote(att, count, "stories") }, "too few to judge");
   const cls = att.z >= 2 ? "hot" : att.z >= 1 ? "warm" : "cool";
-  const r = att.ratio_shown ?? att.ratio;
-  const ratio = r === null || r === undefined ? "" : `${r}× `;
-  return h("span", { class: `badge ${cls}`, title: `${zLabel(att)} ${att.z} against ${att.baseline_days} days, expected ${att.expected}` }, `${ratio}(z ${att.z})`);
+  const r = ratioText(att, count);
+  return h("span", { class: `badge ${cls}`, title: baselineNote(att, count, "stories") }, `${r === "?" ? "" : `${r} `}(z ${att.z})`);
 }
 
 function violenceCell(e, partial) {
@@ -91,13 +87,15 @@ function violenceCell(e, partial) {
   if (!v) return h("span", { class: "muted small" }, "—");
   const s = v.named_score;
   if (partial || !s || s.z === undefined || (s.ratio_shown ?? s.ratio) === null || (s.ratio_shown ?? s.ratio) === undefined) return h("span", { class: "muted small", title: "Articles reporting violence placed in the zone whose headline names it" }, `${v.named}`);
+  const what = `${v.named} articles reporting violence placed in the zone whose headline names it (of ${v.articles})`;
+  if (tooFew(s, v.named)) return h("span", { class: "badge cool", title: `${what}; ${baselineNote(s, v.named, "articles")}` }, `${v.named} · too few to judge`);
   const cls = s.z >= 2 ? "hot" : s.z >= 1 ? "warm" : "cool";
-  const total = h("span", { class: `badge ${cls}`, title: `${v.named} articles reporting violence placed in the zone whose headline names it (of ${v.articles}); ${zLabel(s)} ${s.z} against the last 28 days, expected ${s.expected}` }, `${v.named} · ${ratioText(s)}`);
+  const total = h("span", { class: `badge ${cls}`, title: `${what}; ${baselineNote(s, v.named, "articles")}` }, `${v.named} · ${ratioText(s)}`);
   const spikes = (v.spikes || []).map((k) => {
     const m = (v.members || {})[k];
     const ms = m && m.named_score;
     if (!ms || ms.z === undefined) return null;
-    return h("span", { class: "badge hot", title: `Spike inside the zone: ${m.named} articles reporting violence placed in ${m.name || k} whose headline names the zone; ${zLabel(ms)} ${ms.z} against its own last 28 days, expected ${ms.expected}` }, `${m.name || k} ${m.named} · ${ratioText(ms)}`);
+    return h("span", { class: "badge hot", title: `Spike inside the zone: ${m.named} articles reporting violence placed in ${m.name || k} whose headline names the zone; ${baselineNote(ms, m.named, "articles")}` }, `${m.name || k} ${m.named} · ${ratioText(ms)}`);
   }).filter(Boolean);
   return spikes.length ? h("span", {}, total, " ", ...spikes) : total;
 }
@@ -111,7 +109,7 @@ function zoneRows(list, sum, day) {
       h("td", null, h("a", { class: "zone-link", href: `#/zone/${ent.id}?day=${day}` }, ent.name)),
       h("td", { class: "num" }, e ? stories.toLocaleString() : "—"),
       h("td", { class: "num hide-sm" }, e ? e.stories.toLocaleString() : "—"),
-      h("td", null, e ? attentionBadge(e.attention, sum.partial) : "—"),
+      h("td", null, e ? attentionBadge(e.attention, sum.partial, stories) : "—"),
       h("td", { class: "hide-sm" }, violenceCell(e, sum.partial)),
       h("td", null, alarms ? h("span", { class: "badge hot", title: `Alarm: ${e.alarms.join("; ")}` }, "alarm") : ""));
   });
@@ -189,6 +187,9 @@ const MEASURES = {
   urls: { label: "Attention", noun: "articles reporting events located there", short: "attention" },
 };
 const MEASURE_ORDER = ["violent", "urls"];
+// The examples are two of the country's articles for the day (lead-paragraph events first), one set for every row
+// of the country: not chosen for violence or checked for the place, so they are not evidence for the row.
+const EXAMPLES_NOTE = "Examples are two of the day's articles GDELT placed in the country, the same for its attention and violence rows: they are not chosen for violence or checked, so they do not show why a row is listed.";
 
 function zoneLinks(c, ents, day) {
   const ids = c.zones || [];
@@ -205,7 +206,7 @@ function scoreBadge(s, kind, count) {
     return h("span", { class: "badge warm", title: `${s.ratio90}× the median of the last 90 days (${s.median90})` }, `${s.ratio90}× 90-day`);
   }
   const cls = s.z >= 3 ? "hot" : s.z >= 2 ? "warm" : "cool";
-  return h("span", { class: `badge ${cls}`, title: `${zLabel(s)} ${s.z} against the last 28 days (expected ${s.expected})` }, `${ratioText(s, count)} (z ${s.z})`);
+  return h("span", { class: `badge ${cls}`, title: baselineNote(s, count, "articles") }, `${ratioText(s, count)} (z ${s.z})`);
 }
 
 // Independent origins (Tom, 18 Nov 2026): distinct texts behind the articles, wire copies counted once. Shown only;
@@ -223,17 +224,14 @@ function countryRows(ccs, data, metric, kind, ents) {
   return ccs.map((cc) => {
     const c = data.countries[cc] || {};
     const s = c[`${metric}_score`] || {};
-    const heads = (data.samples[cc] || []).slice(0, 2);
+    const heads = readableHeads(data.samples[cc]);
     return h("tr", null,
       h("td", null, h("strong", null, c.name || cc), h("div", { class: "meta" }, zoneLinks(c, ents, data.day))),
       h("td", { class: "num" }, (c[metric] ?? 0).toLocaleString(), originsNote((c.origins || {})[metric], c[metric])),
-      h("td", null, scoreBadge(s, kind), kind === "rising" && s.ratio90 ? h("div", { class: "meta" }, `${s.ratio90}× 90-day median`) : null),
+      h("td", null, scoreBadge(s, kind, c[metric]), kind === "rising" && s.ratio90 && ratioBase(s) !== "median" ? h("div", { class: "meta" }, `${s.ratio90}× 90-day median`) : null),
       h("td", { class: "hide-sm" }, heads.length
-        ? h("ul", { class: "heads" }, heads.map((x) => {
-          const u = safeUrl(x.url);
-          return h("li", null, u ? h("a", { href: u, target: "_blank", rel: "noopener noreferrer nofollow" }, x.title || new URL(u).hostname) : x.title);
-        }))
-        : h("span", { class: "muted small" }, "—")));
+        ? h("ul", { class: "heads" }, heads.map((x) => h("li", null, h("a", { href: x.url, target: "_blank", rel: "noopener noreferrer nofollow" }, x.title))))
+        : h("span", { class: "muted small", title: "No headline could be read from this country's example links" }, "—")));
   });
 }
 
@@ -244,7 +242,8 @@ function countryTable(title, sub, ccs, data, metric, kind, ents) {
     ccs.length
       ? h("div", { class: "panel" }, h("table", { "data-tic-fold": true },
         h("thead", null, h("tr", null, h("th", null, "Country"), h("th", { class: "num" }, "Articles"),
-          h("th", null, kind === "rising" ? "Vs normal" : "Vs 90 days"), h("th", { class: "hide-sm" }, "Sample headlines"))),
+          h("th", null, kind === "rising" ? "Vs normal" : "Vs 90 days"),
+          h("th", { class: "hide-sm", title: EXAMPLES_NOTE }, "Examples, any topic"))),
         h("tbody", null, countryRows(ccs, data, metric, kind, ents))))
       : h("p", { class: "muted" }, "None today."),
   ];
@@ -269,7 +268,7 @@ async function viewRising(params) {
     h("p", { class: "lede" }, "Every country, not just the watched zones, compared with its own normal, so a new crisis shows up before anyone adds a zone. Counts are articles in GDELT's event data whose events are located in the country."),
     h("div", { class: "bar" }, h("label", null, "UTC day ", picker), h("a", { href: `#/map?day=${data.day}` }, "See it on the map")),
     sections,
-    h("p", { class: "muted small" }, "Headlines are read from article links and may be shortened. GDELT's automated event coding is noisy: treat a row as a pointer to check, not a finding."),
+    h("p", { class: "muted small" }, `${EXAMPLES_NOTE} Headlines are read from article links and may be shortened; links with no readable headline are left out. GDELT's automated event coding is noisy: treat a row as a pointer to check, not a finding.`),
   );
 }
 
@@ -364,8 +363,9 @@ async function viewMap(params) {
     if (!z.map) continue;
     const e = sum && sum.entities[z.id];
     const att = e && !sum.partial ? e.attention : null;
-    const m = L.circleMarker(z.map, { radius: 9, className: `zone-dot ${zBucket(att ? att.z : null)}`, weight: 2 }).addTo(map);
-    m.bindTooltip(h("span", null, `${z.name}${att ? `: z ${att.z}` : ""}`));
+    const few = att && tooFew(att, e.filtered_stories ?? e.stories);
+    const m = L.circleMarker(z.map, { radius: 9, className: `zone-dot ${zBucket(att && !few ? att.z : null)}`, weight: 2 }).addTo(map);
+    m.bindTooltip(h("span", null, `${z.name}${few ? ": too few to judge" : att ? `: z ${att.z}` : ""}`));
     m.on("click", () => { location.hash = `#/zone/${z.id}?day=${day}`; });
   }
   layer.bringToBack();
